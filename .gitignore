@@ -1,0 +1,13 @@
+*.pyc
+*.bak
+*.ui
+*_old.py
+/Archives
+/Examples
+/Tests
+/images
+/doc
+/.metadata
+/.project
+/.pydevproject
+/.settings

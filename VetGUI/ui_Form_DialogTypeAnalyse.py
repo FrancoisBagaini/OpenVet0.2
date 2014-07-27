@@ -1,0 +1,90 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file './Form_DialogTypeAnalyse.ui'
+#
+# Created: Sun Jun 15 16:00:46 2014
+#      by: PyQt4 UI code generator 4.7.2
+#
+# WARNING! All changes made in this file will be lost!
+
+from PyQt4 import QtCore, QtGui
+
+class Ui_DialogTypeAnalyse(object):
+    def setupUi(self, DialogTypeAnalyse):
+        DialogTypeAnalyse.setObjectName("DialogTypeAnalyse")
+        DialogTypeAnalyse.resize(424, 232)
+        self.widget = QtGui.QWidget(DialogTypeAnalyse)
+        self.widget.setGeometry(QtCore.QRect(10, 10, 401, 211))
+        self.widget.setObjectName("widget")
+        self.verticalLayout_main = QtGui.QVBoxLayout(self.widget)
+        self.verticalLayout_main.setObjectName("verticalLayout_main")
+        self.verticalLayout = QtGui.QVBoxLayout()
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.horizontalLayout = QtGui.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.label = QtGui.QLabel(self.widget)
+        self.label.setObjectName("label")
+        self.horizontalLayout.addWidget(self.label)
+        self.lineEdit_Libele = QtGui.QLineEdit(self.widget)
+        self.lineEdit_Libele.setMinimumSize(QtCore.QSize(0, 27))
+        self.lineEdit_Libele.setMaxLength(60)
+        self.lineEdit_Libele.setObjectName("lineEdit_Libele")
+        self.horizontalLayout.addWidget(self.lineEdit_Libele)
+        self.verticalLayout.addLayout(self.horizontalLayout)
+        self.horizontalLayout_2 = QtGui.QHBoxLayout()
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.checkBox_isImage = QtGui.QCheckBox(self.widget)
+        self.checkBox_isImage.setMinimumSize(QtCore.QSize(0, 27))
+        self.checkBox_isImage.setObjectName("checkBox_isImage")
+        self.horizontalLayout_2.addWidget(self.checkBox_isImage)
+        spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_2.addItem(spacerItem)
+        self.verticalLayout.addLayout(self.horizontalLayout_2)
+        self.horizontalLayout_3 = QtGui.QHBoxLayout()
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.label_2 = QtGui.QLabel(self.widget)
+        self.label_2.setObjectName("label_2")
+        self.horizontalLayout_3.addWidget(self.label_2)
+        spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_3.addItem(spacerItem1)
+        self.verticalLayout.addLayout(self.horizontalLayout_3)
+        self.verticalLayout_main.addLayout(self.verticalLayout)
+        self.plainTextEdit_Remarque = QtGui.QPlainTextEdit(self.widget)
+        self.plainTextEdit_Remarque.setMaximumSize(QtCore.QSize(16777215, 59))
+        self.plainTextEdit_Remarque.setObjectName("plainTextEdit_Remarque")
+        self.verticalLayout_main.addWidget(self.plainTextEdit_Remarque)
+        self.horizontalLayout_5 = QtGui.QHBoxLayout()
+        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+        self.pushButton_Cancel = QtGui.QPushButton(self.widget)
+        self.pushButton_Cancel.setMinimumSize(QtCore.QSize(0, 27))
+        self.pushButton_Cancel.setObjectName("pushButton_Cancel")
+        self.horizontalLayout_5.addWidget(self.pushButton_Cancel)
+        self.pushButton_Add = QtGui.QPushButton(self.widget)
+        self.pushButton_Add.setMinimumSize(QtCore.QSize(0, 27))
+        self.pushButton_Add.setObjectName("pushButton_Add")
+        self.horizontalLayout_5.addWidget(self.pushButton_Add)
+        self.pushButton_Delete = QtGui.QPushButton(self.widget)
+        self.pushButton_Delete.setMinimumSize(QtCore.QSize(0, 27))
+        self.pushButton_Delete.setObjectName("pushButton_Delete")
+        self.horizontalLayout_5.addWidget(self.pushButton_Delete)
+        self.pushButton_Valid = QtGui.QPushButton(self.widget)
+        self.pushButton_Valid.setMinimumSize(QtCore.QSize(0, 27))
+        self.pushButton_Valid.setObjectName("pushButton_Valid")
+        self.horizontalLayout_5.addWidget(self.pushButton_Valid)
+        self.verticalLayout_main.addLayout(self.horizontalLayout_5)
+        self.label.setBuddy(self.lineEdit_Libele)
+        self.label_2.setBuddy(self.plainTextEdit_Remarque)
+
+        self.retranslateUi(DialogTypeAnalyse)
+        QtCore.QMetaObject.connectSlotsByName(DialogTypeAnalyse)
+
+    def retranslateUi(self, DialogTypeAnalyse):
+        DialogTypeAnalyse.setWindowTitle(QtGui.QApplication.translate("DialogTypeAnalyse", "Dialog", None, QtGui.QApplication.UnicodeUTF8))
+        self.label.setText(QtGui.QApplication.translate("DialogTypeAnalyse", "Type d\'analyse :", None, QtGui.QApplication.UnicodeUTF8))
+        self.checkBox_isImage.setText(QtGui.QApplication.translate("DialogTypeAnalyse", "Imagerie", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_2.setText(QtGui.QApplication.translate("DialogTypeAnalyse", "Remarque :", None, QtGui.QApplication.UnicodeUTF8))
+        self.pushButton_Cancel.setText(QtGui.QApplication.translate("DialogTypeAnalyse", "Annuler", None, QtGui.QApplication.UnicodeUTF8))
+        self.pushButton_Add.setText(QtGui.QApplication.translate("DialogTypeAnalyse", "Nouveau", None, QtGui.QApplication.UnicodeUTF8))
+        self.pushButton_Delete.setText(QtGui.QApplication.translate("DialogTypeAnalyse", "Supprimer", None, QtGui.QApplication.UnicodeUTF8))
+        self.pushButton_Valid.setText(QtGui.QApplication.translate("DialogTypeAnalyse", "Valider", None, QtGui.QApplication.UnicodeUTF8))
+
