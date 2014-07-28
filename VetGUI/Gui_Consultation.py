@@ -11,7 +11,6 @@ from Gui_ModeleAnalyse import FormModeleAnalyse
 from Gui_Parametre import FormParametreAnalyse
 from Gui_TypeAnalyse import FormTypeAnalyse
 
-#import Gui_Core
 import time
 import Tables
 import config

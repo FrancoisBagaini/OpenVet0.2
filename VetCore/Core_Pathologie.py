@@ -34,8 +34,8 @@ class Pathologie:
 #     def GetDomaines(self):
 #         return self.DBase.GetDbidText("CALL GetDomaines()",'Tous')
     
-    def GetPathologies(self,idPathologieDomaine,defaut=None):
-        return self.DBase.GetDbidText("CALL SelectPathologies(%i,%i)"%(self.idEspece,idPathologieDomaine),defaut)
+#     def GetPathologies(self,idPathologieDomaine,defaut=None):
+#         return self.DBase.GetDbidText("CALL SelectPathologies(%i,%i)"%(self.idEspece,idPathologieDomaine),defaut)
 
     def GetDefinitionPathologie(self,idPathologie):
         res=self.DBase.GetDbText("SELECT DescriptifPublic FROM Pathologie WHERE idPathologie=%i"%idPathologie)
