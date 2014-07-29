@@ -1,7 +1,10 @@
 *.pyc
 *.bak
-*.ui
+*_old1.ui
+*_old2.ui
 *_old.py
+*_old1.py
+*_old2.py
 /Archives
 /Examples
 /Tests

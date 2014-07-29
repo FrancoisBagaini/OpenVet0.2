@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './Form_DialogUnite.ui'
 #
-# Created: Sat Jun 14 10:15:46 2014
+# Created: Mon Jul 28 10:20:58 2014
 #      by: PyQt4 UI code generator 4.7.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -60,7 +60,7 @@ class Ui_DialogUnite(object):
         QtCore.QMetaObject.connectSlotsByName(DialogUnite)
 
     def retranslateUi(self, DialogUnite):
-        DialogUnite.setWindowTitle(QtGui.QApplication.translate("DialogUnite", "Dialog", None, QtGui.QApplication.UnicodeUTF8))
+        DialogUnite.setWindowTitle(QtGui.QApplication.translate("DialogUnite", "Formulaire Unité", None, QtGui.QApplication.UnicodeUTF8))
         self.label.setText(QtGui.QApplication.translate("DialogUnite", "Unité :", None, QtGui.QApplication.UnicodeUTF8))
         self.checkBox_isConcentration.setText(QtGui.QApplication.translate("DialogUnite", "Concentration", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton_Cancel.setText(QtGui.QApplication.translate("DialogUnite", "Annuler", None, QtGui.QApplication.UnicodeUTF8))
