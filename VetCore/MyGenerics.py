@@ -9,18 +9,25 @@ import config
 from DBase import Request
 
 class MyComboModel(QAbstractListModel):
-    def __init__(self, routine=None,firstField=None):
-        QAbstractListModel.__init__(self, parent=None) 
+    def __init__(self, parentwidget,routine=None,firstField=None):
+        QAbstractListModel.__init__(self, parent=None)
+        self.MyRequest=Request()
+        self.error=None
         if routine is None:
             self.Routine=QString('')
         else:
             self.Routine=routine
-            self.listdata = Request().GetComboList('CALL %s'%self.Routine,firstField ) 
+            self.listdata = self.MyRequest.GetComboList('CALL %s'%self.Routine,firstField )
+            if self.MyRequest.lastError().isValid():
+                self.error=self.MyRequest.lastError().text()
+                MyError(parentwidget,self.error)
               
     def Set(self,routine=None,firstField=None):
         if not routine is None:
             self.Routine=routine
-        self.listdata = Request().GetComboList('CALL %s'%self.Routine,firstField )   
+        self.listdata = self.MyRequest.GetComboList('CALL %s'%self.Routine,firstField )
+        if self.MyRequest.lastError().isValid():
+            self.error=self.MyRequest.lastError().text()
                 
     def rowCount(self,parent=QModelIndex()): 
         return len(self.listdata)
@@ -411,3 +418,8 @@ class PlainTextColumnDelegate(QItemDelegate):
     def setModelData(self, editor, model, index):
         model.setData(index, QVariant(editor.text()))
 
+class MyError():
+    def __init__(self,parent,error):
+        display=QErrorMessage(parent)
+        display.showMessage(error)
+        

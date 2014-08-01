@@ -12,6 +12,8 @@ from Core_Critere import CritereConsultation
 from DBase import Request
 from MyGenerics import *
 
+
+
 class Consultation:
 	def __init__(self,DBase,idAnimal):
 		self.Table='Consultation'
@@ -136,12 +138,6 @@ class Consultation:
 		text=text+"&emsp;&emsp;&emsp;&emsp;<font color=\"red\">%s</font>"%self.ConsultationPathologiesString()
 		text=text+"<br>%s<br><span style=\"text-decoration:underline;\">Traitements</span> : %s<br>"%(self.Examen,self.Traitement)
 		return text
-
-# 	def GetConsultants(self):
-# 		return self.DBase.GetDbidText("""SELECT idPersonne,CONCAT(Nom," ",Prenom) FROM Personne WHERE IsConsultant""")
-# 	
-# 	def GetReferants(self):
-# 		return self.DBase.GetDbidText("""SELECT idPersonne,CONCAT(Nom," ",Prenom) FROM Personne WHERE IsReferant""")
 	
 	def IsValidVeterinaire(self,id):
 		res=[]
@@ -282,6 +278,8 @@ class Consultation:
 			print msg
 			return msg				
 
+	def GetComboList(self,parent,request,defaut=None):
+		return MyComboModel(parent,request,defaut)
 	
 class Consultations:
 	def __init__(self,DBase,idAnimal):
@@ -302,12 +300,6 @@ class Consultations:
 		self.textHTML=self.textHTML+"<a HREF=\"#N-1\"><img title=\"Nouvelle Consultation\" style=\"width: 32px; height: 32px;\" alt=\"Nouvelle Consultation\" src=\"file://%s\"></a>"%(icone)
 		return self.textHTML
 
-class TypeConsultation(MyComboModel):
-	def __init__(self,routine='GetTypesConsultation()'):
-		MyComboModel.__init__(self,routine)
-		#self.Print()
-MyComboModel('GetTypesConsultation()')
-		
 
 if __name__ == '__main__':
 	import Tables
