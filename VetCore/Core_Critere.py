@@ -3,6 +3,8 @@ import time
 #import Core
 from PyQt4 import QtCore
 
+
+
 class Critere:                  #TODO: dériver d'une classe DataBase ou class abstraite? 
     def __init__(self,DBase):      
         self.Table='Critere'
@@ -126,10 +128,6 @@ class Critere:                  #TODO: dériver d'une classe DataBase ou class a
             print msg
             return msg
                 
-#     def SaveGrades(self):
-#         for i in self.CritereGrades:
-#             i.Critere_idCritere=self.idCritere
-#             i.Save()
 
 class CritereGrade:
     def __init__(self, parent=None):

@@ -7,11 +7,11 @@ class MyComboBox(QComboBox):
 	def __init__(self,parent=None):
 		super(MyComboBox,self).__init__(parent)
 #	def focusInEvent(self, event):
-#	        self.emit(QtCore.SIGNAL("focusIn"))
-#	        QtGui.QWidget.focusInEvent(self, event)
+#			self.emit(QtCore.SIGNAL("focusIn"))
+#			QtGui.QWidget.focusInEvent(self, event)
 #	def mousePressEvent(self, event):
-#	        self.emit(QtCore.SIGNAL("focusIn"))
-#	        QtGui.QWidget.mousePressEvent(self, event)
+#			self.emit(QtCore.SIGNAL("focusIn"))
+#			QtGui.QWidget.mousePressEvent(self, event)
 
 	def keyPressEvent(self,event):
 		if event.key()==Qt.Key_Return or event.key()==Qt.Key_Enter:
@@ -37,7 +37,6 @@ class MyComboBox(QComboBox):
 				except:
 					pass
 					
-	
 	def GetData(self):
 		value=self.itemData(self.currentIndex()).toInt()
 		if value[1]:
@@ -49,6 +48,15 @@ class MyComboBox(QComboBox):
 	
 	def Getid(self):
 		return self.itemData(self.currentIndex(),Qt.UserRole).toInt()[0]
+	
+	def GetRemarque(self):
+		return self.itemData(self.currentIndex(),Qt.ToolTipRole).toString()
+
+	def GetProperty(self,index):
+		return self.itemData(self.currentIndex(),33+index)
+
+	def GetDeleted(self):
+		return self.itemData(self.currentIndex(),33)
 
 class MyTableWidget(QTableWidget):
 	def __init__(self,parent=None):
@@ -77,6 +85,9 @@ class MyPlainTextEdit(QPlainTextEdit):
 		if text.length()>self.MaxLength:
 			self.setPlainText(text.remove(text.length()-1,1))
 			self.moveCursor(QTextCursor.End)
+	
+	def setText(self,value):
+		self.setPlainText(value)
 			
 class MyTableView(QTableView):
 	def __init__(self,parent=None):

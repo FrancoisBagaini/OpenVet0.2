@@ -2,7 +2,6 @@
 qu'elle est en relation avec une autre déjà existante, elle sera cochée incative. Elle est toujours disponible 
 pour l'intégrité relationelle, mais n'apparait plus dans les choix(ex combobox). Traiter erreur Mysql
 -Enregistrement validé avec ToolTips.showText(QCursor.pos(),text)
--affichage données icones consultation OnClick
 -ajouter main layout pour consultation tabWiget_medical+
 -erreur Paramètre avec valeur non numérique dans tableview_Paramètre
 -redimentionner tableview_Paramètre
@@ -18,3 +17,14 @@ Modifications base de données
 
 Table		Modification			Commentaire
 Personne	Actif->isActif			homogénéisation avec autres tables
+		Ajouter isDeleted		homogénéisation avec autres tables
+
+DomaineRef	Utilité de isPrincipal?
+
+Dans DBase add et update use Execute intead of exec_ et revoir gestion des erreurs
+Generiquer CommentForm pour d'autres besoins dans my Generics
+heure pour consultation?
+
+Inclure isDeleted dans Identifiant sinon il n'est plus possible d'ajouter un élément que l'on a effacé précédement. (Insert new item or update isDeleted=FASLE?)
+
+Recupérer les erreurs de Request()
