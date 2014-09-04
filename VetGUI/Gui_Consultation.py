@@ -42,7 +42,7 @@ class GuiConsultation():
         self.parent.toolButton_comment.clicked.connect(self.EditCommentaire)
         self.parent.connect(self.parent.comboBox_veterinaire,QtCore.SIGNAL("OnEnter"),self.OnConsultantEnter)
         self.parent.toolButton_EditPathologie.clicked.connect(self.EditPathologie)
-        self.parent.toolButton_Pathologie.clicked.connect(self.FormPathologie)
+        self.parent.toolButton_Pathologie.clicked.connect(self.EditCriteresConsultation)
         self.parent.pushButton_valider.clicked.connect(self.SaveConsultation)
         self.parent.pushButton_Nouveau.clicked.connect(self.OnNewConsultation)
         
@@ -181,15 +181,18 @@ class GuiConsultation():
         if form.exec_():
             self.OnDomaine()
     
-    def FormPathologie(self):
-        #TODO: save Consultation & update idConsultation
+    def EditCriteresConsultation(self):
         self.SaveConsultation()
-        if self.editPathologie is None:
-            self.editPathologie = FormPathologie(self)
-        if self.editPathologie.exec_():
-            self.editPathologie.tableWidget_Criteres.clearContents()
-            self.editPathologie.NbCriteres=0
-            print 'Pathologie éditée'
+        data=[[u'Pathologie',4],[u'Modèles d\'examen',4,None,None,u'Edite les modèles d\'examen'],[u'Examen',4,None,None,u'Edite les examens complémentaires'],
+              [u'Critère',4,None,None,u'Edite les critères pathologiques'],[u'',6,None,None,None,2],[u'Remarque',1,200]]
+        form=FormConsultationCriteres(self.idConsultation,data,self.parent)
+        form.exec_()
+#         if self.editPathologie is None:
+#             self.editPathologie = FormPathologie(self)
+#         if self.editPathologie.exec_():
+#             self.editPathologie.tableWidget_Criteres.clearContents()
+#             self.editPathologie.NbCriteres=0
+#             print 'Pathologie éditée'
             
     def OnConsultantEnter(self):#TODO: OnEditConsultant
         print'Ouvre formulaire veto'
@@ -219,11 +222,13 @@ class GuiConsultation():
 #                     self.MyConsult.ConsultationPathologies.append(tmp)
             
     def SaveConsultation(self):
+        #TODO : if MyConsultation.isValid
         self.mapper.submit()
-        if self.MyConsultation.Save(self.parent.comboBox_consultType.GetProperty(),self.mapper.currentIndex()):
+        if self.MyConsultation.Save(self.parent.comboBox_consultType.GetProperty(1),self.mapper.currentIndex()):
             QToolTip.showText(QCursor.pos(),u'Sauvegarde réussie.')
             self.parent.pushButton_valider.setEnabled(False)
             self.GetConsultations()
+            self.idConsultation=self.MyConsultation.idConsultation     
 #        self.NewConsultation=True
              
     def EditCommentaire(self):

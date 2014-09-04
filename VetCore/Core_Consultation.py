@@ -4,7 +4,7 @@ import time
 from PyQt4 import QtCore
 from PyQt4.QtGui import *
 from Core_Pathologie import *
-#from Core_Critere import CritereConsultation
+from Core_Critere import *
 
 from DBase import Request
 from MyGenerics import *
@@ -17,6 +17,7 @@ class Consultation(MyModel):
 		self.idAnimal=idAnimal
 		MyModel.__init__(self,'Consultation',idTable,parent, *args)
 		self.SetConsultation(idTable)
+		self.idConsultation=idTable
 			
 	def SetConsultation(self,idConsultation=0):
 		self.idConsultation=idConsultation
@@ -99,6 +100,7 @@ class Consultation(MyModel):
 		self.Update(index)
 		if self.listdata[0]==0:
 			self.listdata[0]=self.lastid
+			self.idConsultation=self.listdata[0]
 		self.Pathologies.Save(self.listdata[0])
 		return True
 	

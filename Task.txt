@@ -25,6 +25,10 @@ Dans DBase add et update use Execute intead of exec_ et revoir gestion des erreu
 Generiquer CommentForm pour d'autres besoins dans my Generics
 heure pour consultation?
 
-Inclure isDeleted dans Identifiant sinon il n'est plus possible d'ajouter un élément que l'on a effacé précédement. (Insert new item or update isDeleted=FASLE?)
+Inclure isDeleted (et isActif?) dans Identifiant sinon il n'est plus possible d'ajouter un élément que l'on a effacé précédement. (Insert new item or update isDeleted=FASLE?)=>update sinon conflit d'identifiant, mais possibilité de perte d'info.=>update for is Actif, if delete (update trigger) add time in identifiant to make it unique
+Attention in trigger before update set NEW.Identifiant only in New Identifiant!= OLD Identifant
 
 Recupérer les erreurs de Request()
+
+
+Editer Domaines pathologiques(disciplines) dans Form Pathologie_edit

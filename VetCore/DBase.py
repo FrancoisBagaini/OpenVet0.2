@@ -131,6 +131,21 @@ class Request(QSqlQuery):
             tmp[2]=tmp[2].toString()
             self.res.append(tmp)
         return self.res
+
+    def GetTableList(self,NbCol,request):
+        #QVariant(Id),QVariant(col1),...,QVariant(Nbcol),QString(Remarque),QVariant(isDeleted),QVariant(UserProperty1),QVariant(UserProperty2,...
+        self.res=[]
+        self.exec_(request)
+        while self.next():
+            tmp=[]
+            for i in range(self.record().count()):
+                tmp.append(self.value(i))
+            if self.record().count()<NbCol+3:
+                tmp.extend([QVariant(0)]*(NbCol+3-self.record().count()))
+            tmp[NbCol]=tmp[NbCol].toString()
+            self.res.append(tmp)
+        self.FieldsName=[self.record().fieldName(i+1) for i in range(NbCol)]
+        return self.res
     
     def GetLines(self,request):
         self.res=[]

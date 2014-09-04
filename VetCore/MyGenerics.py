@@ -9,6 +9,7 @@ import config
 import Core
 from DBase import Request
 from Mywidgets import *
+#from operator import itemgetter
 
 class MyComboModel(QAbstractListModel):     #Convient aussi pour QListView
     def __init__(self, parentwidget,routine=None,firstField=None):
@@ -135,9 +136,8 @@ class MyComboModel(QAbstractListModel):     #Convient aussi pour QListView
         model.SetNew([values[j] for j in maplist])
         model.New()
         model.Update()
+        #if model.Newvalues[0]==0:return model.lastid else: return model.Newvalues[0]
         return model.lastid
-#         if values[idindex].toInt()[0]==0:
-#             [idindex]=model.lastid
             
     def DeleteItem(self,table,id,parent):
         model=MyModel(table,abs(id),parent)
@@ -200,121 +200,188 @@ class MyComboModel(QAbstractListModel):     #Convient aussi pour QListView
             if value.isNull():
                 value=None
             print '%i. %s : %s'%((i+1),self.Fields[i].Name,str(self.Fdata(i,None,True)))  
-                  
-#     def Print(self): 
-#         for i in self.listdata:
-#             print '%i:%s (%s)'%(i[0].toInt()[0],i[1],i[2].toString())
 
             
-# class MyTableModel(QAbstractTableModel):
-#     def __init__(self, idAnalyse, parent=None, *args): 
-#         QAbstractTableModel.__init__(self, parent, *args)
-#         self.Myrequest = Request()
-#         self.listdata = self.Myrequest.GetLines('CALL GetResultatParametres(%i)' % idAnalyse)
-#         self.Fields
-#         
-#     def Print(self):
-#         for i in range(self.NbFields):
-#             value=self.listdata[i]
-#             if value.isNull():
-#                 value=None
-#             print '%i. %s : %s'%((i+1),self.Fields[i].Name,str(self.Fdata(i,None,True)))  
-#                  
-#     def rowCount(self, parent=QModelIndex()): 
-#         return len(self.listdata)
-#     
-#     def columnCount(self, parent=QModelIndex()):
-#         try:
-#             return len(self.listdata[0])
-#         except:
-#             return 0
-#     
-#     def headerData(self, col, orientation, role):
-#         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-#             return QVariant(self.Headers[col])
-#         return QVariant()
-#     
-#     def data(self, index, role): 
-#         if index.isValid() and role == Qt.DisplayRole:
-#             if index.column() in [2, 4, 5]:
-#                 if self.listdata[index.row()][index.column()].toFloat()[1]:
-#                     return QVariant('%.2f' % self.listdata[index.row()][index.column()].toFloat()[0])
-#                 else:
-#                     return QVariant()            
-#             else:
-#                 return QVariant(self.listdata[index.row()][index.column()])
-#         elif index.isValid() and role == Qt.TextAlignmentRole:
-#             if index.column() > 1:
-#                 return QVariant(int(Qt.AlignRight | Qt.AlignCenter))
-#         elif index.isValid() and role == Qt.ToolTipRole:
-#             return self.listdata[index.row()][6]
-#         elif index.isValid() and index.column() == 2 and role == Qt.TextColorRole:
-#             if not self.listdata[index.row()][7].toBool():
-#                 return QVariant()
-#             lmax = self.listdata[index.row()][2].toFloat() > self.listdata[index.row()][5].toFloat()
-#             lmin = self.listdata[index.row()][2].toFloat() < self.listdata[index.row()][4].toFloat()
-#             if lmax or lmin:
-#                 return QVariant(QColor(Qt.red))
-#             else:
-#                 return QVariant()
-#         else: 
-#             return QVariant()
-#         
-#     def flags(self, index):
-#         if index.isValid() and index.column() == 2:
-#             return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
-#         else:
-#             return Qt.ItemIsEnabled
-#         
-#     def setData(self, index, value, role=Qt.EditRole):
-#         if index.isValid() and index.row() < self.rowCount():
-#             self.CurrentIndex = index
-#             self.listdata[index.row()][2] = value.toString()    
-#             self.listdata[index.row()][9] = True   
-#             self.isChanged = True
-#             self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"), index, index)
-#             return True
-#         return False
-#     
-#     def removeRows(self, position, rows=1, index=QModelIndex()):
-#         if self.rowCount()==0:
-#             return False
-#         self.beginRemoveRows(QModelIndex(), position, position + rows - 1)
-#         self.Deleted.append('%i' % self.listdata[position][0].toInt()[0])
-#         self.listdata = self.listdata[:position] + self.listdata[position + rows:]
-#         self.endRemoveRows()
-#         self.isChanged = True
-#         return True
-#     
-#     def insertRows(self, position, choix, rows=1, index=QModelIndex()):
-#         valid = True
-#         newparametre = self.Parametres.GetParametre(choix)
-#         if not self.isExist(newparametre[1]):
-#             self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
-#             self.listdata.append(newparametre)
-#             self.endInsertRows()
-#             self.isChanged = True
-#             #resizeto contents
-#         else:
-#             valid = False  
-#         return valid
-#             
-#     def SetModel(self,Parametres):
-#         valid = False
-#         if self.rowCount()>0:
-#             self.removeRows(0,self.rowCount())
-#         for i in range(Parametres.rowCount()):
-#             valid = True
-#             newparametre = Parametres.GetParametre(i)
-#             if not self.isExist(newparametre[1]):
-#                 self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
-#                 self.listdata.append(newparametre)
-#                 self.endInsertRows()
-#             else:
-#                 valid = False
-#         self.isChanged = True
-#         return valid
-#     
+class MyTableModel(QAbstractTableModel):
+    def __init__(self, parent,nbHeaders,request, *args): 
+        QAbstractTableModel.__init__(self, parent, *args)
+        self.parent=parent
+        self.Myrequest = Request()
+        self.listdata = self.Myrequest.GetTableList(nbHeaders,'CALL %s' % request)
+        self.Headers=self.Myrequest.FieldsName
+        self.NbCols=nbHeaders
+        self.dirty=False
+         
+    def Print(self):
+        for i in range(self.NbFields):
+            value=self.listdata[i]
+            if value.isNull():
+                value=None
+            print '%i. %s : %s'%((i+1),self.Fields[i].Name,str(self.Fdata(i,None,True)))  
+                  
+    def rowCount(self, parent=QModelIndex()): 
+        return len(self.listdata)
+     
+    def columnCount(self, parent=QModelIndex()):
+        return self.NbCols
+     
+    def headerData(self, col, orientation, role):
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            return QVariant(self.Headers[col])
+        return QVariant()
+     
+    def data(self, index, role): 
+        if not index.isValid():
+            return
+        if role == Qt.DisplayRole or role==Qt.EditRole:
+            if index.column() in [i for i in range(self.NbCols)]:
+                return self.listdata[index.row()][index.column()+1]           
+        elif role == Qt.TextAlignmentRole:
+            if index.column()>1:    #TODO: parametrer [alignt]
+                return QVariant(int(Qt.AlignRight | Qt.AlignCenter))
+        elif role == Qt.ToolTipRole:
+            return self.listdata[index.row()][self.NbCols+1]
+        elif role == Qt.UserRole:
+            return QVariant(self.listdata[index.row()][0])
+        elif role == Qt.TextColorRole:
+            color=self.listdata[index.row()][self.NbCols+2].toInt()[0]
+            if color>0:
+                if color==6:
+                    return(QColor(Qt.lightGray))
+                elif color==7:
+                    return(QColor(Qt.red))
+                elif color==8:
+                    return(QColor(Qt.green))
+        elif role == 33:    #isDeleted
+            return QVariant(self.listdata[index.row()][self.NbCols+3])
+        elif role > 33:    #UserProperty
+            return QVariant(self.listdata[index.row()][self.NbCols+3+role-33])
+            return QVariant()
+        else: 
+            return QVariant()
+         
+    def flags(self, index):
+        if index.isValid() and index.column() in self.EditableCol:
+            return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
+        else:
+            return Qt.ItemIsEnabled
+    
+    def SetEditableCol(self,cols):
+        self.EditableCol=cols
+         
+    def setData(self, index, value, role=Qt.EditRole):
+        if not index.isValid() or not index.row() < self.rowCount():
+            return False
+        value=QVariant(value)
+        if role == Qt.EditRole:
+            self.listdata[index.row()][index.column()+1]=value
+        elif role == Qt.UserRole:
+            self.listdata[index.row()][0]=value
+        elif role == Qt.ToolTipRole:
+            self.listdata[index.row()][self.NbCols+1]=value
+        elif role == Qt.ForegroundRole:
+            self.listdata[index.row()][self.NbCols+2]=value
+        elif role == 33:    #isDeleted
+            self.listdata[index.row()][self.NbCols+3]=value
+        elif role > 33:    #UserProperty
+            self.listdata[index.row()][self.NbCols+3+role-33]=value
+        else: 
+            return False
+        if role!=33:
+            self.dirty = True
+            self.SignId(index)
+        else:
+            self.SignId(index,False)
+        self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"),index,index)
+        return True
+    
+    def SignId(self,index,neg=True):
+        if neg:
+            self.listdata[index.row()][0]=QVariant(-abs(self.listdata[index.row()][0].toInt()[0]))
+        else:
+            self.listdata[index.row()][0]=QVariant(abs(self.listdata[index.row()][0].toInt()[0]))
+    
+    def isExist(self,value,col):
+        return len([i[col] for i in self.listdata if value==i[col]])>0
+    
+    def removeRows(self, position, rows=1, index=QModelIndex()):
+        if self.rowCount()==0:
+            return False
+        self.beginRemoveRows(QModelIndex(), position, position + rows - 1)
+        self.Deleted.append('%i' % self.listdata[position][0].toInt()[0])
+        self.listdata = self.listdata[:position] + self.listdata[position + rows:]
+        self.endRemoveRows()
+        self.dirty = True
+        return True
+     
+    def insertRows(self, position, data, rows=1, index=QModelIndex()):
+        self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
+        self.listdata.append(data)
+        self.endInsertRows()
+        self.dirty = True
+             
+    def SetModel(self,Parametres):
+        valid = False
+        if self.rowCount()>0:
+            self.removeRows(0,self.rowCount())
+        for i in range(Parametres.rowCount()):
+            valid = True
+            newparametre = Parametres.GetParametre(i)
+            if not self.isExist(newparametre[1]):
+                self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
+                self.listdata.append(newparametre)
+                self.endInsertRows()
+            else:
+                valid = False
+        self.dirty = True
+        return valid
+
+    def EditItem(self,values,table,maplist,idindex,delindex,parent):
+        values[idindex]=QVariant(abs(values[idindex].toInt()[0]))
+        model=MyModel(table,0,parent)
+        model.SetNew([values[j] for j in maplist])
+        model.New()
+        model.Update()
+        if model.Newfields[0].toInt()[0]==0:
+            return model.lastid
+        else:
+            return model.Newfields[0].toInt()[0]
+            
+    def DeleteItem(self,table,id,parent):
+        model=MyModel(table,abs(id),parent)
+        model.Delete()
+        
+    def Update(self,table,maplist,parent,idindex=0,delindex=4):
+        if not self.dirty:
+                return
+        #BeginTransaction
+        for i in self.listdata:
+            id=i[idindex].toInt()[0]
+            if id<=0 and not i[delindex].toBool():
+                self.EditItem(i,table,maplist,idindex,delindex,parent)
+                #Appenderror?
+            elif i[delindex].toBool() and id!=0:
+                self.DeleteItem(table,abs(id),parent)
+            
+    def UpdateRelational(self,table,maplist,tableref,maplistref,idref,delref,parent):
+        if not self.dirty:
+            return
+        for i in self.listdata:
+            idtable=i[0].toInt()[0]
+            idtableref=i[idref].toInt()[0]
+            isdeltable=i[4].toBool()
+            isdeltableref=i[delref].toBool()
+            if idtable <=0 and not isdeltable:
+                lastid=self.EditItem(i,table,maplist,0,4,parent)
+                if idtable==0:
+                    i[0]=lastid
+                if idtableref==0 and not isdeltableref:
+                    self.EditItem(i,tableref,maplistref,idref,delref,parent)
+            elif isdeltableref and idtableref!=0:
+                self.DeleteItem(tableref,abs(idtableref),parent)
+                if isdeltable and idtable!=0:
+                    self.DeleteItem(table,abs(idtable),parent)
+     
 #     def Save(self, idAnalyse): 
 #         Myrequest = Request('ResultatAnalyse')  
 #         for i in self.Deleted:
@@ -510,24 +577,32 @@ class MyModel(QAbstractListModel):
                 return self.lastid
  
 
-LINEEDIT,CHECKBOX,PLAINTEXTEDIT,COMBOBOX,LIST,LABELS = range(1,7)
+LINEEDIT,CHECKBOX,PLAINTEXTEDIT,COMBOBOX,LIST,TABLE,LABELS = range(1,8)
 
 class MyForm(QDialog):
     def __init__(self,title,data,parent=None):
         QDialog.__init__(self,parent)
-        #data: libélé,typewidget,maxlen,Qsize,HorizontalGroup
+        #data: label,typewidget,(maxlen,Qsize,tooltip_editbutton,rowFormat(0,1:multiple items on a row,2:a single spanning widget))
         self.setWindowTitle(title)
         self.verticalLayout = QVBoxLayout(self)
         self.formLayout = QFormLayout()
-        self.labels=[]
+        self.spanlayout=QHBoxLayout()
+        Skipping=False
+#        self.labels=[]
         self.fields=[]
         self.popMenus=[]
+        self.EditButtons=[]
         for index,i in enumerate(data):
+            while len(i)<6:
+                if len(i)==5:
+                    i.append(False)
+                else:
+                    i.append(None)        
             if len(i[0])>0:
                 label = QLabel('%s :'%i[0],self)
             else:
                 label = QLabel()
-            self.labels.append(label)
+#            self.labels.append(label)
             if i[1]==1: #LineEdit
                 field = QLineEdit(self)
                 field.setMaxLength(i[2])
@@ -545,15 +620,60 @@ class MyForm(QDialog):
                 field.setMaximumSize(1000,i[3])
                 field.setContextMenuPolicy(Qt.CustomContextMenu)
                 self.connect(field,SIGNAL('customContextMenuRequested(const QPoint&)'), self.OnListViewMenu)
-                menu = QMenu(field)
-                action1=menu.addAction('Supprimer')
+                menuList = QMenu(field)
+                action1=menuList.addAction('Supprimer')
                 action1.setData(field)
                 self.connect(action1,SIGNAL("triggered()"),self.OnList_delete)
-                self.popMenus.append(menu)
+                self.popMenus.append(menuList)
+            if i[1]==6: #TableView:
+                field=MyTableView(self)
+                field.setContextMenuPolicy(Qt.CustomContextMenu)
+                self.connect(field,SIGNAL('customContextMenuRequested(const QPoint&)'), self.OnListViewMenu)
+                menuTable = QMenu(field)
+                action1=menuTable.addAction('Supprimer')
+                action1.setData(field)
+                self.connect(action1,SIGNAL("triggered()"),self.OnList_delete)
+                self.popMenus.append(menuTable)    
+            field.setObjectName(QString(i[0]))
             self.fields.append(field)
-            label.setBuddy(field)
-            self.formLayout.setWidget(index, QFormLayout.LabelRole, label)
-            self.formLayout.setWidget(index, QFormLayout.FieldRole, field)
+            if i[5]!=2:
+                label.setBuddy(field)
+            if not i[4] is None:    #isEditable
+                tmp=QHBoxLayout()
+                tmp.addWidget(field)
+                editbutton=QToolButton(self)
+                editbutton.setIcon(QIcon('../images/edit1.png'))
+                editbutton.setIconSize(QSize(20,20))
+                editbutton.setToolTip(QString(i[4]))
+                editbutton.setObjectName(QString(i[0]))
+                tmp.addWidget(editbutton)
+                field=tmp
+                self.EditButtons.append(editbutton)
+            if i[5]==1:
+                Skipping=True
+                self.spanlayout.addWidget(label)
+                if isinstance(field,QHBoxLayout):
+                    self.spanlayout.addLayout(field)
+                else:
+                    self.spanlayout.addWidget(field)
+            elif i[5]==2:
+                self.formLayout.setWidget(index, QFormLayout.SpanningRole, field)
+            else:
+                if Skipping:
+                    Skipping=False
+                    self.spanlayout.addWidget(label)
+                    if isinstance(field,QHBoxLayout):
+                        self.spanlayout.addLayout(field)
+                    else:
+                        self.spanlayout.addWidget(field)
+                    self.formLayout.addRow(self.spanlayout)
+                    self.spanlayout=QHBoxLayout()  
+                else:
+                    if isinstance(field,QHBoxLayout):
+                        self.formLayout.addRow(label,field)
+                    else:
+                        self.formLayout.setWidget(index, QFormLayout.LabelRole, label)
+                        self.formLayout.setWidget(index, QFormLayout.FieldRole, field)
         self.verticalLayout.addLayout(self.formLayout)
         self.horizontalLayout = QHBoxLayout()
         self.pushButton_Cancel = QPushButton(self)
@@ -580,12 +700,21 @@ class MyForm(QDialog):
         self.pushButton_Valid.clicked.connect(self.OnValid)
         self.pushButton_Add.clicked.connect(self.OnNew)
 
+        self.setSizeGripEnabled(True)
+    
+    def Resize(self,size):
+        self.setMinimumSize(size)   
+         
     def InactivateEnter(self):
         self.pushButton_Valid.setAutoDefault(False)
         self.pushButton_Delete.setAutoDefault(False)
         self.pushButton_Add.setAutoDefault(False)
         self.pushButton_Cancel.setAutoDefault(False)
         
+    def CancelOkOnly(self):
+        self.pushButton_Add.hide()
+        self.pushButton_Delete.hide()   
+             
     def AddMenuAction(self,widget,label,function):
         for i in self.popMenus:
             if i.parent()==widget:
@@ -609,7 +738,7 @@ class MyForm(QDialog):
             self.sender().data().toPyObject().model().setData(self.sender().data().toPyObject().currentIndex(),6,Qt.ForegroundRole)
             QToolTip.showText(QCursor.pos(),u'Elément marqué pour la suppression.')
         self.sender().data().toPyObject().emit(SIGNAL("isDeleted(int)"),isdeleted)
-   
+
     def SetModel(self,model,maplist):
         self.MyModel=model
         self.mapper = QDataWidgetMapper(self)
@@ -830,7 +959,6 @@ class DateColumnDelegate(QItemDelegate):
 
 
 class PlainTextColumnDelegate(QItemDelegate):
-
     def __init__(self, parent=None):
         super(PlainTextColumnDelegate, self).__init__(parent)
 
@@ -843,7 +971,7 @@ class PlainTextColumnDelegate(QItemDelegate):
         editor.setText(value)
 
     def setModelData(self, editor, model, index):
-        if isinstance(editor,(MyPlainTextEdit,QPlainTextEdit)):
+        if isinstance(editor,(MyPlainTextEdit,QPlainTextEdit,QTextEdit)):
             model.setData(index, QVariant(editor.toPlainText()))
         else:
             model.setData(index, QVariant(editor.text()))
