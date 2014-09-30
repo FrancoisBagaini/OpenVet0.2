@@ -21,7 +21,32 @@ class Ctable:
 		for i in self.TableFields:
 			print '%s : %s\t\t\t(%s)'%(i,str(self.__dict__[i]),type(self.__dict__[i]))
 
-		
+def Fdata(value,vtype=None,debug=False):
+	if isinstance(value,QString):
+		return value
+	if vtype is None:
+		vtype=value.typeName()
+	if value.isNull():
+		if debug:
+			return 'NULL'
+		else:
+			return QString('')
+	elif vtype=='QDate':
+		return value.toDate().toString('dd/MM/yyyy')
+	elif vtype=='QDateTime':
+		return value.toDateTime().toString('dd/MM/yyyy hh:mm')
+	elif vtype in ['int','qlonglong']:
+		return value.toInt()[0]
+	elif vtype=='QString':
+		return value.toString()
+	elif vtype=='bool':
+		return value.toBool()
+	elif vtype=='double' or vtype=='float':
+		return value.toFloat()[0]
+	else:
+		if debug:
+			print value.typeName()
+		return u'indeterminé'	  
 	
 def ValideDate(date,formatin='dmyy'):
 	if not isinstance(date, basestring):

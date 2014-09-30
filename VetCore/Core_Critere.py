@@ -23,8 +23,10 @@ class FormConsultationCriteres(MyForm):
         self.connect(self.fields[4],SIGNAL("clicked (QModelIndex)"),self.OnCritereConsultation)
 #        self.connect(self.fields[4],SIGNAL("isDeleted(int)"),self.OnCritereDelete)
         self.connect(self.fields[5],SIGNAL("textEdited(QString)"),self.OnRemarqueEnter)
+        self.EditButtons[0].clicked.connect(self.OnEditModel)
+        self.EditButtons[1].clicked.connect(self.OnEditExamen)
+        self.EditButtons[2].clicked.connect(self.OnEditCritere)
         self.OnPathologie(0)
-
 
     def OnPathologie(self,index):
         self.idPathologieRef=self.fields[0].Getid()
@@ -33,14 +35,17 @@ class FormConsultationCriteres(MyForm):
         self.fields[2].setModel(MyComboModel(self,'GetExamens(%i)'%self.idPathologie))
         self.MyModel=MyTableModel(self,6,'GetConsultationCriteres(%i)'%self.idPathologieRef)
         self.MyModel.SetEditableCol([2,5])
+        self.MyModel.SetRightAligned([3,4,5,6])
         self.fields[4].setModel(self.MyModel)  
         self.fields[4].resizeColumnsToContents()  
         self.connect(self.MyModel,SIGNAL("dataChanged(QModelIndex,QModelIndex)"),self.OnCritereValueChange) 
         self.OnExamen(0)
         
+#    def OnModelExamen(self): 
+  
     def OnExamen(self,index):
-        idExamen=self.fields[2].Getid()
-        self.fields[3].setModel(MyComboModel(self.parent,'GetCriteres(%i,%i)'%(self.idPathologie,idExamen)))
+        self.idExamen=self.fields[2].Getid()
+        self.fields[3].setModel(MyComboModel(self.parent,'GetCriteres(%i,%i)'%(self.idPathologie,self.idExamen)))
         
     def OnCritere(self,index):
         index=self.fields[3].model().index(index)
@@ -71,10 +76,6 @@ class FormConsultationCriteres(MyForm):
             else:
                 grade='%i/%i'%(line[0].toInt()[0],line[1].toInt()[0])
             self.MyModel.setData(self.MyModel.index(index1.row(),5),grade,Qt.EditRole)
-
-#     def OnCritereDelete(self,isdeleted):  
-#         print self.MyModel.data(self.fields[4].currentIndex(),33).toInt()
-#         pass
               
     def OnValid(self):
         if not self.MyModel.dirty:
@@ -88,13 +89,122 @@ class FormConsultationCriteres(MyForm):
         #idCritere,(idPathologieRef,CritereQuant,CritereQual,"")
         self.MyModel.Update('ConsultationCritere',[0,10,11,12,13,6,7,9,14],self,0,9)
         self.accept()        
-#         self.MyModel.BeginTransaction() in MyTableModel.Update
-#         #recuperer erreurs
-#         Myerror(doublon,integrity on delete)
-#         self.MyModel.RollBack()
-#         self.MyModel.CommitTransaction()
 
-            
+    def OnEditModel(self):
+        idModel=self.fields[1].Getid()
+        new=[0,self.idPathologie,'',None,True,False,'']
+        Model=MyModel('ModelExamen',idModel,self)
+        if not Model.SetNew(new):
+            return  
+        data=[[u'Nom du Modèle',1,60],[u'Remarque',3,200,80],[u'Critères',6,0,160]]
+        form=FormModelExamen(data,self)
+        form.SetModel(Model,{0:2,1:3})    #GUI_field : DB_Field
+        form.exec_()
+#         self.fields[2].setModel(MyComboModel(self,'GetModelsExamen(%i)'%self.idPathologie))    TODO:
+#         self.fields[2].Setid(idModel)
+
+    def OnEditExamen(self):
+        idExamen=self.fields[2].Getid()
+        new=[0,'',None,True,False,'']
+        ExamenModel=MyModel('Examen',idExamen,self)
+        if not ExamenModel.SetNew(new):
+            return  
+        data=[[u'Examen',1,60],[u'Remarque',3,200,80]]
+        form=MyForm('Examens',data,self)
+        form.SetModel(ExamenModel,{0:1,1:2})    #GUI_field : DB_Field
+        form.exec_()
+        self.fields[2].setModel(MyComboModel(self,'GetExamens(%i)'%self.idPathologie))
+        self.fields[2].Setid(idExamen)
+        
+    def OnEditCritere(self):
+        idCritere=self.fields[3].Getid()
+        new=[0,0,'',0,'',None,True,False,'']
+        self.CritereModel=MyModel('Critere',idCritere,self)
+        if not self.CritereModel.SetNew(new):
+            return      
+        data=[[u'Examen',4],[u'Critere',1,60],[u'Unité',4,None,None,u'Edite l\'unité'],
+              [u'Nombre de Grades',8,0,20],[u'Remarque',3,200,80],[u'Seuils',6,300,140]]
+        form=FormCritere(idCritere,data,self)
+        form.SetModel(self.CritereModel,{0:1,1:2,2:3,3:4,4:5})
+        form.exec_()
+        self.fields[3].setModel(MyComboModel(self.parent,'GetCriteres(%i,%i)'%(self.idPathologie,self.idExamen)))
+        self.fields[3].Setid(idCritere)
+
+class FormModelExamen(MyForm):
+    def __init__(self,data,parent):
+        MyForm.__init__(self,u'Modèle d\'Examen',data,parent)
+        self.parent=parent
+        self.Criteres=MyTableModel(self,2,parent.MyModel,[0,1,2,7,8,9,10])
+        self.fields[2].setModel(self.Criteres)  
+        self.fields[2].resizeColumnsToContents()
+        self.resize(500,340)
+        
+    def OnValid(self):  #TODO
+        if self.mapper.submit():
+            self.MyModel.Update(self.mapper.currentIndex())
+            #save self.Criteres
+            self.accept()
+        else:
+            if self.mapper.model().lastError().type()==2:
+                QMessageBox.warning(self,u"Alerte OpenVet",u'Cette entrée constitue un doublon', QMessageBox.Ok | QMessageBox.Default)
+
+class FormCritere(MyForm):
+    def __init__(self,idCritere,data,parent):
+        MyForm.__init__(self,u'Grades des critères pathologiques',data,parent)
+        self.parent=parent
+        self.idCritere=idCritere
+        self.fields[0].setModel(MyComboModel(self.parent,'GetExamens(0)'))
+        self.fields[2].setModel(MyComboModel(self.parent,'GetUnites()'))
+        self.fields[3].setEnabled(False)
+        self.GradesModel=MyTableModel(self,3,'GetCritereGrades(%i)'%idCritere)
+        self.GradesModel.SetEditableCol([0,1,2])
+        self.fields[5].setModel(self.GradesModel)  
+        self.fields[5].resizeColumnsToContents() 
+        self.AddMenuAction(self.fields[5],'Ajouter',self.OnAddGrade) 
+        self.connect(self.fields[5],SIGNAL("isDeleted(int)"),self.OnGradeDelete)
+        self.connect(self.GradesModel,SIGNAL("dataChanged(QModelIndex,QModelIndex)"),self.OnGradeChange)
+        self.EditButtons[0].clicked.connect(self.OnEditUnite)
+
+    def OnEditUnite(self):
+        idUnite=self.fields[2].Getid()
+        new=[0,'',False,True,False,'']
+        UniteModel=MyModel('Unite',idUnite,self)
+        if not UniteModel.SetNew(new):
+            return  
+        data=[[u'Unite',1,20],[u'Concentration',2]]
+        form=MyForm('Unités',data,self)
+        form.SetModel(UniteModel,{0:1,1:2})    #GUI_field : DB_Field
+        form.exec_()
+        self.fields[2].setModel(MyComboModel(self.parent,'GetUnites()'))
+        self.fields[2].Setid(idUnite)
+        
+    def OnGradeDelete(self):
+        newvalue=max(self.parent.CritereModel.data(self.parent.CritereModel.index(0,4,QModelIndex()),Qt.DisplayRole).toInt()[0]-1,0)
+        self.parent.CritereModel.setData(self.parent.CritereModel.index(0,4,QModelIndex()),newvalue,Qt.EditRole)
+        #TODO: update is Actif
+        
+    def OnAddGrade(self):
+        self.GradesModel.insertRows(self.GradesModel.rowCount()-1,[0,self.GradesModel.rowCount(),'0.00','0.00','',0,0])
+        newvalue=self.parent.CritereModel.data(self.parent.CritereModel.index(0,4,QModelIndex()),Qt.DisplayRole).toInt()[0]+1
+        self.parent.CritereModel.setData(self.parent.CritereModel.index(0,4,QModelIndex()),newvalue,Qt.EditRole)
+        self.GradesModel.sort(0)
+
+    def OnGradeChange(self):
+        self.GradesModel.sort(0)
+        #TODO: check consistency for grade & min/max
+        
+    def OnValid(self):
+        if self.mapper.submit():
+            self.MyModel.Update(self.mapper.currentIndex())
+            #idCritereSeuil,grade,limInf,limSup,Remarque,Color,6.isDeleted,identifiant,idCritere,isActif
+            self.GradesModel.Update('CritereSeuil',[0,8,2,3,1,4,9,6,7],self,0,6)
+            self.accept()
+        else:
+            if self.mapper.model().lastError().type()==2:
+                QMessageBox.warning(self,u"Alerte OpenVet",u'Cette entrée constitue un doublon', QMessageBox.Ok | QMessageBox.Default)
+
+
+              
 # class Critere:                  #TODO: dériver d'une classe DataBase ou class abstraite? 
 #     def __init__(self,DBase):      
 #         self.Table='Critere'

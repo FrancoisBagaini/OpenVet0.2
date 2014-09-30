@@ -9,7 +9,34 @@ import config
 import Core
 from DBase import Request
 from Mywidgets import *
-#from operator import itemgetter
+from operator import itemgetter
+
+# def Fdata(value,vtype=None,debug=False):
+#     if isinstance(value,QString):
+#         return value
+#     if vtype is None:
+#         vtype=value.typeName()
+#     if value.isNull():
+#         if debug:
+#             return 'NULL'
+#         else:
+#             return QString('')
+#     elif vtype=='QDate':
+#         return value.toDate().toString('dd/MM/yyyy')
+#     elif vtype=='QDateTime':
+#         return value.toDateTime().toString('dd/MM/yyyy hh:mm')
+#     elif vtype in ['int','qlonglong']:
+#         return value.toInt()[0]
+#     elif vtype=='QString':
+#         return value.toString()
+#     elif vtype=='bool':
+#         return value.toBool()
+#     elif vtype=='double' or vtype=='float':
+#         return value.toFloat()[0]
+#     else:
+#         if debug:
+#             print value.typeName()
+#         return u'indeterminé'
 
 class MyComboModel(QAbstractListModel):     #Convient aussi pour QListView
     def __init__(self, parentwidget,routine=None,firstField=None):
@@ -22,11 +49,14 @@ class MyComboModel(QAbstractListModel):     #Convient aussi pour QListView
         if routine is None:
             self.Routine=QString('')
         else:
-            self.Routine=routine
-            self.listdata = self.MyRequest.GetComboList('CALL %s'%self.Routine,firstField )
-            if self.MyRequest.lastError().isValid():
-                self.error=self.MyRequest.lastError().text()
-                MyError(parentwidget,self.error)
+            if isinstance(routine,str):
+                self.Routine=routine
+                self.listdata = self.MyRequest.GetComboList('CALL %s'%self.Routine,firstField )
+                if self.MyRequest.lastError().isValid():
+                    self.error=self.MyRequest.lastError().text()
+                    MyError(parentwidget,self.error)
+            elif isinstance(routine,list):
+                self.listdata =routine
               
     def Set(self,routine=None,firstField=None):
         if not routine is None:
@@ -172,53 +202,78 @@ class MyComboModel(QAbstractListModel):     #Convient aussi pour QListView
                 if isdeltable and idtable!=0:
                     self.DeleteItem(table,abs(idtable),parent)
                     
-    def Fdata(self,col,vtype=None,debug=False):     #TODO: Move in Core Fdata(self,value,vtype=None,debug=False)
-        value=self.listdata[col]
-        if vtype is None:
-            vtype=value.typeName()
-        if value.isNull():
-            if debug:
-                return 'NULL'
-            else:
-                return QString('')
-        elif vtype=='QDate':
-            return value.toDate().toString('dd/MM/yyyy')
-        elif vtype=='QDateTime':
-            return value.toDateTime().toString('dd/MM/yyyy hh:mm')
-        elif vtype in ['int','qlonglong']:
-            return value.toInt()[0]
-        elif vtype=='QString':
-            return value.toString()
-        elif vtype=='bool':
-            return value.toBool()
-        else:
-            return u'indeterminé'
+#     def Fdata(self,col,vtype=None,debug=False):     #TODO: Move in Core Fdata(self,value,vtype=None,debug=False)
+#         value=self.listdata[col]
+#         if vtype is None:
+#             vtype=value.typeName()
+#         if value.isNull():
+#             if debug:
+#                 return 'NULL'
+#             else:
+#                 return QString('')
+#         elif vtype=='QDate':
+#             return value.toDate().toString('dd/MM/yyyy')
+#         elif vtype=='QDateTime':
+#             return value.toDateTime().toString('dd/MM/yyyy hh:mm')
+#         elif vtype in ['int','qlonglong']:
+#             return value.toInt()[0]
+#         elif vtype=='QString':
+#             return value.toString()
+#         elif vtype=='bool':
+#             return value.toBool()
+#         else:
+#             return u'indeterminé'
         
     def Print(self):
-        for i in range(self.NbFields):
-            value=self.listdata[i]
-            if value.isNull():
-                value=None
-            print '%i. %s : %s'%((i+1),self.Fields[i].Name,str(self.Fdata(i,None,True)))  
-
+        fields=['id',u'Libélé','Remarque','Color','isDeleted']
+        for n,i in enumerate(self.listdata):
+            print 'item %i'%n
+            line=[]
+            for m,j in enumerate(i):
+                if m<5:
+                    field=fields[m]
+                else:
+                    field='user%i'%(m-4)
+                line.append('%i.%s=%s'%(m,field,str(Core.Fdata(j,None,True))))
+            print ','.join(line) 
             
 class MyTableModel(QAbstractTableModel):
-    def __init__(self, parent,nbHeaders,request, *args): 
+    def __init__(self, parent,nbHeaders,request,cols=None, *args): 
         QAbstractTableModel.__init__(self, parent, *args)
         self.parent=parent
         self.Myrequest = Request()
-        self.listdata = self.Myrequest.GetTableList(nbHeaders,'CALL %s' % request)
-        self.Headers=self.Myrequest.FieldsName
+        if isinstance(request,str):
+            self.listdata = self.Myrequest.GetTableList(nbHeaders,'CALL %s' % request)
+            self.Headers=self.Myrequest.FieldsName
+        if isinstance(request,QAbstractTableModel):     #Duplicate model
+            self.listdata=[]
+            for row in request.listdata:
+                self.listdata.append([j for i,j in enumerate(row) if i in cols])
+            self.Headers=[j for i,j in enumerate(request.Headers) if i in cols]
         self.NbCols=nbHeaders
+        self.VectorHeaders=[i for i in range(self.NbCols)]
+        self.RightAligned=[i for i in range(self.NbCols) if i>0]
+        self.EditableCol=[]
         self.dirty=False
          
     def Print(self):
-        for i in range(self.NbFields):
-            value=self.listdata[i]
-            if value.isNull():
-                value=None
-            print '%i. %s : %s'%((i+1),self.Fields[i].Name,str(self.Fdata(i,None,True)))  
-                  
+        fields=['id']
+        fields.extend(self.Headers)
+        fields.extend(['Remarque','Color','isDeleted'])
+        for n,i in enumerate(self.listdata):
+            print 'item %i'%n
+            line=[]
+            for m,j in enumerate(i):
+                if m<self.NbCols+4:
+                    field=fields[m]
+                else:
+                    field='user%i'%(m-4)
+                line.append('%i.%s=%s'%(m,field,str(Core.Fdata(j,None,True))))
+            print ','.join(line) 
+            
+    def SetRightAligned(self,vector):
+        self.RightAligned=vector
+                       
     def rowCount(self, parent=QModelIndex()): 
         return len(self.listdata)
      
@@ -229,16 +284,16 @@ class MyTableModel(QAbstractTableModel):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             return QVariant(self.Headers[col])
         return QVariant()
-     
+      
     def data(self, index, role): 
         if not index.isValid():
             return
         if role == Qt.DisplayRole or role==Qt.EditRole:
-            if index.column() in [i for i in range(self.NbCols)]:
+            if index.column() in self.VectorHeaders:
                 return self.listdata[index.row()][index.column()+1]           
         elif role == Qt.TextAlignmentRole:
-            if index.column()>1:    #TODO: parametrer [alignt]
-                return QVariant(int(Qt.AlignRight | Qt.AlignCenter))
+            if index.column() in self.RightAligned:
+                return QVariant(int(Qt.AlignRight | Qt.AlignCenter))         
         elif role == Qt.ToolTipRole:
             return self.listdata[index.row()][self.NbCols+1]
         elif role == Qt.UserRole:
@@ -246,6 +301,8 @@ class MyTableModel(QAbstractTableModel):
         elif role == Qt.TextColorRole:
             color=self.listdata[index.row()][self.NbCols+2].toInt()[0]
             if color>0:
+                if color==1:
+                    return(QColor(Qt.blue))
                 if color==6:
                     return(QColor(Qt.lightGray))
                 elif color==7:
@@ -295,6 +352,9 @@ class MyTableModel(QAbstractTableModel):
         self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"),index,index)
         return True
     
+    def sort(self,col,order = Qt.AscendingOrder):
+        self.listdata=sorted(self.listdata,key=itemgetter(col+1))
+
     def SignId(self,index,neg=True):
         if neg:
             self.listdata[index.row()][0]=QVariant(-abs(self.listdata[index.row()][0].toInt()[0]))
@@ -303,6 +363,10 @@ class MyTableModel(QAbstractTableModel):
     
     def isExist(self,value,col):
         return len([i[col] for i in self.listdata if value==i[col]])>0
+    
+    def Clear(self):
+        while self.rowCount()>0:
+            self.removeRows(self.rowCount()-1)
     
     def removeRows(self, position, rows=1, index=QModelIndex()):
         if self.rowCount()==0:
@@ -459,7 +523,7 @@ class MyTableModel(QAbstractTableModel):
 #         #self.submitAll()
  
         
-class MyModel(QAbstractListModel):
+class MyModel(QAbstractListModel):  #TODO: rename in MyRecordModel
     def __init__(self, table,idTable,parent=None, *args):
         QAbstractListModel.__init__(self, parent, *args)
         if isinstance(idTable,QVariant):
@@ -472,6 +536,7 @@ class MyModel(QAbstractListModel):
         self.GetFields()
         self.listdata=self.MyRequest.GetLineTable(idTable)      
         self.lastid=0
+        self.lasterror=None
         
     def Print(self):
         for i in range(self.NbFields):
@@ -521,7 +586,10 @@ class MyModel(QAbstractListModel):
             return value.toString()
         elif vtype=='bool':
             return value.toBool()
+        elif vtype=='double' or vtype=='float':
+            return value.toFloat()[0]
         else:
+#            print value.typeName()
             return u'indeterminé'
         
     def setData(self, index, value, role=Qt.EditRole):
@@ -571,13 +639,17 @@ class MyModel(QAbstractListModel):
         if len(err) == 0:
             error = self.MyRequest.Save(values)
             if error.isValid():
-                return error#TODO :MyError
+                self.lasterror=error
+                if self.lasterror.type()==2:
+                    MyError(self.ParentWidget,u'La requête \"%s\" constitue un doublon.'%self.MyRequest.lastQuery())
             else:
                 self.lastid=self.MyRequest.lastID
                 return self.lastid
+        else:
+            MyError(u'Les champs %s sont invalides'%','.join(err))
  
 
-LINEEDIT,CHECKBOX,PLAINTEXTEDIT,COMBOBOX,LIST,TABLE,LABELS = range(1,8)
+LINEEDIT,CHECKBOX,PLAINTEXTEDIT,COMBOBOX,LIST,TABLE,LABELS,SPINBOX = range(1,9)
 
 class MyForm(QDialog):
     def __init__(self,title,data,parent=None):
@@ -588,7 +660,7 @@ class MyForm(QDialog):
         self.formLayout = QFormLayout()
         self.spanlayout=QHBoxLayout()
         Skipping=False
-#        self.labels=[]
+        self.labels=[]
         self.fields=[]
         self.popMenus=[]
         self.EditButtons=[]
@@ -602,7 +674,7 @@ class MyForm(QDialog):
                 label = QLabel('%s :'%i[0],self)
             else:
                 label = QLabel()
-#            self.labels.append(label)
+            self.labels.append(label)
             if i[1]==1: #LineEdit
                 field = QLineEdit(self)
                 field.setMaxLength(i[2])
@@ -627,13 +699,21 @@ class MyForm(QDialog):
                 self.popMenus.append(menuList)
             if i[1]==6: #TableView:
                 field=MyTableView(self)
+                if not i[3] is None:
+                    field.setMaximumSize(1000,i[3])
                 field.setContextMenuPolicy(Qt.CustomContextMenu)
                 self.connect(field,SIGNAL('customContextMenuRequested(const QPoint&)'), self.OnListViewMenu)
                 menuTable = QMenu(field)
                 action1=menuTable.addAction('Supprimer')
                 action1.setData(field)
                 self.connect(action1,SIGNAL("triggered()"),self.OnList_delete)
-                self.popMenus.append(menuTable)    
+                self.popMenus.append(menuTable) 
+            if i[1]==8: #SpinBox
+                field = QSpinBox(self)
+                if not i[2] is None:
+                    field.setMinimum(i[2])
+                if not i[2] is None:
+                    field.setMaximum(i[3])   
             field.setObjectName(QString(i[0]))
             self.fields.append(field)
             if i[5]!=2:
@@ -740,6 +820,7 @@ class MyForm(QDialog):
         self.sender().data().toPyObject().emit(SIGNAL("isDeleted(int)"),isdeleted)
 
     def SetModel(self,model,maplist):
+#        maplist format GUI_field : DB_Field
         self.MyModel=model
         self.mapper = QDataWidgetMapper(self)
         self.mapper.setOrientation(Qt.Horizontal)
@@ -749,11 +830,15 @@ class MyForm(QDialog):
         for i,j in enumerate(self.fields):
                 if maplist.has_key(i):
                     if isinstance(j,QLineEdit):
-                        self.MyDelegate.insertFieldDelegate(i+1,self.MyModel.Fields[maplist[i]])
+                        self.MyDelegate.insertFieldDelegate(maplist[i],self.MyModel.Fields[maplist[i]]) #Debug i+1=>maplist[i]
                     elif isinstance(j,QCheckBox):
-                        self.MyDelegate.insertColumnDelegate(i+1,CheckboxColumnDelegate())
+                        self.MyDelegate.insertColumnDelegate(maplist[i],CheckboxColumnDelegate())
+                    elif isinstance(j,QComboBox):
+                        self.MyDelegate.insertColumnDelegate(maplist[i],ComboboxColumnDelegate())
                     elif isinstance(j,(QPlainTextEdit,MyPlainTextEdit)):  #regrouper avec QLineEdit?
-                        self.MyDelegate.insertColumnDelegate(i+1,PlainTextColumnDelegate())              
+                        self.MyDelegate.insertColumnDelegate(maplist[i],PlainTextColumnDelegate())
+                    elif isinstance(j,QSpinBox):
+                        self.MyDelegate.insertColumnDelegate(maplist[i],IntegerColumnDelegate())              
         self.mapper.setItemDelegate(self.MyDelegate)
         for i,j in enumerate(self.fields):
             if maplist.has_key(i):
@@ -773,7 +858,7 @@ class MyForm(QDialog):
             self.accept()
         else:
             if self.mapper.model().lastError().type()==2:
-                QMessageBox.warning(self,u"Alerte OpenVet",u'Cette entré constitue un doublon', QMessageBox.Ok | QMessageBox.Default)
+                QMessageBox.warning(self,u"Alerte OpenVet",u'Cette entrée constitue un doublon', QMessageBox.Ok | QMessageBox.Default)
             
     def OnNew(self):
         self.MyModel.New()
@@ -804,8 +889,7 @@ class GenericDelegate(QItemDelegate):
         elif field.Type=='datetime':
             self.insertColumnDelegate(column, DateColumnDelegate())
         elif 'decimal' in field.Type:
-            NbDecimales=int(field.Type[field.Type.index(',')+1:field.Type.index(')')])
-            self.insertColumnDelegate(column, FloatColumnDelegate(NbDecimales))
+            self.insertColumnDelegate(column, FloatColumnDelegate(field.NbDecimals))
 
     def removeColumnDelegate(self, column):
         if column in self.delegates:
@@ -859,7 +943,10 @@ class IntegerColumnDelegate(QItemDelegate):
 
     def setEditorData(self, editor, index):
         value = index.model().data(index, Qt.DisplayRole).toInt()[0]
-        editor.setValue(value)
+        if isinstance(editor,QLineEdit):
+            editor.setText(QString('%i'%value))
+        else:
+            editor.setValue(value)
 
 
     def setModelData(self, editor, model, index):
@@ -910,10 +997,11 @@ class ComboboxColumnDelegate(QItemDelegate):
         
 class FloatColumnDelegate(QItemDelegate):
 
-    def __init__(self, minimum=0, maximum=10000, parent=None):
-        super(IntegerColumnDelegate, self).__init__(parent)
+    def __init__(self, NbDecimals,minimum=0, maximum=10000, parent=None):
+        super(FloatColumnDelegate, self).__init__(parent)
         self.minimum = minimum
         self.maximum = maximum
+        self.NbDecimals=NbDecimals
 
 
     def createEditor(self, parent, option, index):
@@ -923,8 +1011,14 @@ class FloatColumnDelegate(QItemDelegate):
 
     def setEditorData(self, editor, index):
         value = index.model().data(index, Qt.DisplayRole).toFloat()[0]
-        editor.setValue(value)
-
+        if self.NbDecimals==1:
+            editor.setText('%.1f'%value)
+        elif self.NbDecimals==2:
+            editor.setText('%.2f'%value)
+        elif self.NbDecimals==3:
+            editor.setText('%.3f'%value)
+        else:
+            editor.setText('%.4f'%value)
 
     def setModelData(self, editor, model, index):
         editor.interpretText()

@@ -19,23 +19,23 @@ class MyComboBox(QComboBox):
 		else:
 			QComboBox.keyPressEvent(self,event)
 
-	def Fill(self,function,Remarque=False,Color=False):
-		self.clear()
-		lst=function
-		for i in lst:
-			self.addItem(i[1],i[0])
-		colors=[Qt.black,Qt.red,Qt.green]
-		for i in range(self.count()):
-			if Remarque:
-				try:
-					self.setItemData(i,QVariant(lst[i][2]),Qt.ToolTipRole)
-				except:
-					pass
-			if Color:
-				try:
-					self.setItemData(i,colors[lst[i][3]],Qt.BackgroundColorRole)
-				except:
-					pass
+# 	def Fill(self,function,Remarque=False,Color=False):
+# 		self.clear()
+# 		lst=function
+# 		for i in lst:
+# 			self.addItem(i[1],i[0])
+# 		colors=[Qt.black,Qt.red,Qt.green]
+# 		for i in range(self.count()):
+# 			if Remarque:
+# 				try:
+# 					self.setItemData(i,QVariant(lst[i][2]),Qt.ToolTipRole)
+# 				except:
+# 					pass
+# 			if Color:
+# 				try:
+# 					self.setItemData(i,colors[lst[i][3]],Qt.BackgroundColorRole)
+# 				except:
+# 					pass
 					
 	def GetData(self):
 		value=self.itemData(self.currentIndex()).toInt()
@@ -45,6 +45,13 @@ class MyComboBox(QComboBox):
 			idata=None
 			print 'Erreur d\'index: %s,\" %s\"'%(self.objectName(),self.currentText())
 		return idata
+	
+	def Setid(self,idTable):
+		index=[i for i,j in enumerate(self.model().listdata) if idTable==j[0].toInt()[0]]
+		if len(index)==0:
+			self.setCurrentIndex(0)
+		else:
+			self.setCurrentIndex(index[0])
 	
 	def Getid(self):
 		return self.itemData(self.currentIndex(),Qt.UserRole).toInt()[0]
@@ -92,6 +99,12 @@ class MyPlainTextEdit(QPlainTextEdit):
 class MyTableView(QTableView):
 	def __init__(self,parent=None):
 		super(MyTableView,self).__init__(parent)
+	
+	def keyReleaseEvent(self,event):
+		if event.key()==Qt.Key_Return or event.key()==Qt.Key_Enter:
+			self.emit(SIGNAL("OnEnter"))
+		else:
+			QTableWidget.keyPressEvent(self,event)
 		
 	def autoResize(self,varcol):
 		#redimentionne avec la colonne varcol étant la plus large possible, sous réserve que les autres colonnes affichent les données en entier.

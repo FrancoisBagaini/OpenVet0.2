@@ -269,6 +269,8 @@ class Field:
         self.Maxlength=None
         if tmp.count('(') and 'varchar' not in tmp:
             self.Type=tmp[:tmp.index('(')]
+            if self.Type=='decimal':
+                self.NbDecimals=tmp[tmp.index(',')+1:tmp.index(')')]
             if self.Type=='int' and query.value(3).toString()=='MUL':
                 self.Type='id'
         elif 'varchar' in tmp:

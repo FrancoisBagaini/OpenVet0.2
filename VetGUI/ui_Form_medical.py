@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './Form_medical.ui'
 #
-# Created: Wed Aug 13 21:15:55 2014
+# Created: Mon Sep 29 22:20:31 2014
 #      by: PyQt4 UI code generator 4.7.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -441,7 +441,7 @@ class Ui_tabWidget_medical(object):
         self.label_model.setMaximumSize(QtCore.QSize(110, 16777215))
         self.label_model.setObjectName("label_model")
         self.horizontalLayout_10.addWidget(self.label_model)
-        self.comboBox_model = QtGui.QComboBox(self.layoutWidget2)
+        self.comboBox_model = MyComboBox(self.layoutWidget2)
         self.comboBox_model.setMinimumSize(QtCore.QSize(180, 27))
         self.comboBox_model.setMaximumSize(QtCore.QSize(9999, 27))
         self.comboBox_model.setObjectName("comboBox_model")
@@ -854,6 +854,7 @@ class Ui_tabWidget_medical(object):
         self.toolButton_EditTypeAnalyse.setToolTip(QtGui.QApplication.translate("tabWidget_medical", "AJouter des types d\'analyses", None, QtGui.QApplication.UnicodeUTF8))
         self.toolButton_EditTypeAnalyse.setText(QtGui.QApplication.translate("tabWidget_medical", "...", None, QtGui.QApplication.UnicodeUTF8))
         self.label_model.setText(QtGui.QApplication.translate("tabWidget_medical", "Modèle :", None, QtGui.QApplication.UnicodeUTF8))
+        self.comboBox_model.setToolTip(QtGui.QApplication.translate("tabWidget_medical", "Presser Entrée pour Valider le choix", None, QtGui.QApplication.UnicodeUTF8))
         self.toolButton_EditModelAnalyse.setToolTip(QtGui.QApplication.translate("tabWidget_medical", "AJouter des types d\'analyses", None, QtGui.QApplication.UnicodeUTF8))
         self.toolButton_EditModelAnalyse.setText(QtGui.QApplication.translate("tabWidget_medical", "...", None, QtGui.QApplication.UnicodeUTF8))
         self.label_Parametre.setText(QtGui.QApplication.translate("tabWidget_medical", "Paramètre :", None, QtGui.QApplication.UnicodeUTF8))

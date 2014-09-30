@@ -43,9 +43,10 @@ class GuiConsultation():
         self.parent.connect(self.parent.comboBox_veterinaire,QtCore.SIGNAL("OnEnter"),self.OnConsultantEnter)
         self.parent.toolButton_EditPathologie.clicked.connect(self.EditPathologie)
         self.parent.toolButton_Pathologie.clicked.connect(self.EditCriteresConsultation)
+        self.parent.toolButton_EditDomaine.clicked.connect(self.EditDomaine)
         self.parent.pushButton_valider.clicked.connect(self.SaveConsultation)
         self.parent.pushButton_Nouveau.clicked.connect(self.OnNewConsultation)
-        
+
     def SetAnimal(self,idEspece,idAnimal):
         self.idEspece=idEspece
         self.idAnimal=idAnimal
@@ -84,6 +85,7 @@ class GuiConsultation():
         
     def OnConsultationSelect(self,link):
         self.idConsultation=int(link.toString().toAscii()[2:])
+        self.parent.GuiAnalyse.SetConsultation(self.idConsultation)
         self.MyConsultation.SetConsultation(self.idConsultation)
         if link.toString().toAscii()[1]=='C':
             self.FillFormConsultation()
@@ -169,6 +171,19 @@ class GuiConsultation():
     def OnPathologieEnter(self):
         self.parent.label_Pathologies.setText("<font color=\"blue\">%s</font>"%self.MyConsultation.Pathologies.Add(self.parent.comboBox_Pathologie.Getid()))
 
+    def EditDomaine(self):
+        idDomaine=self.parent.comboBox_PathologieDomaine.Getid()
+        new=[0,'',None,True,False,'']
+        DomaineModel=MyModel('PathologieDomaine',idDomaine,self.parent)
+        if not DomaineModel.SetNew(new):
+            return  
+        data=[[u'Discipline médicale',1,60],[u'Remarque',3,200,80]]
+        form=MyForm('Disciplines médicales',data,self.parent)
+        form.SetModel(DomaineModel,{0:1,1:2})    #GUI_field : DB_Field
+        form.exec_()
+        self.parent.comboBox_PathologieDomaine.setModel(MyComboModel(self.parent,'GetDomaines',u'Tous'))
+        self.parent.comboBox_PathologieDomaine.Setid(idDomaine)
+
     def EditPathologie(self):
         new=[0,'',False,'',True,False]
         idPathologie=self.parent.comboBox_Pathologie.Getid()
@@ -187,13 +202,7 @@ class GuiConsultation():
               [u'Critère',4,None,None,u'Edite les critères pathologiques'],[u'',6,None,None,None,2],[u'Remarque',1,200]]
         form=FormConsultationCriteres(self.idConsultation,data,self.parent)
         form.exec_()
-#         if self.editPathologie is None:
-#             self.editPathologie = FormPathologie(self)
-#         if self.editPathologie.exec_():
-#             self.editPathologie.tableWidget_Criteres.clearContents()
-#             self.editPathologie.NbCriteres=0
-#             print 'Pathologie éditée'
-            
+
     def OnConsultantEnter(self):#TODO: OnEditConsultant
         print'Ouvre formulaire veto'
         
