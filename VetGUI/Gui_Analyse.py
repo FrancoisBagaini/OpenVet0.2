@@ -41,13 +41,12 @@ class GuiAnalyse():
         self.parent.connect(self.parent.listView_AnalyseImage,QtCore.SIGNAL("doubleClicked (QModelIndex)"),self.OnEditAnalyseDocument)
         self.parent.connect(self.parent.listView_Analyses,QtCore.SIGNAL("activated(QModelIndex)"),self.OnListAnalyse)
         self.parent.connect(self.parent.tableView_Parametres,QtCore.SIGNAL("clicked(QModelIndex)"),self.OnClickParametre)
-#        self.parent.connect(self.parent.tableView_Parametres,QtCore.SIGNAL("OnEnter"),self.OnValueParameter)
         self.parent.connect(self.parent.listView_AnalyseImage,QtCore.SIGNAL("clicked(QModelIndex)"),self.OnClickDocument)
         self.parent.toolButton_AddAnalyse.clicked.connect(self.OnNewAnalyse)
-        self.parent.pushButton_SaveAnalyse.clicked.connect(self.OnSaveAnalyse) 
-        self.parent.connect(self.parent.comboBox_typeanalyse,QtCore.SIGNAL("currentIndexChanged(int)"),self.OnTypeAnalyse)
+        self.parent.toolButton_DeleteAnalyse.clicked.connect(self.OnDeleteAnalyse)
+        self.parent.pushButton_SaveAnalyse.clicked.connect(self.OnSaveAnalyse)
+        self.parent.comboBox_typeanalyse.activated.connect(self.OnTypeAnalyse)
         self.parent.toolButton_EditTypeAnalyse.clicked.connect(self.OnEditTypeAnalyse)
-#        self.parent.connect(self.parent.comboBox_model,QtCore.SIGNAL("currentIndexChanged(int)"),self.OnModelAnalyse)
         self.parent.connect(self.parent.comboBox_model,QtCore.SIGNAL("OnEnter"),self.OnModelAnalyse)
         self.parent.toolButton_EditModelAnalyse.clicked.connect(self.OnEditModel)
         self.parent.toolButton_EditParametre.clicked.connect(self.OnEditParametre)
@@ -81,12 +80,22 @@ class GuiAnalyse():
     def SetAnimal(self,idEspece,idAnimal):
         self.idAnimal=idAnimal
         self.idEspece=idEspece
-        self.MyAnalyses=Core_Analyse.Analyses(self.idAnimal)
+        self.MyAnalyses=MyComboModel(self.parent,'GetAnalysesAnimal(%i)'%self.idAnimal)
+#         self.MyAnalyses=Core_Analyse.Analyses(self.idAnimal)
         self.parent.listView_Analyses.setModel(self.MyAnalyses)
         self.HideAnalyse()
     
     def SetConsultation(self,idConsultation):
         self.idConsultation=idConsultation
+    
+    def ResetAnalyses(self):
+        self.parent.tableView_Parametres.model().Clear()
+        self.parent.listView_AnalyseImage.model().listdata=[]
+        self.MyAnalyses=MyComboModel(self.parent,'GetAnalysesAnimal(%i)'%self.idAnimal)
+        self.parent.listView_Analyses.setModel(self.MyAnalyses)
+        self.MyAnalyse.Get(0,self.idConsultation,self.idEspece)
+        self.parent.dateTimeEdit_analyse.setDateTime(QtCore.QDateTime.currentDateTime())     
+        self.HideAnalyse()
     
     def GuiAnalyse(self):
         self.parent.comboBox_typeanalyse.setVisible(True)
@@ -147,7 +156,7 @@ class GuiAnalyse():
         if index.isValid():
             idAnalyse=index.data(QtCore.Qt.UserRole).toInt()[0]
             self.MyAnalyse.Get(idAnalyse,self.idConsultation,self.idEspece)
-            self.OnTypeAnalyse(None)
+            self.OnTypeAnalyse()
                     
     def OnNewAnalyse(self):
         if self.idConsultation==0:
@@ -161,6 +170,17 @@ class GuiAnalyse():
             self.MyAnalyse.Get(0,self.idConsultation,self.idEspece)
             self.parent.dateTimeEdit_analyse.setDateTime(QtCore.QDateTime.currentDateTime())
             self.parent.lineEdit_description.setFocus()
+    
+    def OnDeleteAnalyse(self):  
+        indexAnalyses=self.parent.listView_Analyses.currentIndex()  
+        if QtGui.QMessageBox.question(self.parent,'OpenVet',u'Etes-vous sûre de vouloir effacer l\'analyse : %s ?'%self.parent.listView_Analyses.model().data(indexAnalyses,Qt.DisplayRole).toString(),QtGui.QMessageBox.Yes| QtGui.QMessageBox.Default,QtGui.QMessageBox.No)==QtGui.QMessageBox.No:
+                return
+        self.MyAnalyse.Delete(self.parent.listView_Analyses.model().data(indexAnalyses,Qt.UserRole).toInt()[0])
+#         self.parent.listView_Analyses.model().setData(indexAnalyses,1,33)
+#         self.parent.listView_Analyses.model().setData(indexAnalyses,6,Qt.ForegroundRole)
+#        self.parent.listView_Analyses.model().Update('Analyse',[0,])
+        self.ResetAnalyses()
+        
         
     def OnDeleteParametre(self):
         index=self.parent.tableView_Parametres.currentIndex()
@@ -181,18 +201,19 @@ class GuiAnalyse():
         elif not self.MyAnalyse.isImage and self.parent.radioButton_Document.isChecked():
             self.MyAnalyse.Documents.SetRemarque(self.parent.lineEdit_AnalyseRemarque.text())
         else:
-            self.parent.tableView_Parametres.setData(self.parent.tableView_Parametres.currentIndex(),QVariant(self.parent.lineEdit_AnalyseRemarque.text()),Qt.ToolTipRole)
+            self.parent.tableView_Parametres.model().setData(self.parent.tableView_Parametres.currentIndex(),QVariant(self.parent.lineEdit_AnalyseRemarque.text()),Qt.ToolTipRole)
                     
-    def OnTypeAnalyse(self,index=None):
-        self.idTypeAnalyse=self.idTypeAnalyse=self.parent.comboBox_typeanalyse.Getid() 
+    def OnTypeAnalyse(self):
+        self.idTypeAnalyse=self.parent.comboBox_typeanalyse.Getid() 
         if self.idTypeAnalyse==0:
             return
-        self.MyAnalyse.IsQuantitatif(self.parent.comboBox_typeanalyse.model().data(self.parent.comboBox_typeanalyse.model().index(self.parent.comboBox_typeanalyse.currentIndex()),34))
+        self.MyAnalyse.isImage= self.parent.comboBox_typeanalyse.model().data(self.parent.comboBox_typeanalyse.model().index(self.parent.comboBox_typeanalyse.currentIndex()),34).toBool()
         self.GuiAnalyse()
         if self.MyAnalyse.idAnalyse==0:
             if not self.MyAnalyse.isImage:
                 self.parent.comboBox_Parametre.setModel(MyComboModel(self.parent,'GetParametres(%i,%i)'%(self.idTypeAnalyse,self.idEspece)))
                 self.parent.comboBox_model.setModel(MyComboModel(self.parent,'GetModeles(%i,%i)'%(self.idTypeAnalyse,self.idEspece)))
+            #TODO: else affiche image widgets
         else:
 #             if self.MyAnalyse.Resultats is None:
 #                 return  #Myanalyse have been modified by Table.SetFilter and so have been combobox.TypeAnalyse, but Resultats have not been initialized yet. 
@@ -226,9 +247,9 @@ class GuiAnalyse():
                     self.parent.lineEdit_description.setText(self.parent.comboBox_model.itemData(index,QtCore.Qt.DisplayRole).toString())
             else:
                 self.parent.lineEdit_description.setText(self.parent.comboBox_model.itemData(index,QtCore.Qt.DisplayRole).toString())
-            Core_Analyse.Analyse.idModeleAnalyse=idModele
+            self.MyAnalyse.idModeleAnalyse=idModele
             debut=self.parent.tableView_Parametres.model().rowCount()
-            self.parent.tableView_Parametres.model().InsertModelAnalyse(idModele)
+            self.parent.tableView_Parametres.model().InsertModelAnalyse(idModele,self.MyAnalyse.idAnalyse)
             self.parent.tableView_Parametres.autoResize(0)
             self.parent.tableView_Parametres.edit(self.parent.tableView_Parametres.model().index(debut, 1, QtCore.QModelIndex()))
         else:
@@ -297,9 +318,9 @@ class GuiAnalyse():
     
     def OnAddParametre(self):        
         i=self.parent.comboBox_Parametre.model().listdata[self.parent.comboBox_Parametre.currentIndex()]
-        idParametre=QVariant(self.parent.comboBox_Parametre.Getid())#=i[0]
-        if self.parent.tableView_Parametres.model().isExist(idParametre,10)==0:
-            data=[0,i[1],QVariant(),i[6],i[7],i[8],QVariant(i[2]),QVariant(0),QVariant(0),i[5],idParametre]
+#       idParametre=i[0]
+        if self.parent.tableView_Parametres.model().isExist(i[0],10)==0:
+            data=[QVariant(0),i[1],QVariant(),i[6],i[7],i[8],QVariant(i[2]),QVariant(0),QVariant(0),i[5],i[0],QVariant(self.MyAnalyse.idAnalyse),QVariant()]
             self.parent.tableView_Parametres.model().insertRows(self.parent.comboBox_Parametre.model().rowCount(),data)
             self.parent.tableView_Parametres.autoResize(0)
             self.parent.tableView_Parametres.edit(self.parent.tableView_Parametres.model().index(self.parent.tableView_Parametres.model().rowCount()-1, 1, QtCore.QModelIndex()))
@@ -307,7 +328,7 @@ class GuiAnalyse():
             QtGui.QMessageBox.warning(self.parent,u"Alerte OpenVet",u'Ce paramètre est déjà présent dans la liste.', QtGui.QMessageBox.Ok | QtGui.QMessageBox.Default)
                 
     def OnImportAnalyse(self):
-        self.importAnalyse = FormAnalyse(self)
+        self.importAnalyse = FormAnalyse(self.parent)
         if self.importAnalyse.exec_():
             if self.MyAnalyse.Documents.insertRows(0,[self.importAnalyse.Titre,self.importAnalyse.Etiquette,self.importAnalyse.FichierInterne]):
                 QtGui.QMessageBox.warning(self,u"Alerte OpenVet",u'Cette image est déjà présente dans la liste.', QtGui.QMessageBox.Ok | QtGui.QMessageBox.Default)
@@ -327,6 +348,5 @@ class GuiAnalyse():
     def OnSaveAnalyse(self):
         valid=self.MyAnalyse.Save()
         QtGui.QToolTip.showText(QtGui.QCursor.pos(),valid, widget=None)
-        self.MyAnalyses=Core_Analyse.Analyses(self.idAnimal)
-        self.parent.listView_Analyses.setModel(self.MyAnalyses)      
+        self.ResetAnalyses()
         

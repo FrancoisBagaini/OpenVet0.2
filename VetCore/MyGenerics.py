@@ -372,7 +372,7 @@ class MyTableModel(QAbstractTableModel):
         if self.rowCount()==0:
             return False
         self.beginRemoveRows(QModelIndex(), position, position + rows - 1)
-        self.Deleted.append('%i' % self.listdata[position][0].toInt()[0])
+#        self.Deleted.append('%i' % self.listdata[position][0].toInt()[0])
         self.listdata = self.listdata[:position] + self.listdata[position + rows:]
         self.endRemoveRows()
         self.dirty = True

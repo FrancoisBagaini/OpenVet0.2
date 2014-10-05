@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './Form_medical.ui'
 #
-# Created: Mon Sep 29 22:20:31 2014
+# Created: Sat Oct  4 12:32:56 2014
 #      by: PyQt4 UI code generator 4.7.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -505,11 +505,6 @@ class Ui_tabWidget_medical(object):
         self.radioButton_Document = QtGui.QRadioButton(self.layoutWidget3)
         self.radioButton_Document.setObjectName("radioButton_Document")
         self.horizontalLayout_11.addWidget(self.radioButton_Document)
-        self.toolButton_EditAnalyse = QtGui.QToolButton(self.tab_analyse)
-        self.toolButton_EditAnalyse.setGeometry(QtCore.QRect(90, 400, 26, 25))
-        self.toolButton_EditAnalyse.setIcon(icon)
-        self.toolButton_EditAnalyse.setIconSize(QtCore.QSize(20, 20))
-        self.toolButton_EditAnalyse.setObjectName("toolButton_EditAnalyse")
         tabWidget_medical.addTab(self.tab_analyse, "")
         self.tab_ordonnance = QtGui.QWidget()
         self.tab_ordonnance.setObjectName("tab_ordonnance")
@@ -865,7 +860,6 @@ class Ui_tabWidget_medical(object):
         self.label_VueAnalyse.setText(QtGui.QApplication.translate("tabWidget_medical", "Vue :", None, QtGui.QApplication.UnicodeUTF8))
         self.radioButton_Parametre.setText(QtGui.QApplication.translate("tabWidget_medical", "Parametres", None, QtGui.QApplication.UnicodeUTF8))
         self.radioButton_Document.setText(QtGui.QApplication.translate("tabWidget_medical", "Documents", None, QtGui.QApplication.UnicodeUTF8))
-        self.toolButton_EditAnalyse.setText(QtGui.QApplication.translate("tabWidget_medical", "...", None, QtGui.QApplication.UnicodeUTF8))
         tabWidget_medical.setTabText(tabWidget_medical.indexOf(self.tab_analyse), QtGui.QApplication.translate("tabWidget_medical", "Analyses", None, QtGui.QApplication.UnicodeUTF8))
         self.label_RCP.setText(QtGui.QApplication.translate("tabWidget_medical", "Mentions légales :", None, QtGui.QApplication.UnicodeUTF8))
         self.toolButton.setToolTip(QtGui.QApplication.translate("tabWidget_medical", "Texte complet", None, QtGui.QApplication.UnicodeUTF8))

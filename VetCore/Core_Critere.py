@@ -37,7 +37,7 @@ class FormConsultationCriteres(MyForm):
         self.MyModel.SetEditableCol([2,5])
         self.MyModel.SetRightAligned([3,4,5,6])
         self.fields[4].setModel(self.MyModel)  
-        self.fields[4].resizeColumnsToContents()  
+        self.fields[4].resizeColumnsToContents()
         self.connect(self.MyModel,SIGNAL("dataChanged(QModelIndex,QModelIndex)"),self.OnCritereValueChange) 
         self.OnExamen(0)
         
