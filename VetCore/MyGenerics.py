@@ -7,7 +7,7 @@ import os
 import sys
 import config
 import Core
-from DBase import Request
+from DBase import *
 from Mywidgets import *
 from operator import itemgetter
 
@@ -61,9 +61,12 @@ class MyComboModel(QAbstractListModel):     #Convient aussi pour QListView
     def Set(self,routine=None,firstField=None):
         if not routine is None:
             self.Routine=routine
-        self.listdata = self.MyRequest.GetComboList('CALL %s'%self.Routine,firstField )
-        if self.MyRequest.lastError().isValid():
-            self.error=self.MyRequest.lastError().text()
+            self.listdata = self.MyRequest.GetComboList('CALL %s'%self.Routine,firstField )
+            if self.MyRequest.lastError().isValid():
+                self.error=self.MyRequest.lastError().text()
+        else:
+            self.listdata = []
+        
                 
     def rowCount(self,parent=QModelIndex()): 
         return len(self.listdata)
@@ -147,6 +150,10 @@ class MyComboModel(QAbstractListModel):     #Convient aussi pour QListView
         self.listdata.append(data)
         self.endInsertRows()
         self.dirty = True
+
+    def DeleteLine(self,index):
+        self.dirty = True
+        self.setData(index, 1, 33)
            
     def GetIndex(self,currentid):
         res=[i for i in self.listdata if i[0]==currentid]
@@ -168,6 +175,12 @@ class MyComboModel(QAbstractListModel):     #Convient aussi pour QListView
         model.Update()
         #if model.Newvalues[0]==0:return model.lastid else: return model.Newvalues[0]
         return model.lastid
+    
+    def DeleteAll(self,table,parent):
+        self.dirty=True
+        for i in self.listdata:
+            i[4]=1
+        self.Update(table,None,parent)  
             
     def DeleteItem(self,table,id,parent):
         model=MyModel(table,abs(id),parent)
@@ -201,28 +214,6 @@ class MyComboModel(QAbstractListModel):     #Convient aussi pour QListView
                 self.DeleteItem(tableref,abs(idtableref),parent)
                 if isdeltable and idtable!=0:
                     self.DeleteItem(table,abs(idtable),parent)
-                    
-#     def Fdata(self,col,vtype=None,debug=False):     #TODO: Move in Core Fdata(self,value,vtype=None,debug=False)
-#         value=self.listdata[col]
-#         if vtype is None:
-#             vtype=value.typeName()
-#         if value.isNull():
-#             if debug:
-#                 return 'NULL'
-#             else:
-#                 return QString('')
-#         elif vtype=='QDate':
-#             return value.toDate().toString('dd/MM/yyyy')
-#         elif vtype=='QDateTime':
-#             return value.toDateTime().toString('dd/MM/yyyy hh:mm')
-#         elif vtype in ['int','qlonglong']:
-#             return value.toInt()[0]
-#         elif vtype=='QString':
-#             return value.toString()
-#         elif vtype=='bool':
-#             return value.toBool()
-#         else:
-#             return u'indeterminé'
         
     def Print(self):
         fields=['id',u'Libélé','Remarque','Color','isDeleted']
@@ -414,11 +405,17 @@ class MyTableModel(QAbstractTableModel):
     def DeleteItem(self,table,id,parent):
         model=MyModel(table,abs(id),parent)
         model.Delete()
-        
+    
+    def DeleteAll(self,table,parent,delindex=4):
+        self.dirty=True
+        for i in self.listdata:
+            i[delindex]=1
+        self.Update(table,None,parent,0,delindex)   
+
     def Update(self,table,maplist,parent,idindex=0,delindex=4):
         if not self.dirty:
                 return
-        #BeginTransaction
+        #BeginTransaction TODO: is transaction
         for i in self.listdata:
             id=i[idindex].toInt()[0]
             if id<=0 and not i[delindex].toBool():
@@ -444,88 +441,13 @@ class MyTableModel(QAbstractTableModel):
             elif isdeltableref and idtableref!=0:
                 self.DeleteItem(tableref,abs(idtableref),parent)
                 if isdeltable and idtable!=0:
-                    self.DeleteItem(table,abs(idtable),parent)
-     
-#     def Save(self, idAnalyse): 
-#         Myrequest = Request('ResultatAnalyse')  
-#         for i in self.Deleted:
-#             Myrequest.Delete([Myrequest.Fields[0].Name, i])
-#         for i in self.listdata:
-#             if not i[9]:
-#                 continue  # Not modified
-#             values = [i[0], QVariant(idAnalyse),i[8]]
-#             if i[2].toFloat()[1]:
-#                 values.extend([i[2], None, None,None,None, i[6]])
-#             else:
-#                 values.extend([None, i[2], None,None,None,i[6]])
-#             (err, values) = Myrequest.ValidData(values)
-#             if len(err) == 0:
-#                 # TODO Myrequest.Save(values,[3,4,9]) if update  
-#                 error = Myrequest.Save(values)
-#                 if not error.isValid():
-#                     return error
-#             else:
-#                 print 'Erreur dans la table %s pour le(s) champ(s): %s' % (Myrequest.Table, ','.join(err))
-#                 return QSqlError('','Erreur dans la table %s pour le(s) champ(s): %s' % (Myrequest.Table, ','.join(err)))   
-
-        
-# class MyTable(QSqlTableModel):
-#     def __init__(self, table,idTable,parent=None, *args):
-#         QSqlTableModel.__init__(self, parent, *args)
-#         self.Table=table
-#         self.setTable(table)
-#         self.setFilter('id%s=%i'%(table,idTable))
-#         self.select()
-#         self.fields=[]
-#         self.NbFields=0
-#         self.MyRequest=Request(table)
-#         self.GetFields()
-#         
-#     def GetFields(self):
-#         self.Fields=self.MyRequest.GetFields()
-#         self.NbFields=len(self.Fields)
-#          
-#     def SetNew(self,new):
-#         if self.NbFields!=len(new):
-#             return False
-#         else:
-#             self.Newfields=new
-#             return True
-#         
-#     def Setid(self,idTable):
-#         self.setFilter('id%s=%i'%(self.Table,idTable))
-#        
-#     def New(self):
-#         self.setFilter('id%s=0'%self.Table)
-#         self.insertRow(0)
-#         for index,i in enumerate(self.Newfields):
-#             self.setData(self.index(0, index), QVariant(i), Qt.EditRole)
-#         
-#     def Delete(self,row):
-#         id=self.record(row).value(0).toInt()[0]
-#         self.removeRow(row)
-#         self.MyRequest.Delete_Act(id)
-#         
-#     def Update(self,index):
-#         rec=self.record(0)
-#         self.NbFields=rec.count()
-#         values=[]
-#         for i in range(self.NbFields):
-#             value=rec.value(i)
-#             if value.isNull():
-#                 value=None
-#             values.append(value)
-#         (err, values) =self.MyRequest.ValidData(values, self.Fields)
-#         if len(err) == 0:
-#             error = self.MyRequest.Save(values)
-#         if error.isValid():
-#             return error
-#         #self.submitAll()
+                    self.DeleteItem(table,abs(idtable),parent) 
  
         
 class MyModel(QAbstractListModel):  #TODO: rename in MyRecordModel
     def __init__(self, table,idTable,parent=None, *args):
         QAbstractListModel.__init__(self, parent, *args)
+        self.parent=parent
         if isinstance(idTable,QVariant):
             idTable=idTable.toInt()[0]
         self.Table=table
@@ -642,11 +564,14 @@ class MyModel(QAbstractListModel):  #TODO: rename in MyRecordModel
                 self.lasterror=error
                 if self.lasterror.type()==2:
                     MyError(self.ParentWidget,u'La requête \"%s\" constitue un doublon.'%self.MyRequest.lastQuery())
+                    return QVariant()
             else:
                 self.lastid=self.MyRequest.lastID
                 return self.lastid
         else:
-            MyError(u'Les champs %s sont invalides'%','.join(err))
+            MyError(self.parent,u'Les champs %s sont invalides'%','.join(err))
+            self.lasterror=u'Les champs %s sont invalides'%','.join(err)
+            return -1
  
 
 LINEEDIT,CHECKBOX,PLAINTEXTEDIT,COMBOBOX,LIST,TABLE,LABELS,SPINBOX = range(1,9)

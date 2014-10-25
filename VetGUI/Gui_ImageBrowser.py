@@ -9,6 +9,7 @@ from PyQt4.QtGui import *
 #import poppler
 #from PySide import QtCore, QtGui
 sys.path.append('../VetCore')
+import config
 from ui_Form_DialogAnalyse import Ui_Form_DialogAnalyse
 from Viewer import DocViewer
 
@@ -30,10 +31,10 @@ class FormAnalyse(QDialog, Ui_Form_DialogAnalyse):
         self.toolButton_Fichier.clicked.connect(self.OnFile)
         self.radioButton_img.clicked.connect(self.OnRadio)
         self.radioButton_doc.clicked.connect(self.OnRadio)
-        self.pushButton_Ok.clicked.connect(self.OnValide)
+        self.pushButton_Ok.clicked.connect(self.OnValid)
         self.pushButton_Cancel.clicked.connect(self.OnCancel)
         #ToolBar
-        contrast=QAction(QIcon('../images/contraste.png'),'Contraste',self)
+        contrast=QAction(QIcon('../images/contraste.png'),'Contraste',self) #Path_Icones
         brightness=QAction(QIcon('../images/luminosite.png'),u'Luminosité',self)
         balance=QAction(QIcon('../images/balance.png'),'Balance',self)
         sharpen=QAction(QIcon('../images/scalpel.png'),u'Améliore nettetée',self)
@@ -68,9 +69,9 @@ class FormAnalyse(QDialog, Ui_Form_DialogAnalyse):
         self.FichierPerso=self.MyViewer.Filename_('_p',data[1])
         if os.path.isfile(self.FichierPerso):
             data[1]=self.FichierPerso
-        self.label_FichierInterne.setText('Fichier :../Archives/%s'%data[1])
+        self.label_FichierInterne.setText('Fichier :%s%s'%(config.Path_Analyses,data[1]))
         path=data[1]
-        self.MyViewer.SetFilename('../Archives/%s'%path)
+        self.MyViewer.SetFilename('%s%s'%(config.Path_Analyses,path))
         self.ext=self.MyViewer.GetSuffix()
         if str(self.ext) in ['jpg','jpeg','bmp','png','pdf']:
             self.verticalLayout_4.setMenuBar(self.ToolBar)
@@ -127,10 +128,10 @@ class FormAnalyse(QDialog, Ui_Form_DialogAnalyse):
     def OnContrast(self):
         pass
         
-    def OnValide(self):
+    def OnValid(self):
         if self.Importe:
-            copyfile(self.Path,'../Archives/%s'%self.FichierInterne)
-            self.Etiquette=self.MyViewer.MakeSticker(self.SizeSticker,'../Archives/%s'%self.FichierInterne)
+            copyfile(self.Path,'%s%s'%(config.Path_Analyses,self.FichierInterne))
+            self.Etiquette=self.MyViewer.MakeSticker(self.SizeSticker,'%s%s'%(config.Path_Analyses,self.FichierInterne))
         self.Titre=self.lineEdit_Titre.text()
         self.accept()
         

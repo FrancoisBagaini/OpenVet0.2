@@ -81,7 +81,6 @@ class GuiAnalyse():
         self.idAnimal=idAnimal
         self.idEspece=idEspece
         self.MyAnalyses=MyComboModel(self.parent,'GetAnalysesAnimal(%i)'%self.idAnimal)
-#         self.MyAnalyses=Core_Analyse.Analyses(self.idAnimal)
         self.parent.listView_Analyses.setModel(self.MyAnalyses)
         self.HideAnalyse()
     
@@ -89,12 +88,12 @@ class GuiAnalyse():
         self.idConsultation=idConsultation
     
     def ResetAnalyses(self):
-        self.parent.tableView_Parametres.model().Clear()
-        self.parent.listView_AnalyseImage.model().listdata=[]
         self.MyAnalyses=MyComboModel(self.parent,'GetAnalysesAnimal(%i)'%self.idAnimal)
         self.parent.listView_Analyses.setModel(self.MyAnalyses)
         self.MyAnalyse.Get(0,self.idConsultation,self.idEspece)
-        self.parent.dateTimeEdit_analyse.setDateTime(QtCore.QDateTime.currentDateTime())     
+        self.parent.dateTimeEdit_analyse.setDateTime(QtCore.QDateTime.currentDateTime())
+        if self.parent.listView_AnalyseImage.model():
+            self.parent.listView_AnalyseImage.model().Set(None)     
         self.HideAnalyse()
     
     def GuiAnalyse(self):
@@ -122,10 +121,7 @@ class GuiAnalyse():
             model.SetRightAligned([1,2,3,4,5])
             self.parent.tableView_Parametres.setModel(model)  
             self.parent.tableView_Parametres.autoResize(0)
-    #        if not self.MyAnalyse.Resultats is None:
-    #            self.connect(self.MyAnalyse.Resultats,QtCore.SIGNAL("dataChanged(QModelIndex,QModelIndex)"),self.OnParametreChanged)
-            if not self.MyAnalyse.Documents is None:
-                self.parent.listView_AnalyseImage.setModel(self.MyAnalyse.Documents) 
+            self.parent.listView_AnalyseImage.setModel(Core_Analyse.ModelViewImages(self.parent,'GetResultatImage(%i)'%self.MyAnalyse.idAnalyse))             
         else:
             self.parent.tableView_Parametres.setHidden(True)
             self.parent.comboBox_Parametre.setHidden(True)
@@ -135,8 +131,7 @@ class GuiAnalyse():
             self.parent.label_VueAnalyse.setVisible(False)
             self.parent.radioButton_Parametre.setVisible(False)
             self.parent.radioButton_Document.setVisible(False)
-            if not self.MyAnalyse.Documents is None:
-                self.parent.listView_AnalyseImage.setModel(self.MyAnalyse.Documents)
+            self.parent.listView_AnalyseImage.setModel(Core_Analyse.ModelViewImages(self.parent,'GetResultatImage(%i)'%self.MyAnalyse.idAnalyse))
     
     def OnVueAnalyse(self):
         if self.parent.radioButton_Parametre.isChecked():
@@ -175,13 +170,9 @@ class GuiAnalyse():
         indexAnalyses=self.parent.listView_Analyses.currentIndex()  
         if QtGui.QMessageBox.question(self.parent,'OpenVet',u'Etes-vous sûre de vouloir effacer l\'analyse : %s ?'%self.parent.listView_Analyses.model().data(indexAnalyses,Qt.DisplayRole).toString(),QtGui.QMessageBox.Yes| QtGui.QMessageBox.Default,QtGui.QMessageBox.No)==QtGui.QMessageBox.No:
                 return
-        self.MyAnalyse.Delete(self.parent.listView_Analyses.model().data(indexAnalyses,Qt.UserRole).toInt()[0])
-#         self.parent.listView_Analyses.model().setData(indexAnalyses,1,33)
-#         self.parent.listView_Analyses.model().setData(indexAnalyses,6,Qt.ForegroundRole)
-#        self.parent.listView_Analyses.model().Update('Analyse',[0,])
-        self.ResetAnalyses()
-        
-        
+        if self.MyAnalyse.Delete(self.parent,self.parent.listView_Analyses.model().data(indexAnalyses,Qt.UserRole).toInt()[0]):
+            self.ResetAnalyses()
+             
     def OnDeleteParametre(self):
         index=self.parent.tableView_Parametres.currentIndex()
         if not self.MyAnalyse.Resultats.data(index,QtCore.Qt.DisplayRole).toString().isEmpty():
@@ -193,13 +184,11 @@ class GuiAnalyse():
         self.parent.lineEdit_AnalyseRemarque.setText(self.parent.tableView_Parametres.model().data(index,Qt.ToolTipRole).toString() )    
           
     def OnClickDocument(self,index):
-        self.parent.lineEdit_AnalyseRemarque.setText(self.MyAnalyse.Documents.GetRemarque(index))
+        self.parent.lineEdit_AnalyseRemarque.setText(self.parent.listView_AnalyseImage.model().data(index,Qt.ToolTipRole).toString())
         
     def OnAnalyseRemarque(self):
-        if self.MyAnalyse.isImage:
-            self.MyAnalyse.Documents.SetRemarque(self.parent.lineEdit_AnalyseRemarque.text())
-        elif not self.MyAnalyse.isImage and self.parent.radioButton_Document.isChecked():
-            self.MyAnalyse.Documents.SetRemarque(self.parent.lineEdit_AnalyseRemarque.text())
+        if self.MyAnalyse.isImage or (not self.MyAnalyse.isImage and self.parent.radioButton_Document.isChecked()):
+            self.parent.listView_AnalyseImage.model().setData(self.parent.listView_AnalyseImage.currentIndex(),QVariant(self.parent.lineEdit_AnalyseRemarque.text()),Qt.ToolTipRole)
         else:
             self.parent.tableView_Parametres.model().setData(self.parent.tableView_Parametres.currentIndex(),QVariant(self.parent.lineEdit_AnalyseRemarque.text()),Qt.ToolTipRole)
                     
@@ -213,10 +202,8 @@ class GuiAnalyse():
             if not self.MyAnalyse.isImage:
                 self.parent.comboBox_Parametre.setModel(MyComboModel(self.parent,'GetParametres(%i,%i)'%(self.idTypeAnalyse,self.idEspece)))
                 self.parent.comboBox_model.setModel(MyComboModel(self.parent,'GetModeles(%i,%i)'%(self.idTypeAnalyse,self.idEspece)))
-            #TODO: else affiche image widgets
+            #TODO: else affiche image widgets ??
         else:
-#             if self.MyAnalyse.Resultats is None:
-#                 return  #Myanalyse have been modified by Table.SetFilter and so have been combobox.TypeAnalyse, but Resultats have not been initialized yet. 
             self.parent.comboBox_model.setVisible(False)
             self.parent.label_model.setVisible(False)
             self.parent.toolButton_EditModelAnalyse.setVisible(False)
@@ -330,20 +317,22 @@ class GuiAnalyse():
     def OnImportAnalyse(self):
         self.importAnalyse = FormAnalyse(self.parent)
         if self.importAnalyse.exec_():
-            if self.MyAnalyse.Documents.insertRows(0,[self.importAnalyse.Titre,self.importAnalyse.Etiquette,self.importAnalyse.FichierInterne]):
-                QtGui.QMessageBox.warning(self,u"Alerte OpenVet",u'Cette image est déjà présente dans la liste.', QtGui.QMessageBox.Ok | QtGui.QMessageBox.Default)
+            if not self.parent.listView_AnalyseImage.model().isDoublon(self.importAnalyse.Etiquette,self.importAnalyse.FichierInterne):
+                self.parent.listView_AnalyseImage.model().NewLine([0,self.importAnalyse.Titre,'',self.importAnalyse.Etiquette,0,self.importAnalyse.FichierInterne,self.MyAnalyse.idAnalyse,QVariant()])
+            else:
+                QtGui.QMessageBox.warning(self.parent,u"Alerte OpenVet",u'Cette image est déjà présente dans la liste.', QtGui.QMessageBox.Ok | QtGui.QMessageBox.Default)                 
                 
     def OnEditAnalyseDocument(self,index=None):
         if index is None:
-            index=self.parent.listView_Analyses.currentIndex()
+            index=self.parent.listView_AnalyseImage.currentIndex()
         self.importAnalyse = FormAnalyse(self.parent)
-        self.importAnalyse.Set(self.MyAnalyse.Documents.GetDocument(index))
+        self.importAnalyse.Set(self.parent.listView_AnalyseImage.model().GetDocument(index))
         if self.importAnalyse.exec_():
-            self.MyAnalyse.Documents.setData(index,QtCore.QVariant(self.importAnalyse.Titre))
+            self.parent.listView_AnalyseImage.model().setData(index,self.importAnalyse.Titre)
         
     def OnDeleteAnalyseDocument(self):
-        index=self.parent.listView_Analyses.currentIndex()
-        self.MyAnalyse.Documents.RemoveRow(index.row())
+        index=self.parent.listView_AnalyseImage.currentIndex()
+        self.parent.listView_AnalyseImage.model().DeleteLine(index)
                          
     def OnSaveAnalyse(self):
         valid=self.MyAnalyse.Save()

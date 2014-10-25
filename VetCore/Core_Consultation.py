@@ -60,7 +60,7 @@ class Consultation(MyModel):
 			text=text+"<a HREF=\"#O%i\"><img style=\"width: 32px; height: 32px;\" alt=\"Ordonnance\" src=\"file:%s\"></a>"%(self.idConsultation,icone)
 		if self.Fdata(isPLANTHERAPEUTIQUE):
 			icone='../images/planT.png'
-			text=text+"<a HREF=\"#T%i\"><img style=\"width: 32px; height: 32px;\" alt=\"Plan Thérapeutique\" src=\"file:%s\"></a>"%(self.idConsultation,icone)
+			text=text+u"<a HREF=\"#T%i\"><img style=\"width: 32px; height: 32px;\" alt=\"Plan Thérapeutique\" src=\"file:%s\"></a>"%(self.idConsultation,icone)
 		text=text+"&emsp;&emsp;&emsp;&emsp;<font color=\"red\">%s</font>"%self.LinePathologies
 		text=text+"<br>%s<br><span style=\"text-decoration:underline;\">Traitements</span> : %s<br>"%(self.Fdata(EXAMEN),self.Fdata(TRAITEMENT))
 		return text
@@ -389,6 +389,26 @@ class Consultations:
 		self.textHTML=self.textHTML+"<a HREF=\"#N-1\"><img title=\"Nouvelle Consultation\" style=\"width: 32px; height: 32px;\" alt=\"Nouvelle Consultation\" src=\"file://%s\"></a>"%(icone)
 		return self.textHTML
 
+
+class FormTypeConsultation(MyForm):
+	def __init__(self,idTable,data,parent):
+		self.idTable=idTable
+		MyForm.__init__(self,u'Type de Consultation',data,parent)
+		new=[0,'','',0,0,1,0,'']
+		model=MyModel('TypeConsultation',idTable,parent)
+		if not model.SetNew(new):
+			return
+		self.SetModel(model, {0:1,1:2,2:3,3:4})
+		
+	def OnValid(self):
+		if self.mapper.submit():
+			self.MyModel.Update(self.mapper.currentIndex())
+			if self.fields[2].isChecked():
+				Request().Execute('UPDATE TypeConsultation SET isDefaut=FALSE WHERE NOT idTypeConsultation=%i'%self.idTable)
+			self.accept()
+		else:
+			if self.mapper.model().lastError().type()==2:
+				QMessageBox.warning(self,u"Alerte OpenVet",u'Cette entrée constitue un doublon', QMessageBox.Ok | QMessageBox.Default)
 
 if __name__ == '__main__':
 	import Tables

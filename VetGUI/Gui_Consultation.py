@@ -3,14 +3,11 @@
 import sys
 from PyQt4 import QtCore, QtGui
 #from PySide import QtCore, QtGui
-#sys.path.append('../VetCore')
-#from Gui_Pathologie import FormPathologie
+sys.path.append('../VetCore')
 
 import time
-import Tables
-import config
-# import Core_Pathologie
-# import Core_Critere
+#import config
+
 from MyGenerics import *
 from Core_Consultation import *
 
@@ -21,7 +18,7 @@ class GuiConsultation():
     
     def __init__(self,parent=None):
         self.Qbase=parent.Qbase
-        self.DBase=Tables.DataBase(config.database) # TODO: remove line
+#        self.DBase=Tables.DataBase(config.database) # TODO: remove line
         self.parent=parent
 #        self.editPathologie=None
 #        self.MyPathologie=Core_Pathologie.Pathologie(self.DBase)     #TODO: use QBase or Request
@@ -154,14 +151,9 @@ class GuiConsultation():
             self.parent.comboBox_Referant.setVisible(False)
             
     def OnEditTypeConsultation(self):
-        id=self.parent.comboBox_consultType.Getid()
-        new=[0,'','',True,'']
-        model=MyModel('TypeConsultation',id,self.parent)
-        if not model.SetNew(new):
-            return
-        data=[[u'Libélé',1,45,1],[u'Remarque',1,120,2]]
-        form=MyForm('type de consultation',data,self.parent)
-        form.SetModel(model, {0:1,1:2})
+        idTable=self.parent.comboBox_consultType.Getid()
+        data=[[u'Libélé',1,45,1],[u'Remarque',1,120,2],[u'Choix par défaut',2],[u'Référé',2]]
+        form=FormTypeConsultation(idTable,data,self.parent)
         if form.exec_():
             self.parent.comboBox_consultType.setModel(MyComboModel(self.parent,'GetTypesConsultation'))
         
@@ -185,7 +177,7 @@ class GuiConsultation():
         self.parent.comboBox_PathologieDomaine.Setid(idDomaine)
 
     def EditPathologie(self):
-        new=[0,'',False,'',True,False]
+        new=[0,'',False,'',True,False,'']
         idPathologie=self.parent.comboBox_Pathologie.Getid()
         model=MyModel('Pathologie',idPathologie,self.parent)
         if not model.SetNew(new):

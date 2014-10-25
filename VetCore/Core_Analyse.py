@@ -30,11 +30,14 @@ import os
 import sys
 import hashlib
 import config
+import subprocess
 from DBase import Request
 from Viewer import DocViewer
 from MyGenerics import *
 import Mywidgets
 from PyQt4.QtGui import *
+
+
 
 class FormParametre(MyForm):
     def __init__(self,idparametre,data,parent):
@@ -79,7 +82,7 @@ class FormModeleAnalyse(MyForm):
 class ModelViewParameters(MyTableModel):
     def __init__(self, parent,nbHeaders,request,cols=None, *args): 
         MyTableModel.__init__(self, parent,nbHeaders,request,cols=None, *args)
-         
+
     def setData(self, index, value, role=Qt.EditRole):
         if not index.isValid() or not index.row() < self.rowCount():
             return False
@@ -141,8 +144,62 @@ class ModelViewParameters(MyTableModel):
             elif i[delindex].toBool() and id!=0:
                 self.DeleteItem(table,abs(id),parent)
 
+class ModelViewImages(MyComboModel):
+    def __init__(self, parent,routine,*args): 
+        MyComboModel.__init__(self, parent,routine)
+        self.MyViewer=DocViewer()
+        self.maxiconesize=QSize(128,96)
+        
+    def data(self, index, role): 
+        if not index.isValid():
+            return
+        if role == Qt.DisplayRole and not self.listdata[index.row()][4].toBool():
+            return QVariant(self.listdata[index.row()][1])
+        elif role == Qt.UserRole and not self.listdata[index.row()][4].toBool():
+            return QVariant(self.listdata[index.row()][0])
+        elif role == Qt.ToolTipRole and not self.listdata[index.row()][4].toBool():
+            return QVariant(self.listdata[index.row()][2])
+        elif role == Qt.DecorationRole and not self.listdata[index.row()][4].toBool():
+            self.MyViewer.SetFilename(config.Path_Analyses+'%s'%self.listdata[index.row()][3].toString())
+            return self.MyViewer.ViewImage(self.maxiconesize)
+        elif role == 33:    #isDeleted
+            return QVariant(self.listdata[index.row()][4])
+        elif role > 33:    #UserProperty
+            return QVariant(self.listdata[index.row()][4+role-33])
+        return QVariant()
+    
+    def GetDocument(self,index):
+        if index.isValid() and index.row() < self.rowCount():
+            self.CurrentIndex = index
+            return [self.listdata[index.row()][1],self.listdata[index.row()][5].toString()]
 
-class Analyse(QSqlTableModel):
+    def isDoublon(self,fileLabel,fileExt):
+        for i in self.listdata:
+            #os.system('compare -metric MAE -fuzz 10%% %s%s %s%s null'%(config.Path_Analyses,i[3].toString(),config.Path_Analyses,fileLabel))==0 Too slow
+            result = subprocess.Popen(['identify','-quiet','-format','%#\n',config.Path_Analyses+i[3].toString(),config.Path_Analyses+fileLabel],stdout=subprocess.PIPE).communicate()[0]
+            if result[65:-2]==result[:64]:
+                os.remove('%s%s'%(config.Path_Analyses,fileLabel))
+                os.remove('%s%s'%(config.Path_Analyses,fileExt))
+                return True
+        return False
+    
+    def SetIdAnalyse(self,idAnalyse):
+        for i in self.listdata:
+            i[6]=QVariant(idAnalyse)
+    
+    def Update(self,table,maplist,parent,idindex=0,delindex=4):
+        if not self.dirty:
+                return
+        for i in self.listdata:
+            id=i[idindex].toInt()[0]
+            if id<=0 and not i[delindex].toBool():
+                self.EditItem(i,table,maplist,idindex,delindex,parent)
+            elif i[delindex].toBool() and id!=0:
+                self.DeleteItem(table,abs(id),parent)
+                os.remove('%s%s'%(config.Path_Analyses,i[3].toString()))
+                os.remove('%s%s'%(config.Path_Analyses,i[5].toString()))
+
+class Analyse(QSqlTableModel):  #TODO: dériver de MyGenerics.MyModel?
     def __init__(self, parent=None, *args):  # parentGui_Consultation
         QSqlTableModel.__init__(self, parent, *args)
         # attributes: idAnalyse,Consultation_idConsultation,TypeAnalyse_idTypeAnalyse,DateHeure,DescriptionAnalyse,Prelevement,SyntheseAnalyse,Conclusions
@@ -163,8 +220,7 @@ class Analyse(QSqlTableModel):
         self.mapper.addMapping(parent.plainTextEdit_syntheseanalyse, 6)
         self.mapper.addMapping(parent.plainTextEdit_conclusions, 7)
         self.mapper.addMapping(parent.comboBox_typeanalyse, 2)
-        self.Resultats = None
-        self.Documents =None
+        self.MyRequest=Request('Analyse')
     
     def IsImage(self):
         self.isImage=Request().GetInt("CALL IsAnalyseImage(%i)" % self.idAnalyse, 0)
@@ -178,144 +234,51 @@ class Analyse(QSqlTableModel):
             self.setFilter('idAnalyse>0')
             row = self.rowCount()
             self.insertRow(row)
-            self.mapper.setCurrentIndex(row)    #Not a valid record for QSQLTable
+            self.mapper.setCurrentIndex(row)
             self.setData(self.index(row, 0), QVariant(0), Qt.EditRole)
             self.setData(self.index(row, 1), QVariant(self.idConsultation), Qt.EditRole)
             self.setData(self.index(row, 3), QVariant(QDateTime.currentDateTime()), Qt.EditRole)
-            self.Documents = ResultatAnalyseImage(0)
         else:
             self.setFilter('idAnalyse=%i' % idAnalyse)
             self.mapper.toFirst()
             self.isImage =self.IsImage()
-            self.Documents = ResultatAnalyseImage(idAnalyse)  
                         
-    def Delete(self,idAnalyse):
-        #TODO supprimer ResultatAnalyse Avant
-        errAnalyse=Request('CALL DeleteItemTable(%i,"Analyse")'%idAnalyse)
+    def Delete(self,parent,idAnalyse):
+        return self.MyRequest.Execute('CALL SoftDeleteItemTable(%i,\"Analyse\")'%idAnalyse)
         
     def Save(self):
-        valid = QString(u'Analyses sauvegardées')
+        valid = None
         self.mapper.submit()
-        #TODO:BeginTransaction
+        self.MyRequest.driver().beginTransaction()
         self.submitAll()
         errAnalyse = self.lastError()
         if not errAnalyse.isValid() or (errAnalyse.isValid() and errAnalyse.text().compare(' No Fields to update') == 0):
             if self.idAnalyse == 0:
-                self.idAnalyse = Request().GetInt("SELECT LAST_INSERT_ID()", 0)
+                self.idAnalyse = Request().GetInt("SELECT LAST_INSERT_ID()", 0)            
+            if not self.parent.tableView_Parametres.model() is None:
                 self.parent.tableView_Parametres.model().SetIdAnalyse(self.idAnalyse)
-            if not self.isImage:      
                 self.parent.tableView_Parametres.model().Update('ResultatAnalyse',[0,11,10,2,2,12,12,12,6,8],self.parent,0,8)
-                if not self.idModeleAnalyse is None:
-                    MyRequest=Request('ModeleAnalyse')
-                    MyRequest.Update(['idModeleAnalyse','LastSelection'],['%i'%self.idModeleAnalyse,'\"%s"'%QDate.currentDate().toString('yyyy-MM-dd')])
-            else:
-                errResultats = self.Documents.Save(self.idAnalyse)
-                if errResultats.isValid():
-                    valid = errResultats.text()
-                    MyError(self.parent,errResultats.text())
-            #TODO: maj lastselection modele
+                if self.parent.tableView_Parametres.model().MyRequest.lastError().isValid():
+                    valid=self.parent.tableView_Parametres.model().MyRequest.lastError().text()
+            if not self.parent.listView_AnalyseImage.model()is None:
+                self.parent.listView_AnalyseImage.model().SetIdAnalyse(self.idAnalyse)    
+                self.parent.listView_AnalyseImage.model().Update('ResultatAnalyse',[0,6,7,7,7,1,5,3,2,4],self.parent,0,4)
+                if self.parent.listView_AnalyseImage.model().MyRequest.lastError().isValid():
+                    valid=self.parent.listView_AnalyseImage.model().MyRequest.lastError().text()
+            if not self.idModeleAnalyse is None:
+                self.MyRequest.SetTable('ModeleAnalyse')
+                self.MyRequest.Update(['idModeleAnalyse','LastSelection'],['%i'%self.idModeleAnalyse,'\"%s"'%QDate.currentDate().toString('yyyy-MM-dd')])
+                if self.MyRequest.lastError().isValid():
+                    valid=self.MyRequest.lastError().text()
         else:
             valid = errAnalyse.text()
+        if valid is None:
+            valid=QString(u'Analyses sauvegardées')
+            self.MyRequest.driver().commitTransaction ()
+        else:
+            self.MyRequest.driver().rollbackTransaction ()
         return valid   
-        
-class ResultatAnalyseImage(QAbstractListModel): #=>MyCombomodel
-    def __init__(self, idAnalyse, parent=None, *args):
-        QAbstractListModel.__init__(self, parent, *args) 
-        self.Myrequest = Request()
-        self.MyViewer=DocViewer()
-        self.listdata = self.Myrequest.GetLines('CALL GetResultatImage(%i)' % idAnalyse)
-        self.maxiconesize=QSize(128,96)
-        self.isChanged = False
-        self.CurrentIndex = 0
-        self.Deleted = []
-                
-    def rowCount(self, parent=QModelIndex()): 
-        return len(self.listdata) 
-    
-    def data(self, index, role): 
-        if index.isValid() and role == Qt.DisplayRole:
-            if self.listdata[index.row()][1].toString().isEmpty():
-                return QVariant(self.listdata[index.row()][2])
-            else:
-                return QVariant(self.listdata[index.row()][1])
-        elif index.isValid() and role == Qt.UserRole:
-            return QVariant(self.listdata[index.row()][0])
-        elif index.isValid() and role == Qt.ToolTipRole:
-            return QVariant(self.listdata[index.row()][3])
-        elif index.isValid() and role == Qt.DecorationRole:
-            self.MyViewer.SetFilename('../Archives/%s'%self.listdata[index.row()][2].toString())
-            return self.MyViewer.ViewImage(self.maxiconesize)
-        else: 
-            return QVariant()
-        
-    def setData(self, index, value, role=Qt.EditRole):
-        if index.isValid() and index.row() < self.rowCount():
-            self.CurrentIndex = index
-            self.listdata[index.row()][1] = value   
-            self.listdata[index.row()][5] = QVariant(True)   
-            self.isChanged = True
-            self.emit(SIGNAL("dataChanged(QModelIndex,QModelIndex)"), index, index)
-            return True
-        return False
-    
-    def GetDocument(self,index):
-        if index.isValid() and index.row() < self.rowCount():
-            self.CurrentIndex = index
-            return [self.listdata[index.row()][1].toString(),self.listdata[index.row()][3].toString()]
-            
-    def GetRemarque(self, index):
-        if index.isValid() and index.row() < self.rowCount():
-            self.CurrentIndex = index
-            return self.listdata[index.row()][4].toString()
-        return QVariant()
-    
-    def SetRemarque(self, value):
-        self.listdata[self.CurrentIndex.row()][4] = QVariant(value)
-        self.listdata[self.CurrentIndex.row()][5] = QVariant(True)
-        self.isChanged = True  
-          
-    def RemoveRow(self, position):
-        self.Deleted.append('%i' % self.listdata[position][0].toInt()[0])
-        self.listdata = self.listdata[:position] + self.listdata[position + 1:]
-        self.removeRow(position)
-        self.isChanged = True
-    
-    def insertRows(self, position, data, rows=1, index=QModelIndex()):
-#        hashKey=QImage('../Archives/%s'%data[1]).cacheKey() doesn't work use ImageMagick instead
-#         doublon=False
-#         for i in self.listdata: #traitement trop long
-#             if os.system('compare -metric AE ../Archives/%s ../Archives/%s null'%(data[1],i[2].toString()))==0:
-#                 doublon=True
-#                 break
-#         if doublon:
-#             os.remove('../Archives/%s'%data[1])
-#             os.remove('../Archives/%s'%data[2])
-#         else:
-        ligne=[QVariant(0),QVariant(data[0]),QVariant(data[1]),QVariant(data[2]),QVariant(),QVariant(True)]
-        self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
-        self.listdata.append(ligne)
-        self.endInsertRows()
-        self.isChanged=True
-#        return doublon
-    
-    def Save(self, idAnalyse): 
-        Myrequest = Request('ResultatAnalyse')
-        if not self.isChanged:
-            return
-        for i in self.Deleted:
-            Myrequest.Delete([Myrequest.Fields[0].Name, i])
-        for i in self.listdata:
-            if not i[5].toBool():
-                continue  # Not modified
-            values = [i[0], QVariant(idAnalyse), None,None, None, i[1],i[3],i[2],i[4],QVariant(0)]
-            (err, values) = Myrequest.ValidData(values)
-            if len(err) == 0:
-                error = Myrequest.Save(values)
-                if not error.isValid():
-                    return error
-            else:
-                print 'Erreur dans la table %s pour le(s) champ(s): %s' % (Myrequest.Table, ','.join(err))
-                return QSqlError('','Erreur dans la table %s pour le(s) champ(s): %s' % (Myrequest.Table, ','.join(err)))   
+
 
 class TypeAnalyseDeleguate(QItemDelegate):   
     def setEditorData(self,editor,index):
@@ -343,25 +306,7 @@ class TypeAnalyseDeleguate(QItemDelegate):
             model.setData(index,editor.toPlainText())
         else:
             model.setData(index,editor.text())
-
-# class Analyses(QAbstractListModel): #=>MyComboModel
-#     def __init__(self, idAnimal, parent=None, *args): 
-#         QAbstractListModel.__init__(self, parent, *args) 
-#         self.Myrequest = Request()
-#         self.listdata = self.Myrequest.GetLines('CALL GetAnalysesAnimal(%i)' % idAnimal)
-#  
-#     def rowCount(self, parent=QModelIndex()): 
-#         return len(self.listdata) 
-#     
-#     def data(self, index, role): 
-#         if index.isValid() and role == Qt.DisplayRole:
-#             return QVariant(self.listdata[index.row()][1])
-#         elif index.isValid() and role == Qt.UserRole:
-#             return QVariant(self.listdata[index.row()][0])
-#         elif index.isValid() and role == Qt.ToolTipRole:
-#             return QVariant(self.listdata[index.row()][3])
-#         else: 
-#             return QVariant()
+ 
         
 #debug only        
 def Print(self,List,index=0):
