@@ -18,24 +18,6 @@ class MyComboBox(QComboBox):
 			self.emit(SIGNAL("OnEnter"))
 		else:
 			QComboBox.keyPressEvent(self,event)
-
-# 	def Fill(self,function,Remarque=False,Color=False):
-# 		self.clear()
-# 		lst=function
-# 		for i in lst:
-# 			self.addItem(i[1],i[0])
-# 		colors=[Qt.black,Qt.red,Qt.green]
-# 		for i in range(self.count()):
-# 			if Remarque:
-# 				try:
-# 					self.setItemData(i,QVariant(lst[i][2]),Qt.ToolTipRole)
-# 				except:
-# 					pass
-# 			if Color:
-# 				try:
-# 					self.setItemData(i,colors[lst[i][3]],Qt.BackgroundColorRole)
-# 				except:
-# 					pass
 					
 	def GetData(self):
 		value=self.itemData(self.currentIndex()).toInt()
@@ -64,6 +46,43 @@ class MyComboBox(QComboBox):
 
 	def GetDeleted(self):
 		return self.itemData(self.currentIndex(),33)
+
+
+class MyCompleter(QComboBox):
+	def __init__(self,parent=None):
+		super(MyCompleter,self).__init__(parent)
+		self.setFocusPolicy(Qt.StrongFocus)
+		self.setEditable(True)
+ 		# add a filter model to filter matching items
+ 		self.pFilterModel = QSortFilterProxyModel(self)
+ 		self.pFilterModel.setSourceModel(self.model())
+ 		self.pFilterModel.setFilterCaseSensitivity(Qt.CaseInsensitive)	#Bug filtering is CaseSensitive
+		self.completer = QCompleter(self.pFilterModel, self)
+		# always show all (filtered) completions
+		self.completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
+		self.setCompleter(self.completer)
+		# connect signals
+		self.lineEdit().textEdited[unicode].connect(self.pFilterModel.setFilterFixedString)
+		self.completer.activated.connect(self.on_completer_activated)
+
+	def on_completer_activated(self, text):
+		if text:
+			index = self.findText(text)
+			self.setCurrentIndex(index)
+			self.activated[str].emit(self.itemText(index))
+
+	# on model change, update the models of the filter and completer as well 
+	def setModel(self, model):
+		super(MyCompleter, self).setModel(model)
+ 		self.pFilterModel.setSourceModel(model)
+ 		self.completer.setModel(self.pFilterModel)
+
+	def keyPressEvent(self,event):
+		if event.key()==Qt.Key_Return or event.key()==Qt.Key_Enter:
+			self.emit(SIGNAL("OnEnter"))
+		else:
+			QComboBox.keyPressEvent(self,event)
+
 
 class MyTableWidget(QTableWidget):
 	def __init__(self,parent=None):

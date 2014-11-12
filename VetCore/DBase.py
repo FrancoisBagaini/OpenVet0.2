@@ -157,7 +157,7 @@ class Request(QSqlQuery):
                 self.res.append(tmp)
         return self.res
 
-    def GetLine(self,request):
+    def GetLine(self,request):      #Same as GetLineModel Remove GetLineModel
         self.res=[]
         if self.Execute(request):
             self.next()
@@ -165,6 +165,7 @@ class Request(QSqlQuery):
                 for i in range(self.record().count()):
                     self.res.append(self.value(i))                         
         return self.res
+
     
     def GetFields(self,table=None):
         if not table is None:

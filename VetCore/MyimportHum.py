@@ -1,4 +1,5 @@
 # -*- coding: utf8 -*-
+from __future__ import unicode_literals
 import re
 import os
 import codecs
@@ -7,10 +8,29 @@ from decimal import Decimal
 from MyGenerics import *
 from PyQt4 import QtCore, QtGui, QtSql
 
+
 path = '/media/Datas/Kiwi/OpenVet0.2'
 path = '../'
 pathimport = path + 'Imports/'
 erreur = False
+
+
+def FormatName(chaine,codec='utf8'):    #TODO: maxlength for truncate
+    chaine=chaine.decode(codec)
+    out=[]
+    for i in chaine.split(' '):
+        if i=="DE":
+            out.append('de')
+        elif i[:2]=="D\'":
+            out.append('d\''+i[2]+i[3:].lower())
+        else:
+            if len(i)>1:
+                out.append(i[0]+i[1:].lower())
+            else:
+                out.append(i)
+    chaine=' '.join(out)
+    return chaine
+
 
 def ExtractNumeric(chaine):
     r = re.findall(r'[0-9]*[ ,]?[0-9]+', chaine)
@@ -136,14 +156,23 @@ def GetPresentation(chaine):
                 presentations.append(r1[0].replace('.', ' ').strip())
     return presentations
 
-def GetDecimal(chaine):
-        chaine.replace('\'', '')
+def GetDecimal(chaine,Newchaine=False):
+        chaine=chaine.replace('\'', '')
 #        sols=re.findall(r'[0-9]+[ ,]?[0-9]*',chaine)
+        chaine=re.sub(r'[uU]ne?','1',chaine)
         sols = re.findall(r'[0-9 ,]+', chaine)
         try:
-            return Decimal([i for i in sols if len(i.strip()) > 0][0].replace(',', '.').replace(' ', ''))
+            numb= Decimal([i for i in sols if len(i.strip()) > 0][0].replace(',', '.').replace(' ', ''))
         except:
-            return(Decimal('0'))
+            numb= Decimal('0')
+        if Newchaine:
+            return(numb,chaine.replace(',','.'))
+        else:
+            return numb
+
+def ExtractUnite(chaine):
+    return re.sub(r'[0-9, ]|une?','',chaine)
+    
 
 def Getunite(chaine):
         sols = re.findall(r'([0-9 ,]+)(DL50|kBq|mEq|millions UI|million.*internationales|[a-z]+)', chaine)
@@ -170,11 +199,9 @@ def GetShortPresentation(chaine):
     return ' '.join([first[0].replace('(s)', ''), last[0].replace('(s)', '')])  
 
 def GetVoieAdministration(chaine):
-    nchaine = unicode(chaine.decode('latin-1'))
-    sel = re.findall(r'ophtalmique|auriculaire|gingivale|buccale|dentaire|[^-]?cutanée|intradermique|transdermique|nasale|inhalée|rectale|vaginale|orale|sublinguale|sous-cutanée|intraveineuse|intramusculaire|intrapéritonéale|intra-articulaire|périarticulaire|péridurale|périneurale|intralésionnelle|infiltration', nchaine)  
+    sel = re.findall(ur'ophtalmique|auriculaire|gingivale|buccale|dentaire|[^-]?cutanée|intradermique|transdermique|nasale|inhalée|rectale|vaginale|orale|sublinguale|sous-cutanée|intraveineuse|intramusculaire|intrapéritonéale|intra-articulaire|périarticulaire|péridurale|périneurale|intralésionnelle|infiltration', chaine.decode('latin-1'))  
     if len(sel) == 0:
         sel = ['autre']
-#         print chaine
     return ','.join(sel) 
             
 def FormatSelection(liste):
@@ -195,6 +222,10 @@ def ImportComposition(filin='LCompSpeHum.txt', filout='CompHum.txt'):
 #                 print words
             longname=re.sub(r' POUR PR.PARATIONS HOM.OPATHIQUES| BASE| ANHYDRE| SODIQUE','',words[3])
             shortname = re.sub(r'(^\S+ATE D[E\'] ?)|( \(.+\))|(,.+$)|( \S*HYDRAT\S+$)', '', longname) 
+            if longname.count(':'):
+                longname=longname[longname.index(':')+1:].strip()
+            if shortname.count(':'):
+                shortname=shortname[shortname.index(':')+1:].strip()
             if words[3].count('HOMÉOPATHIQUES'):
                 medoc = [0, words[0], words[1], longname, '0,0', words[5], True,shortname]
             else:
@@ -238,12 +269,10 @@ def ImportSpecialite(filin='LSpeHum.txt', filout='SpeHum.txt'):
         if len(words) > 5:
             words[1] = words[1].replace('\"', '')
             names = words[1].split()
-            if len(names[0]) < 4 or 'Enreg homéo' in words[5]:
+            if len(names[0]) < 6 or 'Enreg homéo' in words[5]:
                 name = ' '.join([names[0], names[1]])
             else:
                 name = names[0].strip('.,')
-#             if name=='STEROGYL':
-#                 print words[1]
             if 'Enreg homéo' in words[5]:
                 selection.append([words[0], name, words[1].split(',')[0], ' ', ' ', '1'])
             else:
@@ -270,6 +299,44 @@ def ImportPresentation(filin='LPresSpeHum.txt', filout='PresHum.txt'):
         foutlog.write(';'.join(i) + '\n')
     foutlog.close() 
 
+
+def ImportClasseTherapeutique(filin,filout,parent):
+    selection=[]
+    header=None
+    finlog = codecs.open(pathimport + filin, 'rU', encoding='utf-8')
+    iterator=iter(finlog)
+    line=iterator.next()
+    while not 'INDEX . . .' in line:
+        line=re.sub(u'\. +','. ',line)
+        sol=re.findall(ur'(([0-9]{1,2}\.)+)',line)
+        if len(sol)>0:
+            if sol[0][0]=='2.3.':
+                print line
+        sols=re.findall(ur'(([0-9]{1,2}\.)+ [^\.]+)',line)
+        if len(sols)>0:
+            newline=sols[0][0]
+            if sols[0][0][-1:]=='\n':
+                line=line+iterator.next()
+                sols=re.findall(ur'(([0-9]{1,2}\.)+ [^\.]+)',line)
+                newline=re.sub(r'\n *',' ',sols[0][0])
+            selection.append(newline)
+            header=re.findall(ur'(([0-9]{1,2}\.)+)',line)[0][0]
+            index=1
+        else:
+            sols=re.findall(ur'\S[^\.]+ . . .',line)
+            if len(sols)>0:
+                if len(re.findall(r'[a-z]+',sols[0]))>0 and not header is None:
+                    selection.append(header+'%i. '%index+sols[0][:-6])
+                    index+=1
+                    print sols
+        line=iterator.next()
+    finlog.close()
+    foutlog = codecs.open(pathimport + filout, 'w', encoding='utf-8')
+    for i in selection:
+        foutlog.write(i+'\n')
+    foutlog.close() 
+
+
 def GetListeAdministration(filin):
     selection = []
     finlog = codecs.open(pathimport + filin, 'r', encoding='utf-8')
@@ -283,12 +350,26 @@ def GetListeAdministration(filin):
     finlog.close()
     return selection
 
+def HomogenMolecule(chaine,codec='latin-1'):
+    chaine=re.sub(r' \S+HYDRATÉE?','',chaine.decode(codec))
+    tmp=re.findall(r'\(\S+ D[\'E]\)',chaine)
+    if len(tmp)>0:
+        chaine=re.sub(r'\(\S+ D[\'E]\)','',chaine)
+        esp=''
+        if tmp[0][-2:-1]=='E':
+            esp=' '
+        chaine=tmp[0].replace('(','').replace(')','')+esp+chaine
+    return chaine.encode(codec)
+        
 def GetListeMolecule(filin):
     selection = []
     myliste=[]
     finlog = codecs.open(pathimport + filin, 'r', encoding='utf-8')
     for line in finlog:
         words = line.split(';')
+        if isVaccin(words[2],words[4]):
+            continue
+        words[2]=HomogenMolecule(words[2],'utf8')
         if words[2].strip() not in selection and len(words[2].strip()) > 0:
             selection.append(words[2].strip())
             #TODO: GET famille therapeutique
@@ -298,19 +379,16 @@ def GetListeMolecule(filin):
 
 def GetUniteAdministration(chaine):
     nchaine = unicode(chaine.decode('latin-1'))
-    sols = re.findall(r'comprimé|gélule|capsule|suspension|solution|dispersion|buvable|injectable|perfusion', nchaine)
-    if len(sols) == 0:
-        return (chaine, False)
-    elif len(sols) == 2:
-        if sols[1] == 'buvable':
-            return ('solution buvable', False)
-        else:
-            return ('solution injectable', True)
-    elif len(sols) == 1 and sols[0] == 'suspension':
-        return (chaine, False)
+    if 'buvable' in chaine:
+        return ('solution buvable', False)
+    sols = re.findall(ur'(suspension|solution)(injectable|perfusion|reconstituée|acides aminés|prête)?', nchaine)
+    if len(sols)>0:
+        return ('solution injectable', True)
+    sols = re.findall(ur'comprimé|gélule|capsule', nchaine,re.U)
+    if len(sols) > 0:
+        return (sols[0].encode('latin-1'), False) 
     else:
-        return (sols[0].encode('latin-1'), False)
-    return
+        return (chaine, False)
     
 def GetListeUniteMedoc(filin):
     selection = []
@@ -341,7 +419,7 @@ def GetListeUniteMolecule(filin):
     finlog = codecs.open(pathimport + filin, 'r', encoding='utf-8')
     for line in finlog:
         words = line.split(';')
-        word = words[2]
+        word = words[3]
         valeur = GetDecimal(word)
         unite = Getunite(word)
         try:
@@ -353,14 +431,51 @@ def GetListeUniteMolecule(filin):
     finlog.close()
     return selection
 
+def isVaccin(word1,word2,codec='latin-1'):
+    sol1=re.findall(ur'VIRUS|ATTÉNUÉ|SOUCHE|NEISSERIA MENINGITIDIS|PNEUMOCOCCIQUE', word1.decode(codec))
+    sol2=re.findall(ur'vaccin', word2.decode(codec))
+    return len(sol1)>0 or len(sol2)>0
+
+def GetComposition(word1,word2):
+    valeur1,word1 = GetDecimal(word1,True)
+    try:
+        word1=word1[word1.index(str(valeur1))+len(str(valeur1)):]
+    except:
+        print 'erreur valeur pour %s'%word1
+        valeur1=-1.0
+    unite=re.findall(r'\S+',word1)
+    if len(unite)==0:
+        print 'erreur pour %s'%word1
+        unite=''
+    else:
+        unite=unite[0]
+    unite=unicode(unite.decode('latin-1'))
+    unite=re.sub(r'[Mm]illigrammes?','mg',unite)
+    unite=re.sub(r'[Mm]icrogrammes?','µg',unite)
+    unite=re.sub(r'[Nn]anogrammes?','mg',unite)
+    unite=re.sub(r'[Gg]rammes?','g',unite)
+    unite=re.sub(r'[Ll]itres?','l',unite)
+    unite=re.sub(r'[Mm]illilitres?','ml',unite)
+    unite=re.sub(r'[Mm]icrolitres?','µl',unite)
+    unite=re.sub(ur'[mM]illions? d\'unités? internationales?|millions UI','MUI',unite)
+    unite1=unite
+    valeur2,word2 = GetDecimal(word2,True)
+    try:
+        word2=word2[word2.index(str(valeur2))+len(str(valeur2)):]
+    except:
+        pass
+    unite2=re.findall(r'\S+',word2)[0]
+#    unite2=GetUniteAdministration( ExtractUnite(word2))
+    return(valeur1, unite1,valeur2,unite2)
+
+        
 def SaveVoiesAdministration(filin, parent):
     model = MyModel('VoieAdministration', 0, parent)
     for i in GetListeAdministration(filin):
-        model.SetNew([0, unicode(i.decode('latin-1')), QVariant(), True])
+        model.SetNew([0,i, QVariant(), True])   #unicode(i.decode('latin-1'))
         model.New()
         model.Update()
 
-    
 def SaveMedicament(filin, parent=None):
     model = MyModel('Medicament', 0, parent)
     modelRef = MyModel('VoieAdministrationRef', 0, parent)
@@ -369,18 +484,19 @@ def SaveMedicament(filin, parent=None):
         i = line.split(';')
         data = []
         for j in i:
-            j = unicode(j.strip().decode('latin-1'))
+            j = j.strip()  #.decode('latin-1')
             if len(j) == 0:
                 j = QVariant()
             data.append(j)
         ishomeo = True
         isinj = False
+        isvaccin=False
         if i[5].strip() == '0':
             ishomeo = False               
             isinj = GetUniteAdministration(i[3])[1]
-#         if data[1]=='APTIVUS':
-#             print
-        model.SetNew([0, data[1], data[2], 'H' + data[0], ishomeo, isinj, data[3], QVariant(), 0, 1, ''])
+            if 'VACCIN' in data[2]:
+                isvaccin=True
+        model.SetNew([0, FormatName(data[1]), data[2], 'H' + data[0], ishomeo, isinj,isvaccin, data[3], QVariant(), 0, 1, ''])
         model.New()
         idMedicament = model.Update()
         # Save Voies Administrations in VoieAdministrationRef
@@ -391,7 +507,7 @@ def SaveMedicament(filin, parent=None):
             for i in data[4].split(','):
                 idVoie = model.MyRequest.GetInt('CALL GetidVoieAdmin(\"%s\")' % i, 0)
                 if not idVoie is None:
-                    modelRef.SetNew([0, idVoie, idMedicament, 1, ''])
+                    modelRef.SetNew([0,idVoie,idMedicament,1,''])
                 else:
                     print u'%s non trouvé dans la base' % i
             modelRef.New()
@@ -402,7 +518,7 @@ def SavePresentation(filin, parent):
     finlog = codecs.open(pathimport + filin, 'r', encoding='utf-8')
     for line in finlog:
         i = line.split(';')
-        i[1] = unicode(i[1].strip().decode('latin-1'))
+        i[1] = i[1].strip()
         idMedicament = model.MyRequest.GetInt('CALL GetidMedicament_Cip(\"H%s\")' % i[0], 0)
         if not idMedicament is None:
             model.SetNew([0, idMedicament, i[1], QVariant(), QVariant(), True, ''])
@@ -415,41 +531,70 @@ def SaveMolecules(filin, parent):
     model = MyModel('Molecule', 0, parent)
     for i in GetListeMolecule(filin):
         if not model.MyRequest.GetInt('CALL isVaccin_Cip(\"H%s\")'%i[2],0):
-            model.SetNew([0,unicode(i[0].decode('latin-1')),unicode(i[1].decode('latin-1')), QVariant(), True,False])
+            model.SetNew([0,FormatName(i[0]),FormatName(i[1]),QVariant(),QVariant(),True,False])
             model.New()
             if model.Update()==-1:
                 print model.lasterror+' pour :'
                 print i
-
-def SaveUnites(filin,parent):
-    pass
                 
-def SaveCompositions(filin,parent): #TODO
-    model = MyModel('Molecule', 0, parent)
+def SaveCompositions(filin,parent):
+    logs=[]
+    medmodel=MyModel('Medicament', 0, parent)
+    model = MyModel('MedicamentConcentration', 0, parent)
     finlog = codecs.open(pathimport + filin, 'r', encoding='utf-8')
     for line in finlog:
         i = line.split(';')
-        i[1] = unicode(i[1].strip().decode('latin-1'))
+        i[2] = i[2].strip()
+        i[4] = i[4].strip()
         idMedicament = model.MyRequest.GetInt('CALL GetidMedicament_Cip(\"H%s\")' % i[0], 0)
-        if not idMedicament is None:
-            model.SetNew([0, idMedicament, i[1], QVariant(), QVariant(), True, ''])#TOMODIFY
-            model.New()
-            model.Update()
-        else:
+        if idMedicament is None:
+            logs.append('H%s non trouvé' % i[0])
             print 'H%s non trouvé' % i[0]
-            
+            continue
+        medmodel.Setid(idMedicament)
+        pi2=i[2]
+        tmp=HomogenMolecule(i[2],'utf8')    #.decode('utf8')
+        idMolecule = model.MyRequest.GetInt('CALL GetidMolecule(\"%s\")' % tmp, 0)
+        if idMolecule is None:
+            if isVaccin(i[2],i[4],'utf8'):
+                medmodel.listdata[6]=QVariant(True)
+                medmodel.Update()
+            else:
+                logs.append('%s non trouvé' % tmp)
+                print '%s non trouvé' % tmp
+            continue
+        if i[5].strip()==u'0':
+            compo=GetComposition(i[3],i[4])
+            idUnite1=model.MyRequest.GetInt('CALL GetidUnite(\"%s\")'%compo[1],0)
+            if idUnite1 is None:
+                idUnite1=QVariant()
+            idUnite2=model.MyRequest.GetInt('CALL GetidUnite(\"%s\")'%compo[3],0) 
+            if idUnite2 is None:
+                idUnite2=QVariant()
+            model.SetNew([0,idMolecule,idMedicament,i[3][:60], float(compo[0]),compo[1],idUnite1,i[4][:60],float(compo[2]),compo[3],idUnite2,True,''])
+        else: 
+            model.SetNew([0,idMolecule,idMedicament,QVariant(), QVariant(),QVariant(),QVariant(),QVariant(),QVariant(),QVariant(),QVariant(),True,''])
+        model.New()
+        if model.Update()==-1:
+            print ('erreur',i[2],i[0],i[3],i[4])   
+    finlog.close()
+    flog=open('importVidal.log','w')
+    for i in logs:
+        flog.write(i+'\n')
+    flog.close()      
     
-#ImportComposition()
+# ImportComposition()
 # ImportSpecialite()
 # ImportPresentation()
+
 # for i,j in enumerate(GetListeAdministration('SpeHum.txt')):
 #     print '%i.%s'%(i+1,j)
 # for i,j in enumerate(GetListeUniteMedoc('SpeHum.txt')):
 #     print '%i.%s'%(i+1,j)
 # for i,j in enumerate(GetListeContenant('CompHum.txt')):
 #     print '%i.%s'%(i+1,j)      
-for i,j in enumerate(GetListeUniteMolecule('CompHum.txt')):
-    print '%i.%s'%(i+1,j)
+# for i,j in enumerate(GetListeUniteMolecule('CompHum.txt')):
+#     print '%i.%s'%(i+1,j)
 
 if __name__ == '__main__':
     t0=time.time()
@@ -462,33 +607,17 @@ if __name__ == '__main__':
     if not db.open():
         QtGui.QMessageBox.warning(None, "Opencompta",
             QtCore.QString("Database Error: %1").arg(db.lastError().text()))
-        sys.exit(1)
-       
+        sys.exit(1)  
     window = QDialog()
     window.show()
-#     SaveVoiesAdministration('SpeHum.txt',window)
-#     SaveMedicament('SpeHum.txt',window)
-#     SavePresentation('PresHum.txt',window)
-#     SaveMolecules('CompHum.txt',window)
-    SaveUnites('CompHum.txt',window)
+#     ImportClasseTherapeutique('REPFR_2014.txt','VClasses.txt',window)
+    SaveVoiesAdministration('SpeHum.txt',window)
+    SaveMedicament('SpeHum.txt',window)
+    SavePresentation('PresHum.txt',window)
+    SaveMolecules('CompHum.txt',window)
+    SaveCompositions('CompHum.txt',window)
     print time.time()-t0  
-    sys.exit(app.exec_())
-
-
-
- 
-# final=[]
-# for i in selref:
-#     if i[0]=='60028495':
-#         print 'Dolirhume'
-#     spe=[j for j in selection if i[0]==j[0]][0]
-#     item=list(spe)
-#     item.extend(i[1:])
-#     final.append(item)     
-# foutlog=codecs.open(pathimport+'MedHum.txt','w',encoding='utf-8')
-# for i in final:
-#     foutlog.write(';'.join(i)+'\n')
-# foutlog.close()           
+    sys.exit(app.exec_())   
 
 
 #     extrait=[None]*len(liste)

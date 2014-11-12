@@ -11,32 +11,6 @@ from DBase import *
 from Mywidgets import *
 from operator import itemgetter
 
-# def Fdata(value,vtype=None,debug=False):
-#     if isinstance(value,QString):
-#         return value
-#     if vtype is None:
-#         vtype=value.typeName()
-#     if value.isNull():
-#         if debug:
-#             return 'NULL'
-#         else:
-#             return QString('')
-#     elif vtype=='QDate':
-#         return value.toDate().toString('dd/MM/yyyy')
-#     elif vtype=='QDateTime':
-#         return value.toDateTime().toString('dd/MM/yyyy hh:mm')
-#     elif vtype in ['int','qlonglong']:
-#         return value.toInt()[0]
-#     elif vtype=='QString':
-#         return value.toString()
-#     elif vtype=='bool':
-#         return value.toBool()
-#     elif vtype=='double' or vtype=='float':
-#         return value.toFloat()[0]
-#     else:
-#         if debug:
-#             print value.typeName()
-#         return u'indeterminé'
 
 class MyComboModel(QAbstractListModel):     #Convient aussi pour QListView
     def __init__(self, parentwidget,routine=None,firstField=None):
@@ -556,7 +530,7 @@ class MyModel(QAbstractListModel):  #TODO: rename in MyRecordModel
             if value.isNull():
                 value=None
             values.append(value)
-#        self.Print()
+#       self.Print()
         (err, values) =self.MyRequest.ValidData(values, self.Fields)
         if len(err) == 0:
             error = self.MyRequest.Save(values)

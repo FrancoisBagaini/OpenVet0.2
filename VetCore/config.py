@@ -16,6 +16,7 @@ Path_Icons='../images/'
 repertoire='/home/francois/Programmes/Kiwi/OpenVet/OpenVet/'
 WorkingPath='/media/Datas/Kiwi/OpenVet'
 dbCodec='ISO-8859-1'
+#dbCodec='UTF-8'
 user='root'
 password='horizons'
 

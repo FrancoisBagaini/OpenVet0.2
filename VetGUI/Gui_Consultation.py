@@ -83,6 +83,7 @@ class GuiConsultation():
     def OnConsultationSelect(self,link):
         self.idConsultation=int(link.toString().toAscii()[2:])
         self.parent.GuiAnalyse.SetConsultation(self.idConsultation)
+        self.parent.GuiOrdonnance.SetConsultation(self.idConsultation)
         self.MyConsultation.SetConsultation(self.idConsultation)
         if link.toString().toAscii()[1]=='C':
             self.FillFormConsultation()

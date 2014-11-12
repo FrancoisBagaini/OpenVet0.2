@@ -52,7 +52,7 @@ class FormParametre(MyForm):
         
     def OnEditUnite(self):
         idUnite=self.fields[3].Getid()
-        new=[0,'',False,True,False,'']
+        new=[0,'',False,False,False,False,True,False,'']
         UniteModel=MyModel('Unite',idUnite,self)
         if not UniteModel.SetNew(new):
             return  

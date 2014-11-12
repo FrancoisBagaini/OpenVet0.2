@@ -1,0 +1,514 @@
+1. Médicaments anti-infectieux 
+1.1. Antibactériens 
+1.1.1. Pharmacodynamie (PD) et pharmacocinétique (PK)
+1.1.2. Résistance
+1.1.3. Positionnement des antimicrobiens
+1.1.4. contre-indications
+1.1.5. Santé publique
+1.1.1. Antibiotiques bêta-lactames 
+1.1.1.1. Pénicillines 
+1.1.1.1.1. Pénicillines naturelles
+1.1.1.1.2. Aminopénicillines
+1.1.1.1.3. Ampicilline
+1.1.1.1.4. Amoxicilline
+1.1.1.1.5. Aminopénicillines associées à un inhibiteur des bêta-lactamases
+1.1.1.2. Céphalosporines 
+1.1.1.2.1. contre les GRAM+
+1.1.1.2.2. Deuxième groupe: céphalosporines à spectre élargi
+1.1.2. Aminosides 
+1.1.2.1. Gentamicine 
+1.1.2.2. Paromomycine 
+1.1.3. Florfénicol 
+1.1.4. Tétracyclines 
+1.1.4.1. Chlortétracycline 
+1.1.4.2. Doxycycline 
+1.1.4.3. Oxytétracycline 
+1.1.5. Macrolides - Lincosamides et Pleuromutilines 
+1.1.5.1. Macrolides 
+1.1.5.1.1. Gamithromycine
+1.1.5.1.2. Tildipirosine
+1.1.5.1.3. Tilmicosine
+1.1.5.1.4. Tulathromycine
+1.1.5.1.5. Tylosine
+1.1.5.1.6. Tylvalosine
+1.1.5.2. Lincosamides 
+1.1.5.2.1. Clindamycine
+1.1.5.2.2. Lincomycine
+1.1.5.3. Pleuromutilines 
+1.1.5.3.1. Tiamuline
+1.1.5.3.2. Valnémuline
+1.1.6. Antimicrobiens Peptidiques 
+1.1.6.1. Polymyxines 
+1.1.6.2. Bacitracine 
+1.1.7. Sulfamidés et Triméthoprime 
+1.1.7.1. Triméthoprime 
+1.1.7.2. Sulfamidés associés au triméthoprime 
+1.1.8. Fluoroquinolones 
+1.1.8.1. Danofloxacine 
+1.1.8.2. Difloxacine 
+1.1.8.3. Enrofloxacine 
+1.1.8.4. Fluméquine 
+1.1.8.5. Marbofloxacine 
+1.1.8.6. Pradofloxacine 
+1.1.9. Associations à base d’antibiotiques              
+1.1.9.1. Pénicilline + aminoside 
+1.1.9.2. Lincomycine + spectinomycine 
+1.1.9.3. Aminopénicilline + polymyxine 
+1.1.9.4. Métronidazole + spiramycine 
+1.1.9.5. Florfénicol + flunixine 
+1.2. Médicaments antimycotiques 
+1.2.1. Itraconazole 
+1.2.2. Kétoconazole 
+1.3. Médicaments antiparasitaires 
+1.3.1. Médicaments injectables et à usage oral actifs contre les endoparasites 
+1.3.1.1. Benzimidazoles et probenzimidazoles 
+1.3.1.1.1. Albendazole
+1.3.1.1.2. Fébantel
+1.3.1.1.3. Fenbendazole
+1.3.1.1.4. Flubendazole
+1.3.1.1.5. Mébendazole
+1.3.1.1.6. Oxfendazole
+1.3.1.2. Triclabendazole 
+1.3.1.3. Imidazothiazolés 
+1.3.1.3.1. Lévamisole
+1.3.1.4. Dérivés d’aminoacétonitrile (AAD) 
+1.3.1.4.1. Monépantel
+1.3.1.5. Tétrahydropyrimidines 
+1.3.1.5.1. Pyrantel
+1.3.1.6. Quinolines 
+1.3.1.6.1. Praziquantel
+1.3.1.7. Dérivés phénoliques et salicylanilides 
+1.3.1.7.1. Closantel
+1.3.1.7.2. Nitroxinil
+1.3.1.7.3. Oxyclozanide
+1.3.1.8. Anticoccidiens 
+1.3.1.9. Produits actifs sur d’autres protozoaires 
+1.3.1.9.1. Imidazoles 
+1.3.1.9.2. Halofuginone 
+1.3.1.9.2.1. Halofuginone
+1.3.1.10. Associations 
+1.3.1.10.1. Moxidectine + triclabendazole
+1.3.1.10.2. Milbémycine + praziquantel
+1.3.1.10.3. Praziquantel + pyrantel embonate
+1.3.1.10.4. Praziquantel + fenbendazole
+1.3.1.10.5. Pyrantel embonate + fébantel + praziquantel
+1.3.1.10.6. Pyrantel embonate + oxantel + praziquantel
+1.3.1.10.7. Pyrantel embonate + fébantel
+1.3.1.10.8. Emodepside + praziquantel
+1.3.1.10.9. Emodepside + toltrazuril
+1.3.2. Médicaments à usage transdermique actifs contre les endoparasites                                                                            
+1.3.2.1. Imidazothiazolés 
+1.3.2.2. Associations 
+1.3.2.2.1. Moxidectine + triclabendazole
+1.3.2.2.2. Emodepside + praziquantel
+1.3.3. Médicaments à usage transdermique actifs contre les ecto- et les endoparasites 
+1.3.3.1. Lactones macrocycliques (LM) 
+1.3.3.1.1. Doramectine
+1.3.3.1.2. Eprinomectine
+1.3.3.1.3. Ivermectine
+1.3.3.1.4. Moxidectine
+1.3.3.1.5. Sélamectine
+1.3.3.2. Organophosphorés 
+1.3.3.2.1. Phoxime
+1.3.3.3. Associations 
+1.3.3.3.1. Imidaclopride + moxidectine
+1.3.3.3.2. Ivermectine + closantel
+1.3.4. Médicaments injectables et à usage oral actifs contre les ecto- et les endoparasites 
+1.3.4.1. Lactones macrocycliques 
+1.3.4.1.1. Doramectine
+1.3.4.1.2. Ivermectine
+1.3.4.1.3. Moxidectine
+1.3.4.2. Associations 
+1.3.4.2.1. Ivermectine + clorsulon
+1.3.4.2.2. Ivermectine + closantel
+1.3.4.2.3. Mébendazole + closantel
+1.3.4.2.4. Moxidectine + praziquantel
+1.3.4.2.5. Ivermectine + praziquantel
+1.3.4.2.6. Spinosad + milbémycine
+1.3.5. Médicaments injectables et à usage oral actifs contre les ectoparasites 
+1.3.5.1. Régulateurs de croissance 
+1.3.5.1.1. Lufénuron
+1.3.5.2. Spinosad 
+1.3.6. Médicaments à usage topique actifs contre les ectoparasites 
+2. Médicaments du système hormonal 
+2.1. Hormones sexuelles et autres médicaments du système reproducteur 
+2.1.1. Œstrogènes 
+2.1.2. Progestagènes 
+2.1.2.1. Progestérone et dérivés de la progestérone 
+2.1.2.1.1. Delmadinone acétate
+2.1.2.1.2. Mégestrol acétate
+2.1.2.1.3. Médroxyprogestérone acétate
+2.1.2.1.4. Proligestone
+2.1.2.1.5. Progestérone
+2.1.2.2. Dérivés d’androgènes à activité progestative 
+2.1.3. Médicaments en cas d’hypertrophie bénigne de la prostate 
+2.1.3.1. Osatérone 
+2.1.3.2. Delmadinone acétate 
+2.1.4. Stéroïdes anabolisants 
+2.1.4.1. Nandrolone 
+2.1.5. Gonadotrophines et médicaments agissant sur leur libération                       
+2.1.5.1. Gonadotrophine chorionique (hCG) 
+2.1.5.2. Gonadotrophine sérique (PMSG ou eCG) 
+2.1.5.3. GnRH : buséréline, desloréline, gonadoréline 
+2.1.5.4. Lyophilisat de pFSH et pLH 
+2.1.5.5. Combinaison de PMSG (eCG) et d’hCG 
+2.1.6. Tocolytiques 
+2.1.6.1. Clenbutérol 
+2.1.7. Ocytociques 
+2.1.8. Prostaglandines 
+2.1.8.1. Alfaprostol 
+2.1.8.2. Cloprosténol 
+2.1.8.3. Dinoprost 
+2.1.9. Médicaments agissant sur la libération de la prolactine                                                                 
+2.1.9.1. Cabergoline 
+2.1.9.2. Métergoline 
+2.1.10. Antiprogestagènes 
+2.1.10.1. Aglépristone 
+2.2. Hormones cortico-surrénales                             
+2.2.1. Dexaméthasone 
+2.2.2. Méthylprednisolone 
+2.2.3. Prednisolone 
+2.3. Médicament utilisé en cas d’hypercorticisme chez le chien (maladie de Cushing) 
+2.3.1. Trilostane 
+2.4. Médicaments contre le dysfonctionnement du lobe intermédiaire de l’hypophyse chez le cheval (maladie de Cushing) 
+2.4.1. Pergolide 
+2.5. Médicaments de la thyroïde 
+2.5.1. Hormone thyroïdienne 
+2.5.1.1. Lévothyroxine 
+2.5.2. Médicament antithyroïdien 
+2.5.2.1. Thiamazole 
+2.6. Insuline 
+3. Analgésiques, antipyrétiques et anti-inflammatoires 
+3.1. Positionnement
+3.2. Fièvre
+3.3. Douleur aiguë
+3.4. Douleur chronique          
+3.5. Inflammation
+3.1. Analgésiques et antipyrétiques (AA)                                     
+3.1.1. Paracétamol 
+3.1.2. Salicylés 
+3.1.2.1. Acide acétylsalicylique 
+3.1.2.2. Salicylate de sodium 
+3.1.3. Métamizole 
+3.2. Analgésiques opioïdes               
+3.2.1. Buprénorphine 
+3.2.2. Butorphanol 
+3.2.3. Fentanyl 
+3.2.4. Méthadone 
+3.3. Anti-inflammatoires non stéroïdiens (AINS ou AAA)                                                                   
+3.3.1. Dérivés de la pyrazolone 
+3.3.1.1. Phénylbutazone
+3.3.2. Dérivés de l’acide nicotinergique et phénamates 
+3.3.2.1. Acide tolfénamique 
+3.3.2.2. Flunixine 
+3.3.3. Dérivés de l’acide arylpropionique 
+3.3.3.1. Carprofène 
+3.3.3.2. Kétoprofène 
+3.3.4. Groupe des oxicams 
+3.3.5. Groupe des coxibs 
+3.3.5.1. Cimicoxib 
+3.3.5.2. Firocoxib 
+3.3.5.3. Mavacoxib 
+3.3.5.4. Robénacoxib 
+3.3.6. Associations d’un AINS avec d’autres substances actives                                       
+4. Médicaments du système gastro-intestinal 
+4.1. Inhibiteur de la sécrétion acide gastrique 
+4.1.1. Oméprazole 
+4.2. Antispasmodiques digestifs 
+4.2.1. Association hyoscine + métamizole 
+4.3. Antiémétiques 
+4.3.1. Maropitant 
+4.3.2. Métoclopramide 
+4.4. Antidiarrhéiques contenant des agents anti-infectieux                                     
+4.4.1. Aminosides 
+4.4.1.1. Apramycine 
+4.4.1.2. Paromomycine 
+4.4.1.3. Spectinomycine 
+4.4.2. Polymyxines 
+4.5. Autres médicaments agissant sur le système gastro-intestinal ou le métabolisme 
+4.5.1. Monensin 
+5. Médicaments agissant sur le métabolisme 
+5.1. Médicaments réhydratants 
+5.1.1. Réhydratants à administrer par voie orale 
+5.1.2. Réhydratants à administrer par voie parentérale 
+5.2. Glucose 
+5.3. Vitamines 
+5.3.1. Vitamine B 
+5.3.2. Vitamine D 
+5.3.3. Association vitamine A + vitamine D3 + vitamine E                          
+5.4. Minéraux 
+5.4.1. Fer 
+5.4.2. Sélénium 
+5.4.3. Oxyde de zinc 
+5.4.4. Association calcium + magnésium 
+5.4.5. Associations calcium + magnésium + autres                       
+5.5. Vitamines + minéraux 
+5.5.1. Association vitamine E + sélénium 
+5.6. Vitamines + minéraux + toniques 
+6. Médicaments agissant sur le système locomoteur 
+6.1. Acide hyaluronique 
+6.2. Polysulfate de pentosane sodique 
+6.3. Dibotermine alpha (rhBMP-2), protéine ostéogénique 
+7. Médicaments du système respiratoire 
+7.1. Bronchodilatateurs 
+7.1.1. Agonistes bêta-2-adrénergiques 
+7.1.1.1. Clenbutérol 
+7.2. Médicament antitussif, expectorant et bronchodilatateur 
+8. Médicaments cardio-vasculaires 
+8.1. Médicaments utilisés dans l’insuffisance cardiaque 
+8.1.1. Inhibiteurs de l’Enzyme de Conversion de l’Angiotensine (IECA)                                                 
+8.1.1.1. Bénazépril 
+8.1.1.2. Enalapril 
+8.1.1.3. Imidapril 
+8.1.1.4. Ramipril 
+8.1.2. Antagoniste de l’aldostérone 
+8.1.2.1. Spironolactone 
+8.1.3. Association d’un IECA et d’un antagoniste de l’aldostérone 
+8.1.3.1. Bénazépril + spironolactone 
+8.1.4. Inodilatateurs 
+8.1.4.1. Pimobendane 
+8.2. Vasodilatateurs périphériques et cérébraux 
+8.2.1. Inhibiteurs de phosphodiestérases 
+8.2.1.1. Propentofylline 
+8.3. Médicaments utilisés en cas d’insuffisance rénale chronique 
+8.3.1. Antagoniste spécifique des récepteurs de l’angiotensine II 
+8.3.1.1. Telmisartan 
+8.4. Diurétiques 
+8.4.1. Diurétiques de l’anse 
+8.4.1.1. Furosémide 
+9. Médicaments du système uro-génital 
+9.1. Médicaments ayant comme indication l’incontinence urinaire chez la chienne ovario-hystérectomisée 
+9.1.1. Phénylpropanolamine (PPA) 
+9.1.2. Œstriol 
+9.1.3. Ephédrine 
+10. Médicaments du système nerveux central et périphérique 
+10.1. Anesthésiques généraux injectables 
+10.1.1. Anesthésiques injectables: les barbituriques                
+10.1.1.1. Pentobarbital 
+10.1.2. Anesthésiques injectables non barbituriques                 
+10.1.2.1. Anesthésiques dissociatifs 
+10.1.2.1.1. Kétamine
+10.1.2.1.2. Tilétamine + zolazépam
+10.1.2.2. Propofol 
+10.1.2.3. Stéroïdes neuroactifs 
+10.1.2.3.1. Alfaxalone
+10.2. Anesthésiques généraux volatils 
+10.2.1. Isoflurane 
+10.3. Agents utilisés pour l’euthanasie 
+10.3.1. Barbituriques 
+10.3.2. Association 
+10.4. Anesthésiques locaux 
+10.4.1. Procaïne 
+10.4.2. Associations avec un vasoconstricteur 
+10.5. Neuroleptiques 
+10.5.1. Phénothiazines 
+10.5.1.1. Acépromazine 
+10.5.2. Dérivés de la butyrophénone               
+10.5.2.1. Azapérone 
+10.6. Benzodiazépines 
+10.6.1. Zolazépam 
+10.7. Les agonistes alpha-2-adrénergiques et leurs antagonistes                                                                       
+10.7.1. Les agonistes alpha-2-adrénergiques 
+10.7.1.1. Détomidine 
+10.7.1.2. Dexmédétomidine 
+10.7.1.3. Médétomidine 
+10.7.1.4. Romifidine 
+10.7.1.5. Xylazine 
+10.7.2. Les antagonistes alpha-2-adrénergiques 
+10.7.2.1. Atipamézole 
+10.8. Myorelaxants 
+10.8.1. Guaïfénésine 
+10.9. Antidépresseurs 
+10.9.1. Antidépresseurs tricycliques 
+10.9.1.1. Clomipramine 
+10.9.2. Inhibiteurs sélectifs de la recapture de la sérotonine                                                
+10.9.2.1. Fluoxétine 
+10.9.3. Inhibiteurs des monoamines oxydases (IMAO) 
+10.9.3.1. Sélégiline 
+10.10. Médicaments antiépileptiques               
+10.10.1. Phénobarbital 
+10.10.2. Imépitoïne 
+10.10.3. Bromure de potassium 
+11. Médicaments pour la peau 
+11.1. Médicaments administrés par voie systémique pour le traitement symptomatique de la dermatite atopique 
+11.1.1. Glucocorticoïdes 
+11.1.2. Ciclosporine 
+12. Médicaments à usage externe 
+12.1. Médicaments à usage dermatologique 
+12.1.1. Antiseptiques 
+12.1.1.1. Antiseptiques utilisés sur la peau 
+12.1.1.2. Solution de trempage des trayons 
+12.1.1.2.1. Chlorhexidine
+12.1.1.2.2. Iode
+12.1.2. Antibiotiques 
+12.1.3. Substances antiparasitaires à usage topique, actives contre les ectoparasites 
+12.1.3.1. Organophosphorés et carbamates 
+12.1.3.1.1. Dimpylate
+12.1.3.1.2. Phoxime
+12.1.3.1.3. Propoxur
+12.1.3.2. Pyréthrinoïdes 
+12.1.3.2.1. Deltaméthrine
+12.1.3.2.2. Fluméthrine
+12.1.3.2.3. Perméthrine
+12.1.3.3. Fipronil 
+12.1.3.4. Pyriprole 
+12.1.3.5. Imidaclopride 
+12.1.3.6. Métaflumizone 
+12.1.3.7. Amitraz 
+12.1.3.8. Indoxacarbe 
+12.1.3.9. Associations 
+12.1.3.9.1. Propoxur + fluméthrine
+12.1.3.9.2. Imidaclopride + perméthrine
+12.1.3.9.3. Imidaclopride + fluméthrine
+12.1.3.9.4. Fipronil + (S)-méthoprène
+12.1.3.9.5. Fipronil, (S)-méthoprène + amitraz
+12.1.3.9.6. Indoxocarbe + perméthrine
+12.1.3.9.7. Métaflumizone + amitraz
+12.1.3.9.8. Dinotéfurane + pyriproxyfène + perméthrine
+12.1.4. Médicament antiparasitaire pour abeilles 
+12.1.4.1. Thymol 
+12.1.5. Antifongiques 
+12.1.6. Glucocorticoïdes 
+12.1.6.1. Hydrocortisone acéponate 
+12.1.7. Associations 
+12.2. Médicaments à usage ophtalmologique 
+12.2.1. Préparations contenant au moins un antimicrobien 
+12.2.1.1. Gentamicine 
+12.2.2. Médicaments utilisés contre la kératoconjonctivite sèche                                                
+12.2.2.1. Ciclosporine 
+12.3. Médicaments à usage otique 
+12.4. Médicaments à usage gynécologique 
+12.5. Médicaments à usage intramammaire 
+12.5.1. Traitement des mammites 
+12.5.1.1. Cloxacilline 
+12.5.1.2. Céphalosporines: premier groupe 
+12.5.1.3. Céphalosporines: deuxième groupe                  
+12.5.1.4. Céphalosporines: troisième groupe                 
+12.5.1.5. Pirlimycine 
+12.5.1.6. Associations 
+12.5.2. Préparations utilisées au cours du tarissement et contenant un antimicrobien 
+12.5.2.1. Cloxacilline 
+12.5.2.2. Céphalosporines surtout actives contre les GRAM+ 
+12.5.2.3. Céphalosporines dont le spectre est élargi 
+12.5.2.4. Rifaximine 
+12.5.2.5. Associations 
+12.5.3. Préparations utilisées au cours du tarissement et ne contenant pas d’antimicrobien 
+12.5.3.1. Sous nitrate de bismuth 
+13. Médicaments agissant sur l’immunité 
+13.1. Vaccins 
+13.1.1. Vaccins pour le cheval 
+13.1.1.1. Vaccination contre les maladies virales 
+13.1.1.1.1. Grippe équine
+13.1.1.1.2. Rhinopneumonie
+13.1.1.1.3. Virus de la fièvre du Nil occidental (West Nile)
+13.1.1.1.4. Rotavirus équin
+13.1.1.2. Vaccination contre les maladies bactériennes 
+13.1.1.2.1. Tétanos
+13.1.1.2.2. Tableau récapitulatif des vaccins pour le cheval
+13.1.2. Vaccins pour les ruminants 
+13.1.2.1. Vaccins contre les maladies virales chez les bovins 
+13.1.2.1.1. Les vaccins contre les maladies respiratoires des bovins
+13.1.2.1.2. Vaccins contre les diarrhées virales bovines
+13.1.2.1.3. Vaccins contre les diarrhées néonatales d’origine virale
+13.1.2.1.4. Vaccination contre la fièvre catarrhale ovine (bluetongue)
+13.1.2.2. Vaccins bactériens pour ruminants (bovins et ovins) 
+13.1.2.2.1. Vaccins colibacillaires
+13.1.2.2.2. Vaccins anti-clostridiens
+13.1.2.2.3. Vaccin contre le piétin
+13.1.2.2.4. Mannheimia haemolytica
+13.1.2.2.5. . aureus
+13.1.2.2.6. Vaccination contre la fièvre Q (Coxiella burnetii)
+13.1.2.2.7. Tableau récapitulatif des vaccins pour bovins
+13.1.2.2.8. Tableau récapitulatif des vaccins pour ovins et/ou chèvres
+13.1.3. Vaccins pour le porc 
+13.1.3.1. Vaccination contre les maladies virales du porc 
+13.1.3.1.1. Parvovirose
+13.1.3.1.2. Grippe porcine (Influenza)
+13.1.3.1.3. Syndrome dysgénésique et respiratoire porcin (SDRP)
+13.1.3.1.4. Circovirus porcin
+13.1.3.2. Vaccination contre les maladies bactériennes chez le porc 
+13.1.3.2.1. pleuropneumoniae)
+13.1.3.2.2. hyopneumoniae)
+13.1.3.2.3. Maladie de Glässer (infections à Haemophilus parasuis)
+13.1.3.2.4. Rhinite atrophique
+13.1.3.2.5. entérotoxigènes
+13.1.3.2.6. productrices de Shiga-toxines (STEC)
+13.1.3.2.7. Clostridium novyi
+13.1.3.2.8. intracellularis)
+13.1.3.2.9. Rouget du porc
+13.1.3.2.10. Tableau récapitulatif des vaccins pour le porc
+13.1.4. Vaccination des lapins 
+13.1.4.1. Vaccin combiné contre la myxomatose et la maladie hémorragique virale 
+13.1.4.1.1. Tableau récapitulatif des vaccins pour le lapin
+13.1.5. Vaccination des poules 
+13.1.5.1. Vaccins contre la maladie de Marek 
+13.1.5.2. Vaccins contre la maladie de Newcastle 
+13.1.5.3. Vaccins contre la bronchite infectieuse 
+13.1.5.4. Vaccins contre la maladie de Gumboro 
+13.1.5.5. Vaccins contre l’encéphalomyélite aviaire 
+13.1.5.6. Vaccins contre l’arthrite due aux réovirus 
+13.1.5.7. Vaccins contre l’anémie infectieuse virale 
+13.1.5.8. Vaccins contre le syndrome de la chute de ponte 
+13.1.5.9. Vaccins contre la laryngotrachéite infectieuse 
+13.1.5.10. Vaccin contre la variole aviaire 
+13.1.5.11. Vaccin contre la rhinotrachéite 
+13.1.5.12. Vaccins utilisés dans la prévention de la coccidiose 
+13.1.5.13. Vaccins contre la salmonellose 
+13.1.5.14. Vaccins contre d’autres infections bactériennes 
+13.1.5.14.1. Tableau: schéma classique de vaccination des volailles
+13.1.6. Vaccination des dindes, pintades, faisans, perdreaux et cailles 
+13.1.6.1. Vaccination contre la maladie de Newcastle 
+13.1.6.2. Vaccin contre la rhinotrachéite aviaire infectieuse 
+13.1.7. Vaccination des pigeons 
+13.1.7.1. Vaccins contre la maladie de Newcastle (Paramyxovirose) 
+13.1.8. Vaccination des canaris et des pinsons 
+13.1.8.1. Vaccin contre la variole du canari 
+13.1.9. Liste des spécialités disponibles 
+13.1.9.1. Vaccins antiviraux pour volaille
+13.1.9.2. Vaccins antiparasitaires pour volaille
+13.1.9.3. Vaccins antibactériens pour volaille
+13.1.9.4. Vaccins pour pigeons
+13.1.9.5. Vaccin pour canaris et pinsons
+13.1.9.6. Tableau récapitulatif des vaccins pour la volaille
+13.1.9.7. Tableau récapitulatif des vaccins pour pigeons
+13.1.9.8. Tableau récapitulatif des vaccins pour canaris et pinsons
+13.1.10. Vaccins pour le chien 
+13.1.10.1. Vaccins contre les maladies virales du chien 
+13.1.10.1.1. Hépatite infectieuse canine
+13.1.10.1.2. Parvovirose
+13.1.10.1.3. Maladie de Carré
+13.1.10.1.4. Herpèsvirose canine
+13.1.10.1.5. Infections virales associées à la toux de chenil
+13.1.10.1.6. Vaccination du chiot avec les vaccins multivalents
+13.1.10.2. Vaccins bactériens pour le chien 
+13.1.10.2.1. Bordetella bronchiseptica
+13.1.10.2.2. Borrelia
+13.1.10.3. Vaccins antiparasitaires pour le chien 
+13.1.10.3.1. Leishmania infantum
+13.1.10.3.2. Tableau récapitulatif des vaccins pour le chien
+13.1.11. Vaccins pour le chat 
+13.1.11.1. Vaccination contre les maladies virales du chat                  
+13.1.11.1.1. Panleucopénie féline
+13.1.11.1.2. Vaccins contre le coryza félin
+13.1.11.1.3. Virus de la leucose féline
+13.1.11.1.4. Vaccin contre la péritonite infectieuse féline
+13.1.11.2. Vaccins bactériens pour le chat 
+13.1.11.2.1. Chlamydophila felis
+13.1.11.2.2. Tableau récapitulatif des vaccins pour le chat
+13.1.12. Vaccins antirabiques 
+13.1.12.1. Vaccins antirabiques monovalents 
+13.1.12.2. Vaccins antirabiques multivalents 
+13.1.13. Tableaux récapitulatifs des vaccins 
+13.2. Immunocastration 
+13.2.1. Vaccin anti-GnRF 
+13.3. Immunoglobulines et sérums 
+13.3.1. Immunoglobulines et sérums utilisés chez le bovin 
+13.3.2. Sérum antitétanique 
+13.4. Immunomodulateurs 
+13.4.1. Interféron 
+14. Médicaments antitumoraux 
+14.1. Inhibiteurs des tyrosine kinases 
+14.1.1. Masitinib 
+14.1.2. Tocéranib 
+14.2. Interleukine-2 féline 
+14.2.1. Liste des prémélanges médicamenteux
