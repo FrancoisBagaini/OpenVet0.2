@@ -82,6 +82,12 @@ class MyCompleter(QComboBox):
 			self.emit(SIGNAL("OnEnter"))
 		else:
 			QComboBox.keyPressEvent(self,event)
+			
+	def Getid(self):
+		return self.itemData(self.currentIndex(),Qt.UserRole).toInt()[0]
+
+	def GetProperty(self,index):
+		return self.itemData(self.currentIndex(),33+index)
 
 
 class MyTableWidget(QTableWidget):
