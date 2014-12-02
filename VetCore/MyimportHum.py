@@ -520,8 +520,19 @@ def SavePresentation(filin, parent):
         i = line.split(';')
         i[1] = i[1].strip()
         idMedicament = model.MyRequest.GetInt('CALL GetidMedicament_Cip(\"H%s\")' % i[0], 0)
+        #Extract idUnite & NbUnite. NULL if not found
+        unite=model.MyRequest.GetLine('CALL ExtractidUnite(\'%s\',\'Galen\')'%','.join(i[1].split()))
+        try:
+            idunite=unite[0].toInt()[0]
+        except:
+            idunite=QVariant()
+        try:
+            nbunite=i[1].split()[unite[2].toInt()[0]-1]
+            nbunite=int(nbunite)
+        except:
+            nbunite=QVariant()
         if not idMedicament is None:
-            model.SetNew([0, idMedicament, i[1], QVariant(), QVariant(), True, ''])
+            model.SetNew([0, idMedicament, i[1], idunite, nbunite, True, ''])
             model.New()
             model.Update()
         else:
@@ -571,9 +582,9 @@ def SaveCompositions(filin,parent):
             idUnite2=model.MyRequest.GetInt('CALL GetidUnite(\"%s\")'%compo[3],0) 
             if idUnite2 is None:
                 idUnite2=QVariant()
-            model.SetNew([0,idMolecule,idMedicament,i[3][:60], float(compo[0]),compo[1],idUnite1,i[4][:60],float(compo[2]),compo[3],idUnite2,True,''])
+            model.SetNew([0,idMolecule,idMedicament,i[3][:60], float(compo[0]),idUnite1,i[4][:60],float(compo[2]),idUnite2,True,''])
         else: 
-            model.SetNew([0,idMolecule,idMedicament,QVariant(), QVariant(),QVariant(),QVariant(),QVariant(),QVariant(),QVariant(),QVariant(),True,''])
+            model.SetNew([0,idMolecule,idMedicament,QVariant(),QVariant(),QVariant(),QVariant(),QVariant(),QVariant(),True,''])
         model.New()
         if model.Update()==-1:
             print ('erreur',i[2],i[0],i[3],i[4])   
@@ -610,7 +621,7 @@ if __name__ == '__main__':
         sys.exit(1)  
     window = QDialog()
     window.show()
-#     ImportClasseTherapeutique('REPFR_2014.txt','VClasses.txt',window)
+    ImportClasseTherapeutique('REPFR_2014.txt','VClasses.txt',window)
     SaveVoiesAdministration('SpeHum.txt',window)
     SaveMedicament('SpeHum.txt',window)
     SavePresentation('PresHum.txt',window)

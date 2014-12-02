@@ -548,7 +548,7 @@ class MyModel(QAbstractListModel):  #TODO: rename in MyRecordModel
             return -1
  
 
-LINEEDIT,CHECKBOX,PLAINTEXTEDIT,COMBOBOX,LIST,TABLE,LABELS,SPINBOX = range(1,9)
+LINEEDIT,CHECKBOX,PLAINTEXTEDIT,COMBOBOX,LIST,TABLE,LABELS,SPINBOX,TREE = range(1,10)
 
 class MyForm(QDialog):
     def __init__(self,title,data,parent=None):
@@ -600,19 +600,37 @@ class MyForm(QDialog):
                 field=MyTableView(self)
                 if not i[3] is None:
                     field.setMaximumSize(1000,i[3])
+                field.verticalHeader().hide()
                 field.setContextMenuPolicy(Qt.CustomContextMenu)
                 self.connect(field,SIGNAL('customContextMenuRequested(const QPoint&)'), self.OnListViewMenu)
                 menuTable = QMenu(field)
-                action1=menuTable.addAction('Supprimer')
+                action1=menuTable.addAction('Supprimer')    #editer
                 action1.setData(field)
                 self.connect(action1,SIGNAL("triggered()"),self.OnList_delete)
                 self.popMenus.append(menuTable) 
+            if i[1]==7: #Label
+                field=label
+                label = QLabel()
             if i[1]==8: #SpinBox
                 field = QSpinBox(self)
                 if not i[2] is None:
                     field.setMinimum(i[2])
-                if not i[2] is None:
-                    field.setMaximum(i[3])   
+                if not i[3] is None:
+                    field.setMaximum(i[3])  
+            if i[1]==9: #TreeView
+                field=QTreeView(self)
+                if not i[3] is None:
+                    field.setMaximumSize(1000,i[3]) 
+                field.setSelectionBehavior(QTreeView.SelectItems)
+                field.setUniformRowHeights(True)
+                field.setContextMenuPolicy(Qt.CustomContextMenu)
+                self.connect(field,SIGNAL('customContextMenuRequested(const QPoint&)'), self.OnListViewMenu)
+                menuTable = QMenu(field)
+                action1=menuTable.addAction('Editer')
+                action1.setData(field)
+#                self.connect(action1,SIGNAL("triggered()"),self.OnList_edit)
+                self.popMenus.append(menuTable)  
+                   
             field.setObjectName(QString(i[0]))
             self.fields.append(field)
             if i[5]!=2:
@@ -902,7 +920,6 @@ class FloatColumnDelegate(QItemDelegate):
         self.maximum = maximum
         self.NbDecimals=NbDecimals
 
-
     def createEditor(self, parent, option, index):
         lineedit = QLineEdit(parent)
         lineedit.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
@@ -920,8 +937,10 @@ class FloatColumnDelegate(QItemDelegate):
             editor.setText('%.4f'%value)
 
     def setModelData(self, editor, model, index):
-        editor.interpretText()
-        model.setData(index, QVariant(editor.value()))
+#        editor.interpretText()
+        value=editor.text().toFloat()
+        if value[1]:
+            model.setData(index, QVariant(value[0]))
 
 class DateColumnDelegate(QItemDelegate):
 
