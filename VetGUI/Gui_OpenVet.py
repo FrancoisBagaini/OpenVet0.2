@@ -49,8 +49,7 @@ if __name__ == '__main__':
     db.setPassword ( config.password )
     db.setDatabaseName(config.database)
     if not db.open():
-        QtGui.QMessageBox.warning(None, "Opencompta",
-            QtCore.QString("Database Error: %1").arg(db.lastError().text()))
+        QtGui.QMessageBox.warning(None, "OpenVet",QtCore.QString("Database Error: %1").arg(db.lastError().text()))
         sys.exit(1)
     #end test
     window = MainWindow(db)

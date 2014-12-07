@@ -476,6 +476,17 @@ def SaveVoiesAdministration(filin, parent):
         model.New()
         model.Update()
 
+def SaveClassesTherapeutique(filin,parent=None):
+    model = MyModel('ClasseTherapeutique', 0, parent)
+    finlog = codecs.open(pathimport + filin, 'r', encoding='utf-8')
+    for line in finlog:
+        i = line.split('. ')
+#         data = []
+#         data.append(QVariant(i[0]),QVariant(i[1]))
+        model.SetNew([0,QVariant(i[0]),QVariant(i[1]),'',1,''])
+        model.New()
+        model.Update()
+    
 def SaveMedicament(filin, parent=None):
     model = MyModel('Medicament', 0, parent)
     modelRef = MyModel('VoieAdministrationRef', 0, parent)
@@ -597,6 +608,8 @@ def SaveCompositions(filin,parent):
 # ImportComposition()
 # ImportSpecialite()
 # ImportPresentation()
+# ImportClasseTherapeutique('REPFR_2014.txt','VClasses.txt',window)
+
 
 # for i,j in enumerate(GetListeAdministration('SpeHum.txt')):
 #     print '%i.%s'%(i+1,j)
@@ -621,12 +634,12 @@ if __name__ == '__main__':
         sys.exit(1)  
     window = QDialog()
     window.show()
-    ImportClasseTherapeutique('REPFR_2014.txt','VClasses.txt',window)
-    SaveVoiesAdministration('SpeHum.txt',window)
-    SaveMedicament('SpeHum.txt',window)
-    SavePresentation('PresHum.txt',window)
-    SaveMolecules('CompHum.txt',window)
-    SaveCompositions('CompHum.txt',window)
+    SaveClassesTherapeutique('VClasses.txt',window)
+#     SaveVoiesAdministration('SpeHum.txt',window)
+#     SaveMedicament('SpeHum.txt',window)
+#     SavePresentation('PresHum.txt',window)
+#     SaveMolecules('CompHum.txt',window)
+#     SaveCompositions('CompHum.txt',window)
     print time.time()-t0  
     sys.exit(app.exec_())   
 

@@ -29,7 +29,7 @@ class GuiOrdonnance():
 		self.parent.comboBox_Molecule.SetCompleter()
 		self.parent.comboBox_Molecule.setModel(MyComboModel(self.parent,'GetMolecules(0,0,1)'),True)
 		self.parent.connect(self.parent.comboBox_Molecule,SIGNAL("OnEnter"),self.OnSelectMolecule)
-		self.parent.connect(self.parent.comboBox_Molecule,SIGNAL("activated"),self.OnSelectMolecule)
+		self.parent.connect(self.parent.comboBox_Molecule,SIGNAL("activated(int)"),self.OnSelectMolecule)
 		self.parent.comboBox_Molecule.clearEditText()
 		
 		self.parent.comboBox_Medicament.SetCompleter()
@@ -89,9 +89,10 @@ class GuiOrdonnance():
 		self.parent.comboBox_Medicament.model().Set('GetMedicaments(\"\",\"%s\",%i)'%(self.Pharmacope,self.Actif))
 		self.parent.comboBox_Medicament.setModel(self.parent.comboBox_Medicament.model())
 	
-	def OnSelectMolecule(self):
+	def OnSelectMolecule(self,index=None):
 		principeActif=self.parent.comboBox_Molecule.currentText()
- 		index=self.parent.comboBox_Molecule.findText(principeActif,Qt.MatchStartsWith)
+		if index is None:
+			index=self.parent.comboBox_Molecule.findText(principeActif,Qt.MatchStartsWith)
 		if not principeActif.isEmpty():
 			self.parent.comboBox_Molecule.setCurrentIndex(index)
 			self.parent.comboBox_Medicament.model().Set('GetMedicaments(\"%s\",\"%s\",%i)'%(principeActif,self.Pharmacope,self.Actif))

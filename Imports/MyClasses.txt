@@ -2,145 +2,148 @@
 1.1. Antibactériens 
 1.1.1. Antibiotiques bêta-lactames 
 1.1.1.1. Pénicillines 
-1.1.1.1.1. Pénicillines naturelles
+1.1.1.1.1. *Pénicilline G
 1.1.1.1.2. Aminopénicillines
-1.1.1.1.3. Ampicilline
-1.1.1.1.4. Amoxicilline
-1.1.1.1.5. Aminopénicillines associées à un inhibiteur des bêta-lactamases
-1.1.1.2. Céphalosporines 
-1.1.1.2.1. contre les GRAM+
-1.1.1.2.2. Deuxième groupe: céphalosporines à spectre élargi
+1.1.1.1.2.1. *Ampicilline
+1.1.1.1.2.2. *Amoxicilline
+1.1.1.2. Céphalosporines
+1.1.1.2.1. Céphalosporines de première génération
+1.1.1.2.2. Céphalosporines de deuxième génération
+1.1.1.2.3. Céphalosporines de troisième génération
+1.1.1.2.4. Céphalosporines à spectre étendu
+1.1.1.3. Inhibiteur des bêta-lactamases
 1.1.2. Aminosides 
-1.1.2.1. Gentamicine 
-1.1.2.2. Paromomycine 
-1.1.3. Florfénicol 
+1.1.2.1. *Gentamicine 
+1.1.2.2. *Paromomycine 
+1.1.3. Phénicolés
+1.1.3.1. *Chloramphénicol
+1.1.3.2. *Florfénicol
 1.1.4. Tétracyclines 
-1.1.4.1. Chlortétracycline 
-1.1.4.2. Doxycycline 
-1.1.4.3. Oxytétracycline 
+1.1.4.1. *Chlortétracycline 
+1.1.4.2. *Doxycycline 
+1.1.4.3. *Oxytétracycline 
 1.1.5. Macrolides - Lincosamides et Pleuromutilines 
 1.1.5.1. Macrolides 
-1.1.5.1.1. Gamithromycine
-1.1.5.1.2. Tildipirosine
-1.1.5.1.3. Tilmicosine
-1.1.5.1.4. Tulathromycine
-1.1.5.1.5. Tylosine
-1.1.5.1.6. Tylvalosine
+1.1.5.1.1. *Gamithromycine
+1.1.5.1.2. *Tildipirosine
+1.1.5.1.3. *Tilmicosine
+1.1.5.1.4. *Tulathromycine
+1.1.5.1.5. *Tylosine
+1.1.5.1.6. *Tylvalosine
 1.1.5.2. Lincosamides 
-1.1.5.2.1. Clindamycine
-1.1.5.2.2. Lincomycine
+1.1.5.2.1. *Clindamycine
+1.1.5.2.2. *Lincomycine
 1.1.5.3. Pleuromutilines 
-1.1.5.3.1. Tiamuline
-1.1.5.3.2. Valnémuline
+1.1.5.3.1. *Tiamuline
+1.1.5.3.2. *Valnémuline
 1.1.6. Antimicrobiens Peptidiques 
-1.1.6.1. Polymyxines 
-1.1.6.2. Bacitracine 
+1.1.6.1. *Polymyxine 
+1.1.6.2. *Bacitracine 
 1.1.7. Sulfamidés et Triméthoprime 
 1.1.8. Fluoroquinolones 
-1.1.8.1. Danofloxacine 
-1.1.8.2. Difloxacine 
-1.1.8.3. Enrofloxacine 
-1.1.8.4. Fluméquine 
-1.1.8.5. Marbofloxacine 
-1.1.8.6. Pradofloxacine 
-1.1.9. Métronidazole   
-1.1.10. Polymyxine        
+1.1.8.1. *Danofloxacine 
+1.1.8.2. *Difloxacine 
+1.1.8.3. *Enrofloxacine 
+1.1.8.4. *Fluméquine 
+1.1.8.5. *Marbofloxacine 
+1.1.8.6. *Pradofloxacine 
+1.1.9. Nitroimidazoles
+1.1.9.1. *Métronidazole         
 1.2. Médicaments antimycotiques 
-1.2.1. Itraconazole 
-1.2.2. Kétoconazole 
+1.2.1. *Itraconazole 
+1.2.2. *Kétoconazole 
 1.3. Médicaments antiparasitaires 
-1.3.1. Médicaments injectables et à usage oral actifs contre les endoparasites 
+1.3.1. Antiparasiatires internes
 1.3.1.1. Benzimidazoles et probenzimidazoles 
-1.3.1.1.1. Albendazole
-1.3.1.1.2. Fébantel
-1.3.1.1.3. Fenbendazole
-1.3.1.1.4. Flubendazole
-1.3.1.1.5. Mébendazole
-1.3.1.1.6. Oxfendazole
-1.3.1.2. Triclabendazole 
+1.3.1.1.1. *Albendazole
+1.3.1.1.2. *Fébantel
+1.3.1.1.3. *Fenbendazole
+1.3.1.1.4. *Flubendazole
+1.3.1.1.5. *Mébendazole
+1.3.1.1.6. *Oxfendazole
+1.3.1.1.7. *Triclabendazole 
+1.3.1.1.8. *Oxantel
 1.3.1.3. Imidazothiazolés 
-1.3.1.3.1. Lévamisole
-1.3.1.4. Dérivés d’aminoacétonitrile (AAD) 
-1.3.1.4.1. Monépantel
+1.3.1.3.1. *Lévamisole
+1.3.1.4. Dérivés d’aminoacétonitrile
+1.3.1.4.1. *Monépantel
 1.3.1.5. Tétrahydropyrimidines 
-1.3.1.5.1. Pyrantel
+1.3.1.5.1. *Pyrantel
 1.3.1.6. Quinolines 
-1.3.1.6.1. Praziquantel
+1.3.1.6.1. *Praziquantel
 1.3.1.7. Dérivés phénoliques et salicylanilides 
-1.3.1.7.1. Closantel
-1.3.1.7.2. Nitroxinil
-1.3.1.7.3. Oxyclozanide
+1.3.1.7.1. *Closantel
+1.3.1.7.2. *Nitroxinil
+1.3.1.7.3. *Oxyclozanide
 1.3.1.8. Anticoccidiens 
-1.3.1.9. Produits actifs sur d’autres protozoaires 
-1.3.1.9.1. Imidazoles 
-1.3.1.9.2. Halofuginone 
-1.3.1.10. Milbémycine
-1.3.1.11. Pyrantel embonate
-1.3.1.12. Oxantel
-1.3.1.13. Emodepside
-1.3.1.14. Toltrazuril
-1.3.3. Médicaments à usage transdermique actifs contre les ecto- et les endoparasites 
-1.3.3.1. Lactones macrocycliques (LM) 
-1.3.3.1.1. Doramectine
-1.3.3.1.2. Eprinomectine
-1.3.3.1.3. Ivermectine
-1.3.3.1.4. Moxidectine
-1.3.3.1.5. Sélamectine
-1.3.3.2. Organophosphorés 
-1.3.3.2.1. Phoxime
-1.3.3.3. Clorsulon
-1.3.5. Médicaments injectables et à usage oral actifs contre les ectoparasites 
-1.3.5.1. Régulateurs de croissance 
-1.3.5.1.1. Lufénuron
-1.3.5.2. Spinosad 
-1.3.6. Médicaments à usage topique actifs contre les ectoparasites 
+1.3.1.8.1. *Halofuginone
+1.3.1.8.1. *Toltrazuril
+1.3.1.13. 0ctadepsipeptides
+1.3.1.13.1.*Emodepside
+1.3.1.14. Benzenesulphonamides
+1.3.1.14.1. *Clorsulon
+1.3.3. Antiparasitaires internes et externes 
+1.3.3.1. Lactones macrocycliques
+1.3.3.1.1. *Doramectine
+1.3.3.1.2. *Eprinomectine
+1.3.3.1.3. *Ivermectine
+1.3.3.1.4. *Moxidectine
+1.3.3.1.5. *Sélamectine
+1.3.3.1.6. *Milbémycine
+1.3.5. Antiparasitaires externes
+1.3.5.1. Organophosphorés 
+1.3.5.1.1. *Phoxime
+1.3.5.2. Régulateurs de croissance 
+1.3.5.2.1. *Lufénuron
+1.3.5.3. Spinosad 
 2. Médicaments du système hormonal 
 2.1. Hormones sexuelles et autres médicaments du système reproducteur 
 2.1.1. Œstrogènes 
 2.1.2. Progestagènes 
 2.1.2.1. Progestérone et dérivés de la progestérone 
-2.1.2.1.1. Delmadinone acétate
-2.1.2.1.2. Mégestrol acétate
-2.1.2.1.3. Médroxyprogestérone acétate
-2.1.2.1.4. Proligestone
-2.1.2.1.5. Progestérone
+2.1.2.1.1. *Delmadinone acétate
+2.1.2.1.2. *Mégestrol acétate
+2.1.2.1.3. *Médroxyprogestérone acétate
+2.1.2.1.4. *Proligestone
+2.1.2.1.5. *Progestérone
 2.1.2.2. Dérivés d’androgènes à activité progestative 
 2.1.3. Médicaments en cas d’hypertrophie bénigne de la prostate 
-2.1.3.1. Osatérone 
+2.1.3.1. *Osatérone 
 2.1.4. Stéroïdes anabolisants 
-2.1.4.1. Nandrolone 
+2.1.4.1. *Nandrolone 
 2.1.5. Gonadotrophines et médicaments agissant sur leur libération                       
-2.1.5.1. Gonadotrophine chorionique (hCG) 
-2.1.5.2. Gonadotrophine sérique (PMSG ou eCG) 
-2.1.5.3. GnRH : buséréline, desloréline, gonadoréline 
-2.1.5.4. Lyophilisat de pFSH et pLH 
-2.1.5.5. Combinaison de PMSG (eCG) et d’hCG 
+2.1.5.1. *Gonadotrophine chorionique
+2.1.5.2. *Gonadotrophine sérique
+2.1.5.3. *Buséréline
+2.1.5.4. *Desloréline
+2.1.5.5. *Gonadoréline 
+2.1.5.6. *Lyophilisat de pFSH et pLH 
 2.1.6. Tocolytiques 
-2.1.6.1. Clenbutérol 
+2.1.6.1. *Clenbutérol 
 2.1.7. Ocytociques 
 2.1.8. Prostaglandines 
-2.1.8.1. Alfaprostol 
-2.1.8.2. Cloprosténol 
-2.1.8.3. Dinoprost 
+2.1.8.1. *Alfaprostol 
+2.1.8.2. *Cloprosténol 
+2.1.8.3. *Dinoprost 
 2.1.9. Anti-prolactine                                                                 
-2.1.9.1. Cabergoline 
-2.1.9.2. Métergoline 
+2.1.9.1. *Cabergoline 
+2.1.9.2. *Métergoline 
 2.1.10. Antiprogestagènes 
-2.1.10.1. Aglépristone 
+2.1.10.1. *Aglépristone 
 2.2. Hormones cortico-surrénales                             
-2.2.1. Dexaméthasone 
-2.2.2. Méthylprednisolone 
-2.2.3. Prednisolone 
-2.3. Médicament utilisé en cas d’hypercorticisme chez le chien (maladie de Cushing) 
-2.3.1. Trilostane 
+2.2.1. *Dexaméthasone 
+2.2.2. *Méthylprednisolone 
+2.2.3. *Prednisolone 
+2.3. Médicament utilisé en cas d’hypercorticisme chez le chien 
+2.3.1. *Trilostane 
 2.4. Médicaments contre le dysfonctionnement du lobe intermédiaire de l’hypophyse chez le cheval (maladie de Cushing) 
-2.4.1. Pergolide 
+2.4.1. *Pergolide 
 2.5. Médicaments de la thyroïde 
 2.5.1. Hormone thyroïdienne 
-2.5.1.1. Lévothyroxine 
+2.5.1.1. *Lévothyroxine 
 2.5.2. Médicament antithyroïdien 
-2.5.2.1. Thiamazole 
-2.6. Insuline 
+2.5.2.1. *Thiamazole 
+2.6. Insulines 
 3. Analgésiques, antipyrétiques et anti-inflammatoires 
 3.1. Analgésiques et antipyrétiques (AA)                                     
 3.1.1. Paracétamol 
@@ -153,6 +156,7 @@
 3.2.2. Butorphanol 
 3.2.3. Fentanyl 
 3.2.4. Méthadone 
+3.2.5. Moprhine
 3.3. Anti-inflammatoires non stéroïdiens (AINS ou AAA)                                                                   
 3.3.1. Dérivés de la pyrazolone 
 3.3.1.1. Phénylbutazone

@@ -7,7 +7,6 @@ class MyComboBox(QComboBox):
 	def __init__(self,parent=None):
 		super(MyComboBox,self).__init__(parent)
 		self.completer=None
-		#oncontextmenu
 		
 #	def focusInEvent(self, event):
 #			self.emit(QtCore.SIGNAL("focusIn"))
@@ -43,16 +42,21 @@ class MyComboBox(QComboBox):
 		self.completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)#reg
 		self.setCompleter(self.completer)
 		# connect signals
-		self.lineEdit().textEdited[unicode].connect(self.pFilterModel.setFilterFixedString)
+#		self.lineEdit().textEdited[unicode].connect(self.pFilterModel.setFilterFixedString)
+		self.connect(self,SIGNAL('editTextChanged(QString)'),self.OnUpdateCompleter)
 		self.completer.activated.connect(self.OnCompleterActivated)
 		self.setContextMenuPolicy(Qt.CustomContextMenu)
 		self.connect(self,SIGNAL('customContextMenuRequested(const QPoint&)'), self.OnPopup)
 
+	def OnUpdateCompleter(self,text):
+		text='^'+text
+		self.pFilterModel.setFilterRegExp(text)
+	
 	def OnCompleterActivated(self, text):
 		if text:
 			index = self.findText(text)
 			self.setCurrentIndex(index)
-			self.activated[str].emit(self.itemText(index))
+			self.emit(SIGNAL("activated(int)"),index)
 
 	# on model change, update the models of the filter and completer as well 
 	def setModel(self, model,isCompleter=False):
@@ -63,19 +67,8 @@ class MyComboBox(QComboBox):
 			
 	def SetPopup(self,inlist):
 		self.Popup=QMenu()
-		#setBackgroundRole ( QPalette::ColorRole)
-# 		 self.setStyleSheet("""
-#            QMenu {
-#                background-color: rgb(49,49,49);
-#                color: rgb(255,255,255);
-#                border: 1px solid #000;          
-#            }
-#  
-#            QMenu::item::selected {
-#                background-color: rgb(30,30,30);
-#            }
-#        """)
-		items=[]
+		self.Popup.setStyleSheet("QMenu {background-color: rgb(0,0,94);color: rgb(188,255,2);border: 1px solid #000;}")
+		self.items=[]
 		for i in inlist:
 			action=self.Popup.addAction(i[0].toString())
 			action.setData(QVariant([i[1],i[2]]))
@@ -83,7 +76,7 @@ class MyComboBox(QComboBox):
 			self.connect(action,SIGNAL("triggered(QAction)"),self.OnSelectPopupItem)
 	
 	def OnPopup(self,point):
-		self.Popup.exec_(self.mapToGlobal(QPoint(0,point.y()+8)))
+		self.Popup.exec_(self.mapToGlobal(QPoint(1,point.y()+8)))
 
 	def OnSelectPopupItem(self,action):
 		self.SelectionContext=action.data()
@@ -106,48 +99,6 @@ class MyComboBox(QComboBox):
 
 	def GetDeleted(self):
 		return self.itemData(self.currentIndex(),33)
-
-
-class MyCompleter(QComboBox):
-	def __init__(self,parent=None):
-		super(MyCompleter,self).__init__(parent)
-		self.setFocusPolicy(Qt.StrongFocus)
-		self.setEditable(True)
- 		# add a filter model to filter matching items
- 		self.pFilterModel = QSortFilterProxyModel(self)
- 		self.pFilterModel.setSourceModel(self.model())
- 		self.pFilterModel.setFilterCaseSensitivity(Qt.CaseInsensitive)	#Bug filtering is CaseSensitive
-		self.completer = QCompleter(self.pFilterModel, self)
-		# always show all (filtered) completions
-		self.completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
-		self.setCompleter(self.completer)
-		# connect signals
-		self.lineEdit().textEdited[unicode].connect(self.pFilterModel.setFilterFixedString)
-		self.completer.activated.connect(self.on_completer_activated)
-
-	def on_completer_activated(self, text):
-		if text:
-			index = self.findText(text)
-			self.setCurrentIndex(index)
-			self.activated[str].emit(self.itemText(index))
-
-	# on model change, update the models of the filter and completer as well 
-	def setModel(self, model):
-		super(MyCompleter, self).setModel(model)
- 		self.pFilterModel.setSourceModel(model)
- 		self.completer.setModel(self.pFilterModel)
-
-	def keyPressEvent(self,event):
-		if event.key()==Qt.Key_Return or event.key()==Qt.Key_Enter:
-			self.emit(SIGNAL("OnEnter"))
-		else:
-			QComboBox.keyPressEvent(self,event)
-			
-	def Getid(self):
-		return self.itemData(self.currentIndex(),Qt.UserRole).toInt()[0]
-
-	def GetProperty(self,index):
-		return self.itemData(self.currentIndex(),33+index)
 
 
 class MyTableWidget(QTableWidget):
@@ -198,3 +149,4 @@ class MyTableView(QTableView):
 			return
 		tot=6+sum([self.columnWidth(i) for i in range(self.model().columnCount()) if i!=varcol])
 		self.setColumnWidth(varcol,self.width()-tot)
+#TODO verify autoresize, make resizeHeight
