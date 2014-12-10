@@ -135,6 +135,9 @@ class MyPlainTextEdit(QPlainTextEdit):
 class MyTableView(QTableView):
 	def __init__(self,parent=None):
 		super(MyTableView,self).__init__(parent)
+		
+	def Getid(self):
+		return self.model().data(self.currentIndex(),Qt.UserRole).toInt()[0]
 	
 	def keyReleaseEvent(self,event):
 		if event.key()==Qt.Key_Return or event.key()==Qt.Key_Enter:
@@ -145,8 +148,41 @@ class MyTableView(QTableView):
 	def autoResize(self,varcol):
 		#redimentionne avec la colonne varcol étant la plus large possible, sous réserve que les autres colonnes affichent les données en entier.
 		self.resizeColumnsToContents()
+		#if verticalSrollBar
 		if self.model() is None:
 			return
-		tot=6+sum([self.columnWidth(i) for i in range(self.model().columnCount()) if i!=varcol])
+		tot=1+sum([self.columnWidth(i) for i in range(self.model().columnCount()) if i!=varcol])
+		if self.verticalScrollBar().isEnabled():
+			tot+=18
 		self.setColumnWidth(varcol,self.width()-tot)
-#TODO verify autoresize, make resizeHeight
+
+	def minimumSizeHint(self):
+		return QSize(self.size().width(),30+self.horizontalHeader().height())
+
+	def maximumSizeHint(self):
+		return QSize(self.size().width(),5*self.rowHeight(0)+self.horizontalHeader().height()+self.horizontalScrollBar().height())
+	
+	def sizeHint(self):
+		height=(self.model().rowCount()+1)*self.rowHeight(0)+self.horizontalHeader().height()
+		if not self.horizontalScrollBar().isHidden():
+			height+=self.horizontalScrollBar().height()
+		return QSize(self.size().width(),height)
+	
+	def ResizeHeight(self):	
+		self.setVisible(False)
+		self.resizeColumnsToContents()
+		self.resizeRowsToContents()
+		self.setVisible(True)
+#		self.resize(self.sizeHint())
+		self.setMinimumHeight(self.minimumSizeHint().height())
+		self.setMaximumHeight(min(self.maximumSizeHint().height(),self.sizeHint().height()))
+		self.update()
+		self.updateGeometry()
+
+
+class MyTreeView(QTreeView):
+	def __init__(self,parent=None):
+		super(MyTreeView,self).__init__(parent)
+		self.setSelectionBehavior(QAbstractItemView.SelectRows)
+		self.setUniformRowHeights(True)
+		

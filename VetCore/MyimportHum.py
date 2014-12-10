@@ -478,14 +478,26 @@ def SaveVoiesAdministration(filin, parent):
 
 def SaveClassesTherapeutique(filin,parent=None):
     model = MyModel('ClasseTherapeutique', 0, parent)
+    molecule=MyModel('Molecule', 0, parent)
+    idClasse=0
     finlog = codecs.open(pathimport + filin, 'r', encoding='utf-8')
     for line in finlog:
         i = line.split('. ')
-#         data = []
-#         data.append(QVariant(i[0]),QVariant(i[1]))
-        model.SetNew([0,QVariant(i[0]),QVariant(i[1]),'',1,''])
-        model.New()
-        model.Update()
+#         try:                        #for debugging only
+#             t=i[1][0]=='*'
+#         except:
+#             print 'index out of range for :'
+#             print i
+        if i[1][0]=='*':
+            idMolecule= molecule.MyRequest.GetInts('CALL FindMolecule(\"%s\")'%i[1][1:].strip(), 0)
+            for i in idMolecule:
+                molecule.Setid(i)
+                molecule.listdata[3]=idClasse
+                molecule.Update()
+        else:
+            model.SetNew([0,QVariant(i[0]),QVariant(i[1]),'',1,''])
+            model.New()
+            idClasse=model.Update()
     
 def SaveMedicament(filin, parent=None):
     model = MyModel('Medicament', 0, parent)
@@ -634,12 +646,12 @@ if __name__ == '__main__':
         sys.exit(1)  
     window = QDialog()
     window.show()
-    SaveClassesTherapeutique('VClasses.txt',window)
-#     SaveVoiesAdministration('SpeHum.txt',window)
-#     SaveMedicament('SpeHum.txt',window)
-#     SavePresentation('PresHum.txt',window)
-#     SaveMolecules('CompHum.txt',window)
-#     SaveCompositions('CompHum.txt',window)
+    SaveVoiesAdministration('SpeHum.txt',window)
+    SaveMedicament('SpeHum.txt',window)
+    SavePresentation('PresHum.txt',window)
+    SaveMolecules('CompHum.txt',window)
+    SaveCompositions('CompHum.txt',window)
+    SaveClassesTherapeutique('MyClassesTher_sample.txt',window)
     print time.time()-t0  
     sys.exit(app.exec_())   
 

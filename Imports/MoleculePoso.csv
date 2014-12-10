@@ -1,4 +1,3 @@
-idMoleculePosologie,Molecule_idMolecule,Especes_idEspeces,VoieAdministration_idVoieAdministration,AutreAdministration,PosologieMin,PosologieMax,Unite_idUnite,Frequence,Remarque,isActif,isDeleted,Identifiant
 1,77,1,2,NULL,0.6250,1.2000,5,1 X/j,NULL,1,0,NULL
 2,77,2,2,NULL,1.0000,2.0000,5,1 à 2 X/j,Seul,1,0,NULL
 3,77,2,2,NULL,0.5000,1.0000,5,1 X/j,En association avec IECA,1,0,NULL

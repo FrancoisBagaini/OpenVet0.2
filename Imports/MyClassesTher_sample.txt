@@ -78,8 +78,8 @@
 1.3.1.8. Anticoccidiens 
 1.3.1.8.1. *Halofuginone
 1.3.1.8.1. *Toltrazuril
-1.3.1.13. 0ctadepsipeptides
-1.3.1.13.1.*Emodepside
+1.3.1.13. Octadepsipeptides
+1.3.1.13.1. *Emodepside
 1.3.1.14. Benzenesulphonamides
 1.3.1.14.1. *Clorsulon
 1.3.3. Antiparasitaires internes et externes 
@@ -143,5 +143,4 @@
 2.5.1.1. *Lévothyroxine 
 2.5.2. Médicament antithyroïdien 
 2.5.2.1. *Thiamazole 
-2.6. Insulines 
-
+2.6. Insulines

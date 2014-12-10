@@ -6,6 +6,7 @@ from PyQt4.QtSql import *
 import os
 import sys
 import config
+import treelib
 import Core
 from DBase import *
 from Mywidgets import *
@@ -417,6 +418,32 @@ class MyTableModel(QAbstractTableModel):
                 if isdeltable and idtable!=0:
                     self.DeleteItem(table,abs(idtable),parent) 
  
+class MyTreeModel(QStandardItemModel):
+    def __init__(self,parent,title,request):
+        QStandardItemModel.__init__(self, parent)
+        self.parent=parent
+        self.Myrequest = Request()
+        self.setHorizontalHeaderLabels([title])
+        if isinstance(request,str):
+                    data=self.Myrequest.GetLines('CALL %s'%request)
+                    self.tree=treelib.Tree()
+                    self.tree.create_node(title,0,None,0)
+                    self.children=[QStandardItem(title)]
+                    for index,i in enumerate(data):
+                        self.tree.create_node(i[1].toString(),str(i[2].toString()),parent=self.GetParent(i[2]),data=index+1)
+                        self.children.append(QStandardItem(i[1].toString()))
+                        self.children[len(self.children)-1].setToolTip(i[3].toString())
+                        indexparent=self.tree.nodes[self.GetParent(i[2])].data
+                        self.children[indexparent].appendRow(self.children[index+1])
+                    self.appendRow(self.children[0])
+                        
+    def GetParent(self,refin):
+        refin=str(refin.toString())
+        try:
+            parent=refin[:refin.rindex('.')]
+        except:
+            parent=0
+        return parent
         
 class MyModel(QAbstractListModel):  #TODO: rename in MyRecordModel
     def __init__(self, table,idTable,parent=None, *args):
@@ -618,7 +645,7 @@ class MyForm(QDialog):
                 if not i[3] is None:
                     field.setMaximum(i[3])  
             if i[1]==9: #TreeView
-                field=QTreeView(self)
+                field=MyTreeView(self)
                 if not i[3] is None:
                     field.setMaximumSize(1000,i[3]) 
                 field.setSelectionBehavior(QTreeView.SelectItems)

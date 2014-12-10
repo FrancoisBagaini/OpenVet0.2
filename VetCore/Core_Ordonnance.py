@@ -201,15 +201,56 @@ class FormMolecule(MyForm):
         MyForm.__init__(self,u'Edition de molécule',data,parent)
         self.SetModel(self.MoleculeModel,{0:2,1:1,2:4})
         self.parent=parent
+        #Fill Posologies
         self.posologiesModel=MyTableModel(self,6,'GetPosologies(%i,%i)'%(idMolecule,idEspece))
         self.fields[6].setMinimumWidth(400)
+        self.fields[6].horizontalHeader().setResizeMode(QHeaderView.Interactive)
+        self.fields[6].setSizePolicy(QSizePolicy.Preferred,QSizePolicy.Minimum)
         self.fields[6].setModel(self.posologiesModel)
         self.fields[6].ResizeHeight()
         self.adjustSize()
+        self.fields[6].ResizeHeight()
         self.fields[6].autoResize(0)
-        #TODO: qtree
+        action=self.popMenus[1].addAction('Editer')
+        self.connect(action,SIGNAL("triggered()"),self.OnPosoEdit)
+        #Fill Classes Thérapeutiques and select
+        self.classesTherModel=MyTreeModel(self,u'Classes Thérapeutiques','GetClassesTherapeutiques()')
+        self.fields[4].setModel(self.classesTherModel)
+        classeTherid=self.MoleculeModel.data(self.MoleculeModel.index(0,3,self),Qt.DisplayRole).toInt()[0]
+        if classeTherid>0:
+            node=self.classesTherModel.tree.get_node(str(self.classesTherModel.Myrequest.GetString('CALL GetClasseTherapeutique(%i)'%classeTherid,1)))
+            leave=node.data
+            while self.classesTherModel.tree.parent(node.identifier) is not None:
+                node=self.classesTherModel.tree.parent(node.identifier)
+                index = self.classesTherModel.indexFromItem(self.classesTherModel.children[node.data])
+                self.fields[4].expand(index)
+            self.classesTherModel.children[leave].setForeground(QBrush(QColor('red')))
+#             selection = self.fields[4].selectionModel()
+#             index = self.classesTherModel.indexFromItem(self.classesTherModel.children[leave])
+#             selection.select(index, QItemSelectionModel.Select|QItemSelectionModel.Rows)
            
-           
+    def OnPosoEdit(self):
+        idPoso=self.fields[6].Getid()
+        form=FormPosologie(idPoso,idMolecule,idEspece,idVoieAdminself.parent)
+        if form.exec_():
+            #TODO:
+            self.PresentationModel=MyTableModel(self,3,'GetPresentation(%i)'%self.Medicament.idMedicament)
+            self.fields[7].setModel(self.PresentationModel)
+
+
+class FormPosologie(MyForm):
+    def __init__(self,idPoso,idMolecule,idEspece,idVoieAdmin,parent):
+        self.parent=parent 
+        new=[0,idMolecule,idEspece,idVoieAdmin,None,0.0,0.0,1,'',None,1,0,'']#get idunitedafaut=mg/kg
+        self.PosologieModel=MyModel(u'MoleculePosologie',idPoso,self.parent)
+        if not self.PosologieModel.SetNew(new):
+            return      
+        data=[[u'Espèce',4,None,None,'Editer les espèces'],[u'Voie d\'administration',4,None,None,'Editer les voies d\'administration'],[u'Autre administration',1,80],[u'Posologie Min',],[u'Posologie Max',1,10],
+              [u'Unité',4,None,None,'Editer les unités de posologie'],[u'Fréquence',1,80],[u'Remarque',3,200,80]]
+        MyForm.__init__(self,u'Edition de la Posologie',data,self.parent)
+        self.SetModel(self.MoleculeModel,{0:2,1:1,2:4})
+
+        
 class FormPresentation(MyForm):
     def __init__(self,data,parent):
         MyForm.__init__(self,u'Edition de Présentations de Médicament',data,parent)
@@ -237,7 +278,7 @@ class FormComposition(MyForm):
     def __init__(self,data,parent):
         MyForm.__init__(self,u'Edition de la composition de Médicament',data,parent)
         self.parent=parent
-        self.fields[0].setModel(MyComboModel(self,'GetMolecules(0,0,1)'))   #every active molecule 
+        self.fields[0].setModel(MyComboModel(self,'GetMolecules(0,1)'))   #every active molecule 
         self.fields[0].setMaximumSize(QSize(300,27))
         self.fields[3].setModel(MyComboModel(self,'GetUnites_fortype(\'Compo\')'))
         self.EditButtons[1].clicked.connect(self.EditCompoUnites) 

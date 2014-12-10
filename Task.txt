@@ -34,3 +34,8 @@ Analyses
 	-ResetAnalyses() on consultation changed
 	-Bug ModelViewParameters.SetData réagit parfois à datachanged et non pas à press enter
 
+
+Bugs Qt:
+- role color ne marche pas dans QCombobox, mais marche avec QTable
+- Qcompleter.activated n'est pas déclenché si plusieurs éléments dans le popup
+- resizing QTableView: resize does nothing and scrollbar.isVisible and isHidden have the same value!

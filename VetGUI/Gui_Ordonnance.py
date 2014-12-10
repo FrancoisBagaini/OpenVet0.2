@@ -27,7 +27,7 @@ class GuiOrdonnance():
 		self.MyOrdonnance=Ordonnance(0,self.parent)
 		self.MyMedicament=None
 		self.parent.comboBox_Molecule.SetCompleter()
-		self.parent.comboBox_Molecule.setModel(MyComboModel(self.parent,'GetMolecules(0,0,1)'),True)
+		self.parent.comboBox_Molecule.setModel(MyComboModel(self.parent,'GetMolecules(0,1)'),True)
 		self.parent.connect(self.parent.comboBox_Molecule,SIGNAL("OnEnter"),self.OnSelectMolecule)
 		self.parent.connect(self.parent.comboBox_Molecule,SIGNAL("activated(int)"),self.OnSelectMolecule)
 		self.parent.comboBox_Molecule.clearEditText()
@@ -147,6 +147,6 @@ class GuiOrdonnance():
 		idEspece=self.parent.comboBox_especeCible.Getid() 
 		form=FormMolecule(idMolecule,idEspece,self.parent)
 		if form.exec_():
-			self.parent.comboBox_Molecule.setModel(MyComboModel(self.parent,'GetMolecules(0,0,1)'),True)
+			self.parent.comboBox_Molecule.setModel(MyComboModel(self.parent,'GetMolecules(0,1)'),True)
 			self.parent.comboBox_Molecule.setCurrentIndex(idMolecule)
 			
