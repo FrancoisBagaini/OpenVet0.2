@@ -192,6 +192,7 @@ class FormMedicament(MyForm):
              
 class FormMolecule(MyForm):
     def __init__(self,idMolecule,idEspece,parent):
+        self.idMolecule=idMolecule
         new=[0,'','',None,'',1,0]
         self.MoleculeModel=MyModel(u'Molecule',idMolecule,parent)
         if not self.MoleculeModel.SetNew(new):
@@ -199,6 +200,7 @@ class FormMolecule(MyForm):
         data=[[u'Ppe actif court',1,110],[u'Ppe actif long',1,110],[u'Remarque',3,200,80],[u'Famille Thérapeutique',7,None,None,None,2],
               ['',9,None,180,None,2],[u'Posologies',7,None,None,None,2],[u'',6,None,150,None,2]]
         MyForm.__init__(self,u'Edition de molécule',data,parent)
+        self.InactivateEnter()
         self.SetModel(self.MoleculeModel,{0:2,1:1,2:4})
         self.parent=parent
         #Fill Posologies
@@ -212,44 +214,112 @@ class FormMolecule(MyForm):
         self.fields[6].ResizeHeight()
         self.fields[6].autoResize(0)
         action=self.popMenus[1].addAction('Editer')
-        self.connect(action,SIGNAL("triggered()"),self.OnPosoEdit)
+        self.connect(action,SIGNAL("triggered()"),self.OnEditPosologie)
         #Fill Classes Thérapeutiques and select
+        self.CurrentClassTher=None
         self.classesTherModel=MyTreeModel(self,u'Classes Thérapeutiques','GetClassesTherapeutiques()')
         self.fields[4].setModel(self.classesTherModel)
         classeTherid=self.MoleculeModel.data(self.MoleculeModel.index(0,3,self),Qt.DisplayRole).toInt()[0]
         if classeTherid>0:
             node=self.classesTherModel.tree.get_node(str(self.classesTherModel.Myrequest.GetString('CALL GetClasseTherapeutique(%i)'%classeTherid,1)))
-            leave=node.data
+            self.CurrentClassTher=node.data
             while self.classesTherModel.tree.parent(node.identifier) is not None:
                 node=self.classesTherModel.tree.parent(node.identifier)
                 index = self.classesTherModel.indexFromItem(self.classesTherModel.children[node.data])
                 self.fields[4].expand(index)
-            self.classesTherModel.children[leave].setForeground(QBrush(QColor('red')))
+            self.classesTherModel.children[self.CurrentClassTher].setForeground(QBrush(QColor('red')))
 #             selection = self.fields[4].selectionModel()
 #             index = self.classesTherModel.indexFromItem(self.classesTherModel.children[leave])
 #             selection.select(index, QItemSelectionModel.Select|QItemSelectionModel.Rows)
-           
-    def OnPosoEdit(self):
+        self.connect(self.fields[4],SIGNAL("activated(QModelIndex)"),self.OnSelectClassTher)
+        
+    def OnEditPosologie(self):
         idPoso=self.fields[6].Getid()
-        form=FormPosologie(idPoso,idMolecule,idEspece,idVoieAdminself.parent)
-        if form.exec_():
-            #TODO:
-            self.PresentationModel=MyTableModel(self,3,'GetPresentation(%i)'%self.Medicament.idMedicament)
-            self.fields[7].setModel(self.PresentationModel)
-
-
-class FormPosologie(MyForm):
-    def __init__(self,idPoso,idMolecule,idEspece,idVoieAdmin,parent):
-        self.parent=parent 
-        new=[0,idMolecule,idEspece,idVoieAdmin,None,0.0,0.0,1,'',None,1,0,'']#get idunitedafaut=mg/kg
+        idEspece=self.fields[6].model().data(self.fields[6].currentIndex(),34)
+        idVoieAdmin=self.fields[6].model().data(self.fields[6].currentIndex(),35)
         self.PosologieModel=MyModel(u'MoleculePosologie',idPoso,self.parent)
+        new=[0,self.idMolecule,idEspece,idVoieAdmin,None,0.0,0.0,32,'',None,1,0,'']
         if not self.PosologieModel.SetNew(new):
             return      
-        data=[[u'Espèce',4,None,None,'Editer les espèces'],[u'Voie d\'administration',4,None,None,'Editer les voies d\'administration'],[u'Autre administration',1,80],[u'Posologie Min',],[u'Posologie Max',1,10],
-              [u'Unité',4,None,None,'Editer les unités de posologie'],[u'Fréquence',1,80],[u'Remarque',3,200,80]]
-        MyForm.__init__(self,u'Edition de la Posologie',data,self.parent)
-        self.SetModel(self.MoleculeModel,{0:2,1:1,2:4})
+        data=[[u'Espèce',4,None,None,u'Editer les espèces'],[u'Voie d\'administration',4,None,None,u'Editer les voies d\'administration'],[u'Autre administration',1,80],[u'Posologie Min',1,10],[u'Posologie Max',1,10],
+              [u'Unité',4,None,None,u'Editer les unités de posologie'],[u'Fréquence',1,80],[u'Remarque',3,200,80]]
+        form=FormPosologie(data,self.parent)
+        form.SetModel(self.PosologieModel,{0:2,1:3,2:4,3:5,4:6,5:7,6:8,7:9})
+        if form.exec_():
+            self.posologiesModel=MyTableModel(self,6,'GetPosologies(%i,%i)'%(self.idMolecule,idEspece))
+            self.fields[6].setModel(self.posologiesModel)
+    
+    def OnSelectClassTher(self,index):
+        self.classesTherModel.children[self.CurrentClassTher].setForeground(QBrush(QColor('grey')))#TODO getdefault color
+        self.CurrentClassTher=index.data(Qt.UserRole).toInt()[0] 
+        self.classesTherModel.children[self.CurrentClassTher].setForeground(QBrush(QColor('red')))
+        
+    def OnValid(self):
+        if self.mapper.submit():
+            self.MyModel.Update(self.mapper.currentIndex())
+            self.accept()
+        else:
+            if self.mapper.model().lastError().type()==2:
+                QMessageBox.warning(self,u"Alerte OpenVet",u'Cette entrée constitue un doublon', QMessageBox.Ok | QMessageBox.Default)
 
+class FormPosologie(MyForm):
+    def __init__(self,data,parent):
+        self.parent=parent
+        MyForm.__init__(self,u'Edition de la Posologie',data,parent)
+        self.fields[0].setModel(MyComboModel(self.parent,'GetEspeces()'))
+        self.fields[1].setModel(MyComboModel(self.parent,'GetVoiesAdmin()'))
+        self.fields[5].setModel(MyComboModel(self.parent,'GetUnites_fortype(\'Posol\')'))
+        self.EditButtons[0].clicked.connect(self.OnEditEspece)
+        self.EditButtons[1].clicked.connect(self.OnEditVoieAdmin)
+        self.EditButtons[2].clicked.connect(self.OnEditUnite)
+        
+    def OnEditEspece(self):
+        idEspece=self.fields[0].Getid()
+        EspeceModel=MyModel(u'Especes',idEspece,self.parent)
+        new=[0,'',None,1,0,'']
+        if not EspeceModel.SetNew(new):
+            return      
+        data=[[u'Espèce',1,60],[u'Remarque',3,200,80]]
+        form=MyForm(u'Edition des espèces',data,self.parent)
+        form.SetModel(EspeceModel,{0:1,1:2})
+        if form.exec_():
+            self.fields[0].setModel(MyComboModel(self.parent,'GetEspeces()'))
+            if not form.MyModel.lastid is None:
+                self.fields[0].Setid(form.MyModel.lastid.toInt()[0])
+            else:
+                self.fields[0].Setid(idEspece)
+
+    def OnEditVoieAdmin(self):
+        idVoie=self.fields[1].Getid()
+        VoieModel=MyModel(u'VoieAdministration',idVoie,self.parent)
+        new=[0,'','',1]
+        if not VoieModel.SetNew(new):
+            return      
+        data=[[u'Voie d\'administration',1,45],[u'Abréviation',1,12]]
+        form=MyForm(u'Edition des voies d\'administration',data,self.parent)
+        form.SetModel(VoieModel,{0:1,1:2})
+        if form.exec_():
+            self.fields[1].setModel(MyComboModel(self.parent,'GetVoiesAdmin()'))
+            if not form.MyModel.lastid is None:
+                self.fields[1].Setid(form.MyModel.lastid.toInt()[0])
+            else:
+                self.fields[1].Setid(idVoie)
+                
+    def EditUnites(self):
+        idUnite=self.fields[5].Getid()
+        new=[0,'',False,True,False,False,False,True,'']
+        UniteModel=MyModel('Unite',idUnite,self)
+        if not UniteModel.SetNew(new):
+            return  
+        data=[[u'Unite',1,20],[u'Posologie',2]]
+        form=MyForm(u'Unités de posologie',data,self)
+        form.SetModel(UniteModel,{0:1,1:3})
+        if form.exec_():
+            self.fields[5].setModel(MyComboModel(self.parent,'GetUnites_fortype(\'Posol\')'))
+            if not form.MyModel.lastid is None:
+                self.fields[5].Setid(form.MyModel.lastid.toInt()[0])
+            else:
+                self.fields[5].Setid(idUnite)
         
 class FormPresentation(MyForm):
     def __init__(self,data,parent):
@@ -267,11 +337,14 @@ class FormPresentation(MyForm):
         if not UniteModel.SetNew(new):
             return  
         data=[[u'Unite',1,20],[u'Galénique',2]]
-        form=MyForm('Unités',data,self)
+        form=MyForm(u'Unités galénique',data,self)
         form.SetModel(UniteModel,{0:1,1:3})
         if form.exec_():
             self.fields[1].setModel(MyComboModel(self.parent,'GetUnites_fortype(\'Galen\')'))
-            self.fields[1].Setid(idUnite)
+            if not form.MyModel.lastid is None:
+                self.fields[1].Setid(form.MyModel.lastid.toInt()[0])
+            else:
+                self.fields[1].Setid(idUnite)
         
 
 class FormComposition(MyForm):  
