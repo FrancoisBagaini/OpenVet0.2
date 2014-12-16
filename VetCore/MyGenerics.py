@@ -433,6 +433,7 @@ class MyTreeModel(QStandardItemModel):
                         self.tree.create_node(i[1].toString(),str(i[2].toString()),parent=self.GetParent(i[2]),data=index+1)
                         self.children.append(QStandardItem(i[1].toString()))
                         self.children[len(self.children)-1].setToolTip(i[3].toString())
+                        self.children[len(self.children)-1].setData(i[0],Qt.UserRole)
                         indexparent=self.tree.nodes[self.GetParent(i[2])].data
                         self.children[indexparent].appendRow(self.children[index+1])
                     self.appendRow(self.children[0])
@@ -484,7 +485,7 @@ class MyModel(QAbstractListModel):  #TODO: rename in MyRecordModel
     def index(self, row, column, parent):
         return self.createIndex(row, column, parent)
     
-    def data(self, index, role): 
+    def data(self, index, role= Qt.DisplayRole): 
         if index.isValid() and role == Qt.DisplayRole:
             return QVariant(self.listdata[index.column()])
         else: 
@@ -777,12 +778,14 @@ class MyForm(QDialog):
                         self.MyDelegate.insertFieldDelegate(maplist[i],self.MyModel.Fields[maplist[i]]) #Debug i+1=>maplist[i]
                     elif isinstance(j,QCheckBox):
                         self.MyDelegate.insertColumnDelegate(maplist[i],CheckboxColumnDelegate())
-                    elif isinstance(j,QComboBox):
+                    elif isinstance(j,QComboBox,MyComboBox):
                         self.MyDelegate.insertColumnDelegate(maplist[i],ComboboxColumnDelegate())
                     elif isinstance(j,(QPlainTextEdit,MyPlainTextEdit)):  #regrouper avec QLineEdit?
                         self.MyDelegate.insertColumnDelegate(maplist[i],PlainTextColumnDelegate())
                     elif isinstance(j,QSpinBox):
-                        self.MyDelegate.insertColumnDelegate(maplist[i],IntegerColumnDelegate())              
+                        self.MyDelegate.insertColumnDelegate(maplist[i],IntegerColumnDelegate())
+                    elif isinstance(j,QTreeView,MyTreeView):
+                        self.MyDelegate.insertColumnDelegate(maplist[i],ComboboxColumnDelegate())             
         self.mapper.setItemDelegate(self.MyDelegate)
         for i,j in enumerate(self.fields):
             if maplist.has_key(i):
