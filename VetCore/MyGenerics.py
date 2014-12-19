@@ -423,18 +423,23 @@ class MyTreeModel(QStandardItemModel):
         QStandardItemModel.__init__(self, parent)
         self.parent=parent
         self.Myrequest = Request()
+        self.SelectedIndex=None
         self.setHorizontalHeaderLabels([title])
         if isinstance(request,str):
                     data=self.Myrequest.GetLines('CALL %s'%request)
                     self.tree=treelib.Tree()
                     self.tree.create_node(title,0,None,0)
                     self.children=[QStandardItem(title)]
+                    self.indexMap={}
+                    self.refMap={}
                     for index,i in enumerate(data):
                         self.tree.create_node(i[1].toString(),str(i[2].toString()),parent=self.GetParent(i[2]),data=index+1)
                         self.children.append(QStandardItem(i[1].toString()))
                         self.children[len(self.children)-1].setToolTip(i[3].toString())
                         self.children[len(self.children)-1].setData(i[0],Qt.UserRole)
                         indexparent=self.tree.nodes[self.GetParent(i[2])].data
+                        self.indexMap.update({i[0].toInt()[0]:len(self.children)-1})
+                        self.refMap.update({i[0].toInt()[0]:str(i[2].toString())})
                         self.children[indexparent].appendRow(self.children[index+1])
                     self.appendRow(self.children[0])
                         
@@ -445,6 +450,14 @@ class MyTreeModel(QStandardItemModel):
         except:
             parent=0
         return parent
+    
+    def GetIndex(self,currentid):
+        return self.indexMap[currentid]
+    
+    def GetNode(self,currentid):
+        node=self.tree.get_node(self.refMap[currentid])
+        return node
+
         
 class MyModel(QAbstractListModel):  #TODO: rename in MyRecordModel
     def __init__(self, table,idTable,parent=None, *args):
@@ -778,14 +791,14 @@ class MyForm(QDialog):
                         self.MyDelegate.insertFieldDelegate(maplist[i],self.MyModel.Fields[maplist[i]]) #Debug i+1=>maplist[i]
                     elif isinstance(j,QCheckBox):
                         self.MyDelegate.insertColumnDelegate(maplist[i],CheckboxColumnDelegate())
-                    elif isinstance(j,QComboBox,MyComboBox):
+                    elif isinstance(j,MyComboBox):
                         self.MyDelegate.insertColumnDelegate(maplist[i],ComboboxColumnDelegate())
                     elif isinstance(j,(QPlainTextEdit,MyPlainTextEdit)):  #regrouper avec QLineEdit?
                         self.MyDelegate.insertColumnDelegate(maplist[i],PlainTextColumnDelegate())
                     elif isinstance(j,QSpinBox):
                         self.MyDelegate.insertColumnDelegate(maplist[i],IntegerColumnDelegate())
-                    elif isinstance(j,QTreeView,MyTreeView):
-                        self.MyDelegate.insertColumnDelegate(maplist[i],ComboboxColumnDelegate())             
+                    elif isinstance(j,MyTreeView):
+                        self.MyDelegate.insertColumnDelegate(maplist[i],TreeviewColumnDelegate())             
         self.mapper.setItemDelegate(self.MyDelegate)
         for i,j in enumerate(self.fields):
             if maplist.has_key(i):
@@ -941,6 +954,24 @@ class ComboboxColumnDelegate(QItemDelegate):
     def setModelData(self, editor, model, index):
         model.setData(index, QVariant(editor.Getid()))
         
+class TreeviewColumnDelegate(QItemDelegate):
+    def __init__(self, parent=None):
+        super(TreeviewColumnDelegate, self).__init__(parent)
+
+    def createEditor(self, parent, option, index):
+        return self
+
+    def setEditorData(self, editor, index):
+        idBase = index.model().data(index, Qt.DisplayRole).toInt()[0]
+        if idBase>0:
+            treeindex = editor.model().indexFromItem(editor.model().children[editor.model().GetIndex(idBase)])
+#            editor.model().children[editor.model().GetIndex(idBase)].setForeground(QBrush(QColor('red')))
+        else:
+            treeindex = editor.model().indexFromItem(editor.model().children[0])
+        editor.setCurrentIndex(treeindex)
+
+    def setModelData(self, editor, model, index):
+        model.setData(index, editor.currentIndex().data(Qt.UserRole))
         
 class FloatColumnDelegate(QItemDelegate):
 

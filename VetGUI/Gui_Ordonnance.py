@@ -47,6 +47,8 @@ class GuiOrdonnance():
 		self.parent.toolButton_EditRCP.clicked.connect(self.OnEditRCP)
 		self.parent.toolButton_EditMedicament.clicked.connect(self.OnEditMedicament)
 		self.parent.toolButton_EditMolecule.clicked.connect(self.OnEditMolecule)
+		self.parent.pushButton_toOrdonnance.clicked.connect(self.OnAdd2Ordonnance)
+		
 	def SetAnimal(self,idEspece,idAnimal):
 		self.idEspece=idEspece
 		self.parent.comboBox_especeCible.setModel(MyComboModel(self.parent,'GetEspeces()'))
@@ -90,6 +92,7 @@ class GuiOrdonnance():
 		self.parent.comboBox_Medicament.setModel(self.parent.comboBox_Medicament.model())
 	
 	def OnSelectMolecule(self,index=None):
+		idTable=self.parent.comboBox_Molecule.Getid()
 		principeActif=self.parent.comboBox_Molecule.currentText()
 		if index is None:
 			index=self.parent.comboBox_Molecule.findText(principeActif,Qt.MatchStartsWith)
@@ -97,6 +100,8 @@ class GuiOrdonnance():
 			self.parent.comboBox_Molecule.setCurrentIndex(index)
 			self.parent.comboBox_Medicament.model().Set('GetMedicaments(\"%s\",\"%s\",%i)'%(principeActif,self.Pharmacope,self.Actif))
 			self.parent.comboBox_Medicament.setModel(self.parent.comboBox_Medicament.model(),True)
+			self.MyMolecule=Molecule('Molecule',idTable,self.parent)
+			self.parent.comboBox_Molecule.SetPopup(self.MyMolecule.GetPosologies(self.idEspece))
 		else:
 			self.parent.comboBox_Medicament.model().Set('GetMedicaments(\"\",\"%s\",%i)'%(self.Pharmacope,self.Actif))
 			self.parent.comboBox_Medicament.setModel(self.parent.comboBox_Medicament.model())
@@ -104,21 +109,33 @@ class GuiOrdonnance():
 
 	def OnSelectMedicament(self,index):
 		idTable=self.parent.comboBox_Medicament.Getid()
-		self.MyMedicament=Medicament('Medicament',idTable,self.parent)
-		self.parent.comboBox_Medicament.SetPopup(self.MyMedicament.GetPresentations(idTable))
+		medicament=self.parent.comboBox_Medicament.currentText()
+		self.MyMedicament=Medicament('Medicament',idTable,self.parent.comboBox_Molecule.Getid(),self.parent)
+		self.parent.comboBox_Medicament.SetPopup(self.MyMedicament.GetPresentations(medicament))
 		if not self.parent.comboBox_Medicament.GetProperty(2).isNull():
 			self.parent.textBrowser_medicament.setSource(QUrl(config.Path_RCP+self.parent.comboBox_Medicament.GetProperty(2).toString()))
+
+	def OnSelectPosologie(self):
+		self.MyMedicament.Posologie=self.parent.comboBox_Molecule.SelectionContext
 			
 	def OnSelectPresentation(self):
-		self.MyMedicament.Presentation=self.parent.comboBox_Medicament.SelectionContext
-		#TODO: fill ordonnance
+		self.MyMedicament.Presentation=self.parent.comboBox_Medicament.SelectionContext#idPresentation
+		
+	def OnAdd2Ordonnance(self):
+		m=self.MyMedicament.GetEverything()
+		print m
+		
+
 					
 	def OnDownloadRCP(self):
 		if self.MyMedicament is None:
 			return
 		cip=str(self.parent.comboBox_Medicament.GetProperty(1).toString())[1:]
-		self.MyMedicament.Download(cip)
-		self.parent.textBrowser_medicament.setSource(QUrl(config.Path_ImportMed+'rcptmp.html'))
+		if self.MyMedicament.Download(cip):
+			self.parent.textBrowser_medicament.clear()
+			self.parent.textBrowser_medicament.setSource(QUrl(config.Path_ImportMed+'rcptmp.html'))
+		else:
+			MyError(self.parent,u'RCP non trouvée en téléchargement')
 	
 	def OnEditRCP(self):
 		if self.MyMedicament is None:
@@ -149,4 +166,4 @@ class GuiOrdonnance():
 		if form.exec_():
 			self.parent.comboBox_Molecule.setModel(MyComboModel(self.parent,'GetMolecules(0,1)'),True)
 			self.parent.comboBox_Molecule.setCurrentIndex(idMolecule)
-			
+	

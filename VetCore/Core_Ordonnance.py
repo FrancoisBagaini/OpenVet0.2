@@ -30,10 +30,20 @@ class Ordonnance(MyModel):
             return self.Animal[7].toString()
 
 
+class Molecule(MyModel):
+    def __init__(self, table,idTable,parent):
+        MyModel.__init__(self, table,idTable,parent)
+        self.idMolecule=idTable
+        
+    def GetPosologies(self,idEspece):
+        self.Posologie=None
+        return self.MyRequest.GetLines('CALL GetPosologieMenu(%i,%i)'%(self.idMolecule,idEspece))
+
 class Medicament(MyModel):
-    def __init__(self, table,idTable,parent=None, *args):
+    def __init__(self, table,idTable,idMolecule,parent=None, *args):
         MyModel.__init__(self, table,idTable,parent=None, *args)
         self.idMedicament=idTable
+        self.idMolecule=idMolecule
         self.Presentation=None
         self.Posologie=None
         self.QuantDelivre=None
@@ -55,14 +65,17 @@ class Medicament(MyModel):
     def GetRCP(self):
             return self.listdata[8].toString()
         
-    def GetPresentations(self,idMedicament):
+    def GetPresentations(self,Medicament):
         self.Presentation=None
-        return self.MyRequest.GetLines('CALL GetPresentationMenu(%i)'%idMedicament)
+        return self.MyRequest.GetLines('CALL GetPresentationMenu(\"%s\")'%Medicament)
+    
+    def GetEvrythhing(self):
+        #GetMyMedicament(idMedicament,idPresentation,idMolecule,idPosologie)
+        return self.MyRequest.GetLine('CALL GetMyMedicament(%i,%i,%i,%i)'%(self.idMedicament,self.Presentation,self.idMolecule,self.Posologie))
         
     def Download(self,cip):
         if os.system('curl \"http://base-donnees-publique.medicaments.gouv.fr/affichageDoc.php?specid=%s&typedoc=R\" -o %srcptmp.html'%(cip,config.Path_ImportMed))>0:
-            MyError(self.parent,u'RCP non trouvée en téléchargement')
-            return
+            return False
         else:
             #Clean imported html file
             myfile=open(config.Path_ImportMed+'rcptmp.html','r')
@@ -78,6 +91,7 @@ class Medicament(MyModel):
             outfile=open(config.Path_ImportMed+'rcptmp.html','w')
             outfile.write(sel)
             outfile.close()
+            return True
             
 class FormRCP(QDialog): 
     def __init__(self,Medicament,RCP_txt,parent=None):
@@ -130,9 +144,37 @@ class FormRCP(QDialog):
 #         with codecs.open(config.Path_RCP+name, encoding="windows-1252", mode="w") as f:    #encode codec: "utf-8"
 #             f.write(self.editor.toHtml())
         fout=open(config.Path_RCP+name,'wt')
-        fout.write(self.editor.toHtml())    
+        text=str(self.editor.toHtml())
+        text=text.replace('<meta name=\"qrichtext\" content=\"1\" />','<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />')
+        fout.write(text)    
         fout.close()
         self.accept()
+ 
+# import htmlentitydefs,re,string
+#  
+# def stringhtml(chaine):
+#     emap={}
+#     for i in range(256):
+#         emap[chr(i)]= "&%d;" % i
+#  
+#     for entity, char in htmlentitydefs.entitydefs.items():
+#         if emap.has_key(char):
+#             emap[char]="&%s;" % entity
+#  
+#     def remplace(m,get=emap.get):
+#         return string.join(map(get,m.group()),"")
+#  
+#     return re.sub(r'[&<>\"\x80-\xff]+', remplace, chaine)
+#  
+# chaine='à == ç == è == ù == û == è == & == ë "'
+# print chaine
+# print stringhtml(chaine)
+
+        # convertir texte en unicode
+        #texte = "é".decode('utf-8')
+        # variante : texte = u"é"
+        # convertir unicode non-ascii en HTML
+        #texte.encode('ascii', "xmlcharrefreplace")
     
     def OnCancel(self):
         self.close()
@@ -201,7 +243,6 @@ class FormMolecule(MyForm):
               ['',9,None,180,None,2],[u'Posologies',7,None,None,None,2],[u'',6,None,150,None,2]]
         MyForm.__init__(self,u'Edition de molécule',data,parent)
         self.InactivateEnter()
-        self.SetModel(self.MoleculeModel,{0:2,1:1,2:4})
         self.parent=parent
         #Fill Posologies
         self.posologiesModel=MyTableModel(self,6,'GetPosologies(%i,%i)'%(idMolecule,idEspece))
@@ -219,18 +260,8 @@ class FormMolecule(MyForm):
         self.CurrentClassTher=None
         self.classesTherModel=MyTreeModel(self,u'Classes Thérapeutiques','GetClassesTherapeutiques()')
         self.fields[4].setModel(self.classesTherModel)
-        classeTherid=self.MoleculeModel.data(self.MoleculeModel.index(0,3,self),Qt.DisplayRole).toInt()[0]
-        if classeTherid>0:
-            node=self.classesTherModel.tree.get_node(str(self.classesTherModel.Myrequest.GetString('CALL GetClasseTherapeutique(%i)'%classeTherid,1)))
-            self.CurrentClassTher=node.data
-            while self.classesTherModel.tree.parent(node.identifier) is not None:
-                node=self.classesTherModel.tree.parent(node.identifier)
-                index = self.classesTherModel.indexFromItem(self.classesTherModel.children[node.data])
-                self.fields[4].expand(index)
-            self.classesTherModel.children[self.CurrentClassTher].setForeground(QBrush(QColor('red')))
-#             selection = self.fields[4].selectionModel()
-#             index = self.classesTherModel.indexFromItem(self.classesTherModel.children[leave])
-#             selection.select(index, QItemSelectionModel.Select|QItemSelectionModel.Rows)
+        #        self.SetModel(self.MoleculeModel,{0:2,1:1,2:4})
+        self.SetModel(self.MoleculeModel,{0:2,1:1,2:4,4:3})
         self.connect(self.fields[4],SIGNAL("activated(QModelIndex)"),self.OnSelectClassTher)
         
     def OnEditPosologie(self):
@@ -250,17 +281,10 @@ class FormMolecule(MyForm):
             self.fields[6].setModel(self.posologiesModel)
     
     def OnSelectClassTher(self,index):
-        self.classesTherModel.children[self.CurrentClassTher].setForeground(QBrush(QColor('grey')))#TODO getdefault color
+        self.classesTherModel.children[self.CurrentClassTher].setForeground(QBrush(QColor('darkgrey')))#TODO getdefault color
         self.CurrentClassTher=index.data(Qt.UserRole).toInt()[0] 
         self.classesTherModel.children[self.CurrentClassTher].setForeground(QBrush(QColor('red')))
         
-    def OnValid(self):
-        if self.mapper.submit():
-            self.MyModel.Update(self.mapper.currentIndex())
-            self.accept()
-        else:
-            if self.mapper.model().lastError().type()==2:
-                QMessageBox.warning(self,u"Alerte OpenVet",u'Cette entrée constitue un doublon', QMessageBox.Ok | QMessageBox.Default)
 
 class FormPosologie(MyForm):
     def __init__(self,data,parent):
@@ -305,7 +329,7 @@ class FormPosologie(MyForm):
             else:
                 self.fields[1].Setid(idVoie)
                 
-    def EditUnites(self):
+    def OnEditUnite(self):
         idUnite=self.fields[5].Getid()
         new=[0,'',False,True,False,False,False,True,'']
         UniteModel=MyModel('Unite',idUnite,self)

@@ -42,9 +42,8 @@ class MyComboBox(QComboBox):
 		self.completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)#reg
 		self.setCompleter(self.completer)
 		# connect signals
-#		self.lineEdit().textEdited[unicode].connect(self.pFilterModel.setFilterFixedString)
 		self.connect(self,SIGNAL('editTextChanged(QString)'),self.OnUpdateCompleter)
-		self.completer.activated.connect(self.OnCompleterActivated)
+		self.connect(self.completer,SIGNAL('activated(QString)'),self.OnCompleterActivated)
 		self.setContextMenuPolicy(Qt.CustomContextMenu)
 		self.connect(self,SIGNAL('customContextMenuRequested(const QPoint&)'), self.OnPopup)
 
@@ -61,6 +60,10 @@ class MyComboBox(QComboBox):
 	# on model change, update the models of the filter and completer as well 
 	def setModel(self, model,isCompleter=False):
 		super(MyComboBox,self).setModel(model)
+		if self.count()<10:
+			self.showPopup ()
+		else:
+			self.hidePopup ()
 		if isCompleter:
 			self.pFilterModel.setSourceModel(model)
 			self.completer.setModel(self.pFilterModel)
@@ -71,15 +74,24 @@ class MyComboBox(QComboBox):
 		self.items=[]
 		for i in inlist:
 			action=self.Popup.addAction(i[0].toString())
-			action.setData(QVariant([i[1],i[2]]))
+			action.setToolTip(i[1].toString())
+			if len(i)>2:
+				action.setData(QVariant(i[2:]))
+			action.setCheckable(True)
 			self.items.append(action)
-			self.connect(action,SIGNAL("triggered(QAction)"),self.OnSelectPopupItem)
+			self.connect(action,SIGNAL("triggered(bool)"),self.OnSelectPopupItem)
 	
 	def OnPopup(self,point):
 		self.Popup.exec_(self.mapToGlobal(QPoint(1,point.y()+8)))
 
 	def OnSelectPopupItem(self,action):
-		self.SelectionContext=action.data()
+		for j,i in enumerate(self.items):
+			if i!=self.sender():
+				i.setChecked(False)
+			else:
+				index=j
+		self.SelectionContext=[index].extend(self.sender().data().toPyObject())
+		self.emit(SIGNAL("ContextMenuActivated"))		
 		
 	def Setid(self,idTable):
 		index=[i for i,j in enumerate(self.model().listdata) if idTable==j[0].toInt()[0]]
@@ -185,4 +197,8 @@ class MyTreeView(QTreeView):
 		super(MyTreeView,self).__init__(parent)
 		self.setSelectionBehavior(QAbstractItemView.SelectRows)
 		self.setUniformRowHeights(True)
+		
+	def Getid(self):
+		return self.currentIndex().data(Qt.UserRole)
+
 		
