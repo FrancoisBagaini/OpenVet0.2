@@ -88,9 +88,7 @@ class MyComboBox(QComboBox):
 		for j,i in enumerate(self.items):
 			if i!=self.sender():
 				i.setChecked(False)
-			else:
-				index=j
-		self.SelectionContext=[index].extend(self.sender().data().toPyObject())
+		self.SelectionContext=self.sender().data().toPyObject()
 		self.emit(SIGNAL("ContextMenuActivated"))		
 		
 	def Setid(self,idTable):

@@ -1,6 +1,7 @@
 <RCC>
   <qresource prefix="newPrefix">
     <file>../images/warning.png</file>
+    <file>../images/TransfertUp2.png</file>
     <file>../images/gelule.png</file>
     <file>../images/valid.png</file>
     <file>../images/pathologie.png</file>

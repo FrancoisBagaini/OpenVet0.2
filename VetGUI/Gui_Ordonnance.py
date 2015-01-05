@@ -11,6 +11,7 @@ import sys
 import time
 #import config
 
+import re
 from MyGenerics import *
 from Core_Ordonnance import *
 
@@ -26,6 +27,7 @@ class GuiOrdonnance():
 		self.parent.dateEdit_ordonance.setDate(QDate.currentDate())
 		self.MyOrdonnance=Ordonnance(0,self.parent)
 		self.MyMedicament=None
+		self.parent.textEdit_Ordonnance.setHtml('<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />')
 		self.parent.comboBox_Molecule.SetCompleter()
 		self.parent.comboBox_Molecule.setModel(MyComboModel(self.parent,'GetMolecules(0,1)'),True)
 		self.parent.connect(self.parent.comboBox_Molecule,SIGNAL("OnEnter"),self.OnSelectMolecule)
@@ -37,6 +39,7 @@ class GuiOrdonnance():
 		self.parent.comboBox_Medicament.clearEditText()
 		self.parent.connect(self.parent.comboBox_Medicament,SIGNAL("activated(int)"),self.OnSelectMedicament)
 		self.parent.connect(self.parent.comboBox_Medicament,SIGNAL("ContextMenuActivated"),self.OnSelectPresentation)
+		self.parent.connect(self.parent.comboBox_Molecule,SIGNAL("ContextMenuActivated"),self.OnSelectPosologie)
 		self.parent.connect(self.parent.radioButton_PharmacopeVet,SIGNAL("toggled(bool)"),self.OnPharmacopeV)
 		self.parent.connect(self.parent.radioButton_PharmacopeHum,SIGNAL("toggled(bool)"),self.OnPharmacopeH)
 #		self.parent.connect(self.parent.comboBox_Molecule,SIGNAL("editTextChanged(QString)"),self.OnMoleculeChanged)
@@ -48,6 +51,10 @@ class GuiOrdonnance():
 		self.parent.toolButton_EditMedicament.clicked.connect(self.OnEditMedicament)
 		self.parent.toolButton_EditMolecule.clicked.connect(self.OnEditMolecule)
 		self.parent.pushButton_toOrdonnance.clicked.connect(self.OnAdd2Ordonnance)
+		self.parent.pushButton_toOrdonnance.setDisabled(True)
+		self.parent.dateEdit_ordonance.dateChanged.connect(self.OnUpdateDate)
+		
+		self.parent.comboBox_Molecule.setFocus()
 		
 	def SetAnimal(self,idEspece,idAnimal):
 		self.idEspece=idEspece
@@ -55,7 +62,12 @@ class GuiOrdonnance():
 		self.parent.comboBox_especeCible.Setid(idEspece)
 		self.MyOrdonnance.SetAnimal(idAnimal)
 		self.parent.lineEdit_poids.setText(self.MyOrdonnance.GetPoidsAnimal())
-
+		nline=self.MyOrdonnance.Html
+		nline=nline.replace('</body></html>','')
+		nline=nline+'<center><b>Pour %s </b></center><br>'%self.MyOrdonnance.Animal[1].toString()
+		nline=nline+'<div align=\"right\">Le %s</div><br></p></body></html>'%self.parent.dateEdit_ordonance.text()
+		self.MyOrdonnance.Html=nline
+		self.parent.textEdit_Ordonnance.setHtml(nline)
 		#TODO : ordonnances existantes
 		
 	def SetConsultation(self,idConsultation):
@@ -63,6 +75,11 @@ class GuiOrdonnance():
 		#TODO : get pathologies	
 #		self.MyConsultation= Consultation(self.idAnimal,0,self.parent)
 
+	def OnUpdateDate(self):
+		nline=self.MyOrdonnance.Html
+		self.MyOrdonnance.Html=nline
+		self.parent.textEdit_Ordonnance.setHtml(nline)
+		
 	def OnActif(self,state):
 		if state:
 			self.Actif=True
@@ -108,25 +125,35 @@ class GuiOrdonnance():
 		self.parent.comboBox_Medicament.clearEditText()
 
 	def OnSelectMedicament(self,index):
+		#TODO :get molecule if combomolecule not filled
 		idTable=self.parent.comboBox_Medicament.Getid()
 		medicament=self.parent.comboBox_Medicament.currentText()
 		self.MyMedicament=Medicament('Medicament',idTable,self.parent.comboBox_Molecule.Getid(),self.parent)
+		self.MyMedicament.Posologie=0
+		self.MyMedicament.Presentation=0
+		self.parent.pushButton_toOrdonnance.setEnabled(True)
 		self.parent.comboBox_Medicament.SetPopup(self.MyMedicament.GetPresentations(medicament))
 		if not self.parent.comboBox_Medicament.GetProperty(2).isNull():
 			self.parent.textBrowser_medicament.setSource(QUrl(config.Path_RCP+self.parent.comboBox_Medicament.GetProperty(2).toString()))
 
 	def OnSelectPosologie(self):
-		self.MyMedicament.Posologie=self.parent.comboBox_Molecule.SelectionContext
+		self.MyMedicament.Posologie=self.parent.comboBox_Molecule.SelectionContext[0]		#idPosologie
 			
 	def OnSelectPresentation(self):
-		self.MyMedicament.Presentation=self.parent.comboBox_Medicament.SelectionContext#idPresentation
+		self.MyMedicament.Setid(self.parent.comboBox_Medicament.SelectionContext[0])		#idMedicament
+		self.MyMedicament.Presentation=self.parent.comboBox_Medicament.SelectionContext[1]	#idPresentation
 		
 	def OnAdd2Ordonnance(self):
-		m=self.MyMedicament.GetEverything()
-		print m
-		
-
-					
+		print self.MyMedicament.Presentation
+		if self.MyMedicament.Presentation==0:
+			MyError(self.parent,u'Vous devez renseigner la présentation avant d\'ajouter le médicament à l\'ordonnance')
+		else:
+			poids=self.parent.lineEdit_poids.text().toFloat()
+			if poids[1]:
+				self.MyMedicament.GetLigneOrdonnance(poids[0])
+			else:
+				MyError(self.parent,u'Poids non valide')
+							
 	def OnDownloadRCP(self):
 		if self.MyMedicament is None:
 			return

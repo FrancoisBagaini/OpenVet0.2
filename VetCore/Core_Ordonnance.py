@@ -7,17 +7,21 @@ from PyQt4.QtGui import *
 import os
 import htql
 import codecs
+import re
 
 import config
 from DBase import Request
 from MyGenerics import *
+from Gui_Prescrire import *
 
 class Ordonnance(MyModel):
     def __init__(self,idTable=0,parent=None, *args):
         MyModel.__init__(self,'Ordonnance',idTable,parent, *args)
+        self.parent=parent
         self.Animal=None        #contains animal properties :idAnimal,Nom,Race,idEspeces,Sexe,Age(years),identification,Poids
         self.Pathologies=[]     #contains Pathologies for the current consultation
         self.Lignes=[]
+        self.Html='<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /></head><body></body></html>'
         
     def SetAnimal(self,idAnimal):
         self.Animal=self.MyRequest.GetLine('CALL GetAnimal(%i)'%idAnimal)
@@ -42,19 +46,22 @@ class Molecule(MyModel):
 class Medicament(MyModel):
     def __init__(self, table,idTable,idMolecule,parent=None, *args):
         MyModel.__init__(self, table,idTable,parent=None, *args)
+        self.parent=parent
+        self.table=table
         self.idMedicament=idTable
         self.idMolecule=idMolecule
-        self.Presentation=None
-        self.Posologie=None
+        self.Presentation=0
+        self.Posologie=0
         self.QuantDelivre=None
 #         config.Path_ImportMed
 #         config.Path_RCP
 
-    def Reinit(self):
-        self.listdata=self.MyRequest.GetLineTable(self.listdata[0].toInt()) 
+#     def Reinit(self):
+#         self.listdata=self.MyRequest.GetLineTable(self.listdata[0].toInt()) 
            
     def Setid(self,idMedicament):
         self.idMedicament=idMedicament
+        self.listdata=self.MyRequest.GetLineTable(idMedicament)
     
     def GetCip(self):
         return self.listdata[3].toString()
@@ -66,13 +73,67 @@ class Medicament(MyModel):
             return self.listdata[8].toString()
         
     def GetPresentations(self,Medicament):
-        self.Presentation=None
+        self.Presentation=0
         return self.MyRequest.GetLines('CALL GetPresentationMenu(\"%s\")'%Medicament)
     
-    def GetEvrythhing(self):
+    def GetEverything(self):
         #GetMyMedicament(idMedicament,idPresentation,idMolecule,idPosologie)
         return self.MyRequest.GetLine('CALL GetMyMedicament(%i,%i,%i,%i)'%(self.idMedicament,self.Presentation,self.idMolecule,self.Posologie))
-        
+    
+    def GetMultiple(self,unite):
+        convert={'':1,'m':1E-3,'µ':1E-6,'n':1E-9,'p':1E-12,'M':1E6}
+        try:
+            m=re.findall(r'g|l|UI|Eq|mol',unite)[0]
+            return convert[unite[:unite.index(m)]]
+        except:
+            MyError(self.parent,u'Unité non reconnue <> g,l,UI,Eq,mol')
+            return -1
+            
+    def CheckUniteFits(self,conc,poso):
+        try:
+            poso_qte=poso[:poso.index('/')]
+            poso_patient=poso[poso.index('/')+1:]
+        except:
+            MyError(self.parent,u'Unité de posologie incorrecte')
+            return -1
+#        conc='µg'
+        if poso_qte==conc:
+            return 1
+        else:
+            return self.GetMultiple(poso_qte)/self.GetMultiple(conc)
+    
+    def GetLigneOrdonnance(self,poids):
+            m=self.GetEverything()
+            dosemin=None
+            maxadmin=None
+            duree=''
+            dose='?'
+            if m[4].toFloat()[1] and m[4].toFloat()[1] and m[13].toFloat()[1] and m[14].toFloat()[1]:
+                if m[4].toFloat()[0]==0:
+                    MyError(self.parent,u'La composition du médicament n\'est pas valide')
+                else:
+                    rapport=self.CheckUniteFits(str(m[5].toString()),str(m[15].toString()))
+                    if rapport!=-1:
+                        dosemin=m[13].toFloat()[0]*poids*rapport/m[4].toFloat()[0]
+                        dosemax=m[14].toFloat()[0]*poids*rapport/m[4].toFloat()[0]
+                        if m[8].toString()==m[10].toString():
+                            maxadmin=round(m[11].toInt()[0]*m[4].toFloat()[0]/(dosemin*rapport),1)
+                            minadmin=round(m[11].toInt()[0]*m[4].toFloat()[0]/(dosemax*rapport),1)
+                            dosemin=round(dosemin,3)
+                            dosemax=round(dosemax,3)
+                            dose='%.3f-%.3f %s(s)'%(dosemin,dosemax,m[8].toString())
+                            duree='%.1f-%.1f admin'%(minadmin,maxadmin)
+            else:
+                MyError(self.parent,u'Posologie et/ou composition inconnue')
+            info=u'Composition: %s pour %s.\nPrésentation: %s.'%(m[3].toString(),m[6].toString(),m[9].toString())
+            data=[dose,duree,m[10].toString(),info,m[16].toString(),m[17].toString(),m[2].toString(),m[12].toString(),poids]
+            MyForm=FormPrescrire(data,self.parent)
+            if MyForm.exec_()==MyForm.Accepted:
+                nline=str(MyForm.prescription)
+                nline='<b>'+nline[:nline.index('\n')]+'</b><br>'+nline[nline.index('\n')+1:]+'<br>'
+                nline=self.parent.textEdit_Ordonnance.toHtml().replace('<meta name=\"qrichtext\" content=\"1\" />','<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />')+unicode(nline)
+                self.parent.textEdit_Ordonnance.setHtml(nline)    
+                
     def Download(self,cip):
         if os.system('curl \"http://base-donnees-publique.medicaments.gouv.fr/affichageDoc.php?specid=%s&typedoc=R\" -o %srcptmp.html'%(cip,config.Path_ImportMed))>0:
             return False
