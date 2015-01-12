@@ -18,6 +18,8 @@ class Ordonnance(MyModel):
     def __init__(self,idTable=0,parent=None, *args):
         MyModel.__init__(self,'Ordonnance',idTable,parent, *args)
         self.parent=parent
+        self.Date
+        self.Prescripteur
         self.Animal=None        #contains animal properties :idAnimal,Nom,Race,idEspeces,Sexe,Age(years),identification,Poids
         self.Pathologies=[]     #contains Pathologies for the current consultation
         self.Lignes=[]

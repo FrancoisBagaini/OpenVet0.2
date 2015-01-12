@@ -24,7 +24,7 @@ class GuiOrdonnance():
 		self.parent.radioButton_PharmacopeVet.setChecked(True)
 		self.parent.radioButton_PharmacopeHum.setChecked(False)
 		self.parent.checkBox_Actif.setChecked(True)
-		self.parent.dateEdit_ordonance.setDate(QDate.currentDate())
+#		self.parent.dateEdit_ordonance.setDate(QDate.currentDate())
 		self.MyOrdonnance=Ordonnance(0,self.parent)
 		self.MyMedicament=None
 		self.parent.textEdit_Ordonnance.setHtml('<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />')
@@ -52,20 +52,21 @@ class GuiOrdonnance():
 		self.parent.toolButton_EditMolecule.clicked.connect(self.OnEditMolecule)
 		self.parent.pushButton_toOrdonnance.clicked.connect(self.OnAdd2Ordonnance)
 		self.parent.pushButton_toOrdonnance.setDisabled(True)
-		self.parent.dateEdit_ordonance.dateChanged.connect(self.OnUpdateDate)
+#		self.parent.dateEdit_ordonance.dateChanged.connect(self.OnUpdateDate)
 		
 		self.parent.comboBox_Molecule.setFocus()
 		
 	def SetAnimal(self,idEspece,idAnimal):
+		#TODO:set idConsultation=>DateConsultation,prescripteur
 		self.idEspece=idEspece
-		self.parent.comboBox_especeCible.setModel(MyComboModel(self.parent,'GetEspeces()'))
-		self.parent.comboBox_especeCible.Setid(idEspece)
+#		self.parent.comboBox_especeCible.setModel(MyComboModel(self.parent,'GetEspeces()'))
+#		self.parent.comboBox_especeCible.Setid(idEspece)
 		self.MyOrdonnance.SetAnimal(idAnimal)
-		self.parent.lineEdit_poids.setText(self.MyOrdonnance.GetPoidsAnimal())
+#		self.parent.lineEdit_poids.setText(self.MyOrdonnance.GetPoidsAnimal())
 		nline=self.MyOrdonnance.Html
 		nline=nline.replace('</body></html>','')
 		nline=nline+'<center><b>Pour %s </b></center><br>'%self.MyOrdonnance.Animal[1].toString()
-		nline=nline+'<div align=\"right\">Le %s</div><br></p></body></html>'%self.parent.dateEdit_ordonance.text()
+		nline=nline+'<div align=\"right\">Le %s</div><br></p></body></html>'%self.MyOrdonnance.Date
 		self.MyOrdonnance.Html=nline
 		self.parent.textEdit_Ordonnance.setHtml(nline)
 		#TODO : ordonnances existantes

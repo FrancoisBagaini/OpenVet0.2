@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './Form_medical.ui'
 #
-# Created: Sat Jan  3 23:45:02 2015
+# Created: Mon Jan 12 22:22:35 2015
 #      by: PyQt4 UI code generator 4.7.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -521,28 +521,6 @@ class Ui_tabWidget_medical(object):
         self.horizontalLayout_3 = QtGui.QHBoxLayout()
         self.horizontalLayout_3.setSizeConstraint(QtGui.QLayout.SetDefaultConstraint)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.label_10 = QtGui.QLabel(self.layoutWidget_5)
-        self.label_10.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
-        self.label_10.setObjectName("label_10")
-        self.horizontalLayout_3.addWidget(self.label_10)
-        self.dateEdit_ordonance = QtGui.QDateEdit(self.layoutWidget_5)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.dateEdit_ordonance.sizePolicy().hasHeightForWidth())
-        self.dateEdit_ordonance.setSizePolicy(sizePolicy)
-        self.dateEdit_ordonance.setMinimumSize(QtCore.QSize(112, 27))
-        self.dateEdit_ordonance.setBaseSize(QtCore.QSize(0, 0))
-        self.dateEdit_ordonance.setCalendarPopup(True)
-        self.dateEdit_ordonance.setObjectName("dateEdit_ordonance")
-        self.horizontalLayout_3.addWidget(self.dateEdit_ordonance)
-        self.comboBox_especeCible = MyComboBox(self.layoutWidget_5)
-        self.comboBox_especeCible.setMinimumSize(QtCore.QSize(180, 0))
-        self.comboBox_especeCible.setMaximumSize(QtCore.QSize(16777215, 27))
-        self.comboBox_especeCible.setObjectName("comboBox_especeCible")
-        self.horizontalLayout_3.addWidget(self.comboBox_especeCible)
-        spacerItem2 = QtGui.QSpacerItem(30, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_3.addItem(spacerItem2)
         self.label_11 = QtGui.QLabel(self.layoutWidget_5)
         self.label_11.setObjectName("label_11")
         self.horizontalLayout_3.addWidget(self.label_11)
@@ -556,6 +534,8 @@ class Ui_tabWidget_medical(object):
         self.lineEdit_poids.setMaximumSize(QtCore.QSize(50, 16777215))
         self.lineEdit_poids.setObjectName("lineEdit_poids")
         self.horizontalLayout_3.addWidget(self.lineEdit_poids)
+        spacerItem2 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_3.addItem(spacerItem2)
         self.verticalLayout_4.addLayout(self.horizontalLayout_3)
         self.textEdit_Ordonnance = QtGui.QTextEdit(self.layoutWidget_5)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Fixed)
@@ -563,7 +543,7 @@ class Ui_tabWidget_medical(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.textEdit_Ordonnance.sizePolicy().hasHeightForWidth())
         self.textEdit_Ordonnance.setSizePolicy(sizePolicy)
-        self.textEdit_Ordonnance.setMinimumSize(QtCore.QSize(0, 320))
+        self.textEdit_Ordonnance.setMinimumSize(QtCore.QSize(0, 370))
         self.textEdit_Ordonnance.setMaximumSize(QtCore.QSize(99999, 9999))
         self.textEdit_Ordonnance.setStyleSheet("background-color: rgb(255, 255, 255);")
         self.textEdit_Ordonnance.setObjectName("textEdit_Ordonnance")
@@ -873,7 +853,6 @@ class Ui_tabWidget_medical(object):
         self.label_model.setBuddy(self.comboBox_model)
         self.label_Parametre.setBuddy(self.comboBox_Parametre)
         self.label_Analyse_Remarque.setBuddy(self.lineEdit_AnalyseRemarque)
-        self.label_10.setBuddy(self.dateEdit_ordonance)
         self.label_11.setBuddy(self.lineEdit_poids)
         self.label_RCP.setBuddy(self.textBrowser_medicament)
         self.label_doc.setBuddy(self.listView_doc)
@@ -964,9 +943,6 @@ class Ui_tabWidget_medical(object):
         self.radioButton_Parametre.setText(QtGui.QApplication.translate("tabWidget_medical", "Parametres", None, QtGui.QApplication.UnicodeUTF8))
         self.radioButton_Document.setText(QtGui.QApplication.translate("tabWidget_medical", "Documents", None, QtGui.QApplication.UnicodeUTF8))
         tabWidget_medical.setTabText(tabWidget_medical.indexOf(self.tab_analyse), QtGui.QApplication.translate("tabWidget_medical", "Analyses", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_10.setText(QtGui.QApplication.translate("tabWidget_medical", "Le :", None, QtGui.QApplication.UnicodeUTF8))
-        self.dateEdit_ordonance.setDisplayFormat(QtGui.QApplication.translate("tabWidget_medical", "dd/MM/yyyy", None, QtGui.QApplication.UnicodeUTF8))
-        self.comboBox_especeCible.setToolTip(QtGui.QApplication.translate("tabWidget_medical", "Choix de l\'espèce cible", None, QtGui.QApplication.UnicodeUTF8))
         self.label_11.setText(QtGui.QApplication.translate("tabWidget_medical", "Poids :", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton_ValidOrdonnance.setToolTip(QtGui.QApplication.translate("tabWidget_medical", "Valide et enregistre l\'ordonnance", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton_ValidOrdonnance.setText(QtGui.QApplication.translate("tabWidget_medical", "Valider", None, QtGui.QApplication.UnicodeUTF8))
