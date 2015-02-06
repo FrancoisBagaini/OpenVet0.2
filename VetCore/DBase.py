@@ -47,7 +47,7 @@ class Request(QSqlQuery):
             return False
         return True
         
-    def GetInt(self,request,index):
+    def GetInt(self,request,index=0):
         self.res=None
         if self.Execute(request):
             self.next()

@@ -70,6 +70,12 @@ class FormPrescrire(QDialog, Ui_DialogPrescrire):
             MyError(self,u'La préscription est vide')
         else:
             self.prescription=self.plainTextEdit_Prescription.toPlainText()
+            self.dose=eval(str(self.lineEdit_dose.text()).replace('/','.0/'))
+            self.duree=eval(str(self.spinBox_duree.text()))
+#            self.idtemps=self.comboBox_duree.itemData(self.comboBox_duree.currentIndex(), Qt.UserRole).toInt()[0]
+            self.idtemps=self.comboBox_duree.Getid()
+            self.delivre=eval(str(self.spinBox_qtdelivree.text()))
+            self.remarque=self.lineEdit_Remarque.text()
             self.accept()
     
     def OnCancel(self):

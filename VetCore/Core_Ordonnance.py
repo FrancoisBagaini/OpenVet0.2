@@ -18,15 +18,25 @@ class Ordonnance(MyModel):
     def __init__(self,idTable=0,parent=None, *args):
         MyModel.__init__(self,'Ordonnance',idTable,parent, *args)
         self.parent=parent
-        self.Date
-        self.Prescripteur
-        self.Animal=None        #contains animal properties :idAnimal,Nom,Race,idEspeces,Sexe,Age(years),identification,Poids
+        self.idTable=idTable
+        self.Date=None
+        self.Prescripteur=None
+        self.Consultation=None  #contains id,Date,4:idPrescripteur,5:Prescripteur,9:Pathologies,15:Nb Ordonnances (only one by consultation)
+        self.Animal=None        #contains animal properties :idAnimal,Nom,Race,idEspeces,Sexe,Age(years),identification,Poids,idPoids
         self.Pathologies=[]     #contains Pathologies for the current consultation
         self.Lignes=[]
         self.Html='<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /></head><body></body></html>'
         
     def SetAnimal(self,idAnimal):
         self.Animal=self.MyRequest.GetLine('CALL GetAnimal(%i)'%idAnimal)
+    
+    def SetConsulation(self,idConsulation):   
+        self.Consultation=self.MyRequest.GetLine('CALL GetConsultation(%i)'%idConsulation)
+        self.Date=self.Consultation[1].toDate().toString('dd.MM.yyyy')
+        Nord=self.MyRequest.GetString('SELECT NoOrdre FROM Personne WHERE idPersonne=%i'%self.Consultation[4].toInt()[0])
+        Nord='123000'#debug only
+        self.Prescripteur=self.Consultation[5].toString()+' (%s)'%Nord
+        #TODO: GetPathologies
         
     def SetPathologies(self,idConsultation):
         self.Pathologies=self.MyRequest.GetLines('CALL GetPathologiesConsult(%i)'%idConsultation)
@@ -34,7 +44,16 @@ class Ordonnance(MyModel):
     def GetPoidsAnimal(self):
         if not self.Animal is None:
             return self.Animal[7].toString()
-
+    
+    def Save(self):
+        pathologies=''
+        html=self.parent.textEdit_Ordonnance.toHtml().replace('\"','\\"')
+        new=[self.idTable,self.Consultation[0].toInt()[0],self.Consultation[4].toInt()[0],self.Animal[8].toInt()[0],pathologies,
+             html,self.parent.lineEdit_Remarque.text(),True,False,'']
+        self.SetNew(new)
+        self.New()
+        self.Update()
+        #TODO valid Lignes & save Lignes
 
 class Molecule(MyModel):
     def __init__(self, table,idTable,parent):
@@ -42,7 +61,7 @@ class Molecule(MyModel):
         self.idMolecule=idTable
         
     def GetPosologies(self,idEspece):
-        self.Posologie=None
+        self.Posologie=0
         return self.MyRequest.GetLines('CALL GetPosologieMenu(%i,%i)'%(self.idMolecule,idEspece))
 
 class Medicament(MyModel):
@@ -52,9 +71,8 @@ class Medicament(MyModel):
         self.table=table
         self.idMedicament=idTable
         self.idMolecule=idMolecule
-        self.Presentation=0
-        self.Posologie=0
-        self.QuantDelivre=None
+        self.idPresentation=0
+        self.idPosologie=0
 #         config.Path_ImportMed
 #         config.Path_RCP
 
@@ -75,12 +93,11 @@ class Medicament(MyModel):
             return self.listdata[8].toString()
         
     def GetPresentations(self,Medicament):
-        self.Presentation=0
+        self.idPresentation=0
         return self.MyRequest.GetLines('CALL GetPresentationMenu(\"%s\")'%Medicament)
     
     def GetEverything(self):
-        #GetMyMedicament(idMedicament,idPresentation,idMolecule,idPosologie)
-        return self.MyRequest.GetLine('CALL GetMyMedicament(%i,%i,%i,%i)'%(self.idMedicament,self.Presentation,self.idMolecule,self.Posologie))
+        return self.MyRequest.GetLine('CALL GetMyMedicament(%i,%i,%i,%i)'%(self.idMedicament,self.idPresentation,self.idMolecule,self.idPosologie))
     
     def GetMultiple(self,unite):
         convert={'':1,'m':1E-3,'µ':1E-6,'n':1E-9,'p':1E-12,'M':1E6}
@@ -98,7 +115,6 @@ class Medicament(MyModel):
         except:
             MyError(self.parent,u'Unité de posologie incorrecte')
             return -1
-#        conc='µg'
         if poso_qte==conc:
             return 1
         else:
@@ -132,9 +148,14 @@ class Medicament(MyModel):
             MyForm=FormPrescrire(data,self.parent)
             if MyForm.exec_()==MyForm.Accepted:
                 nline=str(MyForm.prescription)
+                #icone=config.WorkingPath+'/images/edit.png'
+                #self.textHTML="<a HREF=\"#N-1\"><img title=\"Nouvelle Consultation\" style=\"width: 32px; height: 32px;\" alt=\"Nouvelle Consultation\" src=\"file://%s\"></a>"%(icone)
+                #Put next 3 lines in Gui_ordonnance
                 nline='<b>'+nline[:nline.index('\n')]+'</b><br>'+nline[nline.index('\n')+1:]+'<br>'
                 nline=self.parent.textEdit_Ordonnance.toHtml().replace('<meta name=\"qrichtext\" content=\"1\" />','<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />')+unicode(nline)
-                self.parent.textEdit_Ordonnance.setHtml(nline)    
+                self.parent.textEdit_Ordonnance.setHtml(nline)   
+                idUniteGalenique=self.MyRequest.GetInt('SELECT Unite_idUnite FROM Presentation WHERE idPresentation=%i'%self.idPresentation)
+                return (self.idMedicament,self.idPresentation,self.idMolecule,self.idPosologie,MyForm.dose,idUniteGalenique,MyForm.duree,MyForm.idtemps,str(MyForm.prescription),MyForm.delivre,MyForm.remarque)
                 
     def Download(self,cip):
         if os.system('curl \"http://base-donnees-publique.medicaments.gouv.fr/affichageDoc.php?specid=%s&typedoc=R\" -o %srcptmp.html'%(cip,config.Path_ImportMed))>0:

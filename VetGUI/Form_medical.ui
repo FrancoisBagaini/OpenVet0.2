@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="currentIndex">
-   <number>3</number>
+   <number>0</number>
   </property>
   <widget class="QWidget" name="tab_consulation">
    <attribute name="title">
@@ -1649,35 +1649,26 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgb
         <number>10</number>
        </property>
        <item>
+        <widget class="QLabel" name="label_10">
+         <property name="text">
+          <string>Remarque :</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_Remarque">
+         <property name="maxLength">
+          <number>200</number>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="pushButton_ValidOrdonnance">
          <property name="toolTip">
           <string>Valide et enregistre l'ordonnance</string>
          </property>
          <property name="text">
           <string>Valider</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_4">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButton_majDM">
-         <property name="toolTip">
-          <string>Mise à jour de la base des médicaments</string>
-         </property>
-         <property name="text">
-          <string>Mise à jour</string>
          </property>
         </widget>
        </item>
@@ -1691,7 +1682,7 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgb
       <x>520</x>
       <y>10</y>
       <width>491</width>
-      <height>131</height>
+      <height>135</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -1730,6 +1721,16 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgb
           </size>
          </property>
         </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_majDM">
+         <property name="toolTip">
+          <string>Mise à jour de la base des médicaments</string>
+         </property>
+         <property name="text">
+          <string>Mise à jour</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>

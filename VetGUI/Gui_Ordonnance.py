@@ -18,6 +18,7 @@ from Core_Ordonnance import *
 
 class GuiOrdonnance():
 	def __init__(self,parent=None):
+		#TODO: pointeur=sablier
 		self.Actif=True
 		self.Pharmacope="H"	#TODO set to "V"
 		self.parent=parent
@@ -53,33 +54,37 @@ class GuiOrdonnance():
 		self.parent.pushButton_toOrdonnance.clicked.connect(self.OnAdd2Ordonnance)
 		self.parent.pushButton_toOrdonnance.setDisabled(True)
 #		self.parent.dateEdit_ordonance.dateChanged.connect(self.OnUpdateDate)
+		self.parent.pushButton_ValidOrdonnance.clicked.connect(self.OnValidOrdonnance)
 		
 		self.parent.comboBox_Molecule.setFocus()
 		
 	def SetAnimal(self,idEspece,idAnimal):
-		#TODO:set idConsultation=>DateConsultation,prescripteur
 		self.idEspece=idEspece
-#		self.parent.comboBox_especeCible.setModel(MyComboModel(self.parent,'GetEspeces()'))
-#		self.parent.comboBox_especeCible.Setid(idEspece)
 		self.MyOrdonnance.SetAnimal(idAnimal)
-#		self.parent.lineEdit_poids.setText(self.MyOrdonnance.GetPoidsAnimal())
-		nline=self.MyOrdonnance.Html
-		nline=nline.replace('</body></html>','')
-		nline=nline+'<center><b>Pour %s </b></center><br>'%self.MyOrdonnance.Animal[1].toString()
-		nline=nline+'<div align=\"right\">Le %s</div><br></p></body></html>'%self.MyOrdonnance.Date
-		self.MyOrdonnance.Html=nline
-		self.parent.textEdit_Ordonnance.setHtml(nline)
-		#TODO : ordonnances existantes
+		self.parent.lineEdit_poids.setText(self.MyOrdonnance.GetPoidsAnimal())
 		
 	def SetConsultation(self,idConsultation):
-		self.idConsultation=idConsultation
-		#TODO : get pathologies	
-#		self.MyConsultation= Consultation(self.idAnimal,0,self.parent)
-
-	def OnUpdateDate(self):
+		self.MyOrdonnance.SetConsulation(idConsultation)
+		#TODO : ordonnance(s) existante(s)
 		nline=self.MyOrdonnance.Html
+		nline=nline.replace('</body></html>','')
+		if self.MyOrdonnance.Consultation is None:
+			#debug only
+			nline=nline+'<div align=\"right\">Le %s</div><br></p></body></html>'%QDate.currentDate().toString()
+		else:
+			#TODO Ordonnance.MakeHtml
+			nline=nline+'<div align=\"left\">Dr %s</div><br><br></p>'%self.MyOrdonnance.Prescripteur
+			nline=nline+'<div align=\"right\">Le %s</div><br></p>'%self.MyOrdonnance.Date
+		nline=nline+'<center><b>Pour %s </b></center><br></body></html>'%self.MyOrdonnance.Animal[1].toString()
 		self.MyOrdonnance.Html=nline
 		self.parent.textEdit_Ordonnance.setHtml(nline)
+		
+
+
+# 	def OnUpdateDate(self):
+# 		nline=self.MyOrdonnance.Html
+# 		self.MyOrdonnance.Html=nline
+# 		self.parent.textEdit_Ordonnance.setHtml(nline)
 		
 	def OnActif(self,state):
 		if state:
@@ -130,28 +135,29 @@ class GuiOrdonnance():
 		idTable=self.parent.comboBox_Medicament.Getid()
 		medicament=self.parent.comboBox_Medicament.currentText()
 		self.MyMedicament=Medicament('Medicament',idTable,self.parent.comboBox_Molecule.Getid(),self.parent)
-		self.MyMedicament.Posologie=0
-		self.MyMedicament.Presentation=0
+		self.MyMedicament.idPosologie=0
+		self.MyMedicament.idPresentation=0
 		self.parent.pushButton_toOrdonnance.setEnabled(True)
 		self.parent.comboBox_Medicament.SetPopup(self.MyMedicament.GetPresentations(medicament))
 		if not self.parent.comboBox_Medicament.GetProperty(2).isNull():
 			self.parent.textBrowser_medicament.setSource(QUrl(config.Path_RCP+self.parent.comboBox_Medicament.GetProperty(2).toString()))
 
 	def OnSelectPosologie(self):
-		self.MyMedicament.Posologie=self.parent.comboBox_Molecule.SelectionContext[0]		#idPosologie
+		self.MyMedicament.idPosologie=self.parent.comboBox_Molecule.SelectionContext[0]
 			
 	def OnSelectPresentation(self):
 		self.MyMedicament.Setid(self.parent.comboBox_Medicament.SelectionContext[0])		#idMedicament
-		self.MyMedicament.Presentation=self.parent.comboBox_Medicament.SelectionContext[1]	#idPresentation
+		self.MyMedicament.idPresentation=self.parent.comboBox_Medicament.SelectionContext[1]
 		
 	def OnAdd2Ordonnance(self):
-		print self.MyMedicament.Presentation
-		if self.MyMedicament.Presentation==0:
+		print self.MyMedicament.idPresentation
+		if self.MyMedicament.idPresentation==0:
 			MyError(self.parent,u'Vous devez renseigner la présentation avant d\'ajouter le médicament à l\'ordonnance')
 		else:
 			poids=self.parent.lineEdit_poids.text().toFloat()
 			if poids[1]:
-				self.MyMedicament.GetLigneOrdonnance(poids[0])
+				ligne=self.MyMedicament.GetLigneOrdonnance(poids[0])
+				self.MyOrdonnance.Lignes.append(ligne)
 			else:
 				MyError(self.parent,u'Poids non valide')
 							
@@ -195,3 +201,7 @@ class GuiOrdonnance():
 			self.parent.comboBox_Molecule.setModel(MyComboModel(self.parent,'GetMolecules(0,1)'),True)
 			self.parent.comboBox_Molecule.setCurrentIndex(idMolecule)
 	
+	def OnValidOrdonnance(self):
+		self.MyOrdonnance.Save()
+		if self.MyOrdonnance.lasterror is None:
+			QToolTip.showText(QCursor.pos(),u'Sauvegarde réussie.')
