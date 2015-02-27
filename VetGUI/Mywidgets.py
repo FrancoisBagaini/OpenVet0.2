@@ -199,4 +199,36 @@ class MyTreeView(QTreeView):
 	def Getid(self):
 		return self.currentIndex().data(Qt.UserRole)
 
+class MyTextEdit(QTextEdit):
+	def __init__(self,parent=None):	
+		super(MyTextEdit,self).__init__(parent)
+		self.acceptRichText()
+		self.setToolTip(u"Ctrl+E: Editer; Ctrl+B: Gras; Ctrl+U: Souligner; Ctrl+I: Italique")
+		
+	#def contextMenuEvent()
+	
+	def keyPressEvent(self,event):
+		if event.modifiers() & Qt.ControlModifier:
+			handled=False
+			if event.key()==Qt.Key_B:
+				self.setFontWeight(QFont.Normal if self.fontWeight()>QFont.Normal else QFont.Bold)
+				handled=True
+			elif event.key()==Qt.Key_I:
+				self.setFontItalic(not self.fontItalic())
+				handled=True
+			elif event.key()==Qt.Key_U:
+				self.setFontUnderline(not self.fontUnderline())
+				handled=True
+			elif event.key()==Qt.Key_E:
+				self.Selection=self.textCursor()
+				self.emit(SIGNAL("OnEdit"))
+				handled=True
+			if handled:
+				event.accept()
+			return
+		else:
+			QTextEdit.keyPressEvent(self,event)
+
+		
+		
 		

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file './Form_prescrire.ui'
 #
-# Created: Wed Feb  4 12:30:45 2015
+# Created: Fri Feb 27 11:39:16 2015
 #      by: PyQt4 UI code generator 4.7.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -119,6 +119,13 @@ class Ui_DialogPrescrire(object):
         self.toolButton_prescrire.setIconSize(QtCore.QSize(24, 24))
         self.toolButton_prescrire.setObjectName("toolButton_prescrire")
         self.ButtonLayout.addWidget(self.toolButton_prescrire)
+        self.toolButton_erase = QtGui.QToolButton(self.layoutWidget)
+        icon2 = QtGui.QIcon()
+        icon2.addPixmap(QtGui.QPixmap(":/newPrefix/images/delete2.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.toolButton_erase.setIcon(icon2)
+        self.toolButton_erase.setIconSize(QtCore.QSize(24, 24))
+        self.toolButton_erase.setObjectName("toolButton_erase")
+        self.ButtonLayout.addWidget(self.toolButton_erase)
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.ButtonLayout.addItem(spacerItem)
         self.pushButton_Cancel = QtGui.QPushButton(self.layoutWidget)
@@ -200,6 +207,8 @@ class Ui_DialogPrescrire(object):
         self.toolButton_detail.setText(QtGui.QApplication.translate("DialogPrescrire", "...", None, QtGui.QApplication.UnicodeUTF8))
         self.toolButton_prescrire.setToolTip(QtGui.QApplication.translate("DialogPrescrire", "Insérer dans la préscription", None, QtGui.QApplication.UnicodeUTF8))
         self.toolButton_prescrire.setText(QtGui.QApplication.translate("DialogPrescrire", "...", None, QtGui.QApplication.UnicodeUTF8))
+        self.toolButton_erase.setToolTip(QtGui.QApplication.translate("DialogPrescrire", "Effacer la prescription", None, QtGui.QApplication.UnicodeUTF8))
+        self.toolButton_erase.setText(QtGui.QApplication.translate("DialogPrescrire", "...", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton_Cancel.setText(QtGui.QApplication.translate("DialogPrescrire", "Annuler", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton_Valid.setText(QtGui.QApplication.translate("DialogPrescrire", "Valider", None, QtGui.QApplication.UnicodeUTF8))
         self.label_5.setText(QtGui.QApplication.translate("DialogPrescrire", "Posologie: ", None, QtGui.QApplication.UnicodeUTF8))

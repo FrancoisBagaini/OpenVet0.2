@@ -33,6 +33,8 @@ class GuiOrdonnance():
 		self.parent.comboBox_Molecule.setModel(MyComboModel(self.parent,'GetMolecules(0,1)'),True)
 		self.parent.connect(self.parent.comboBox_Molecule,SIGNAL("OnEnter"),self.OnSelectMolecule)
 		self.parent.connect(self.parent.comboBox_Molecule,SIGNAL("activated(int)"),self.OnSelectMolecule)
+#		self.parent.connect(self.parent.textEdit_Ordonnance, SIGNAL("anchorClicked(QUrl)"),self.OnEditPrescription)
+		self.parent.connect(self.parent.textEdit_Ordonnance, SIGNAL("OnEdit"),self.OnEditPrescription)
 		self.parent.comboBox_Molecule.clearEditText()
 		
 		self.parent.comboBox_Medicament.SetCompleter()
@@ -54,6 +56,7 @@ class GuiOrdonnance():
 		self.parent.pushButton_toOrdonnance.clicked.connect(self.OnAdd2Ordonnance)
 		self.parent.pushButton_toOrdonnance.setDisabled(True)
 #		self.parent.dateEdit_ordonance.dateChanged.connect(self.OnUpdateDate)
+		self.parent.toolButton_CommentLine.clicked.connect(self.OnAddCommentLine)
 		self.parent.pushButton_ValidOrdonnance.clicked.connect(self.OnValidOrdonnance)
 		
 		self.parent.comboBox_Molecule.setFocus()
@@ -150,16 +153,23 @@ class GuiOrdonnance():
 		self.MyMedicament.idPresentation=self.parent.comboBox_Medicament.SelectionContext[1]
 		
 	def OnAdd2Ordonnance(self):
-		print self.MyMedicament.idPresentation
 		if self.MyMedicament.idPresentation==0:
 			MyError(self.parent,u'Vous devez renseigner la présentation avant d\'ajouter le médicament à l\'ordonnance')
 		else:
 			poids=self.parent.lineEdit_poids.text().toFloat()
 			if poids[1]:
 				ligne=self.MyMedicament.GetLigneOrdonnance(poids[0])
-				self.MyOrdonnance.Lignes.append(ligne)
+				if not ligne is None:
+					self.MyOrdonnance.Lignes.append(ligne)
+					self.MyOrdonnance.WritePrescription(self.MyMedicament.nline)	
 			else:
 				MyError(self.parent,u'Poids non valide')
+				
+	def OnAddCommentLine(self):
+		ligne=self.parent.lineEdit_Remarque.text()
+		if not ligne.isEmpty():
+			self.MyOrdonnance.Lignes.append([None,None,None,None,None,None,None,None,ligne,None,None,True,False,''])
+			self.MyOrdonnance.WritePrescription()	
 							
 	def OnDownloadRCP(self):
 		if self.MyMedicament is None:
@@ -200,7 +210,21 @@ class GuiOrdonnance():
 		if form.exec_():
 			self.parent.comboBox_Molecule.setModel(MyComboModel(self.parent,'GetMolecules(0,1)'),True)
 			self.parent.comboBox_Molecule.setCurrentIndex(idMolecule)
-	
+
+	def OnEditPrescription(self):
+		(idline,line)=self.MyOrdonnance.GetLine(self.parent.textEdit_Ordonnance.Selection)
+		(self.MyMedicament.idMedicament,self.MyMedicament.idPresentation,self.MyMedicament.idMolecule,self.MyMedicament.idPosologie)=line[:4]
+		poids=self.parent.lineEdit_poids.text().toFloat()
+		if poids[1]:
+			ligne=self.MyMedicament.GetLigneOrdonnance(poids[0],line)
+			if not ligne is None:
+				if ligne[8]=='':
+					del self.MyOrdonnance.Lignes[idline]
+				else:
+					self.MyOrdonnance.Lignes[idline]=ligne
+				#TODO	select line[8] to modify or delete
+				self.MyOrdonnance.WritePrescription(self.MyMedicament.nline)		
+			
 	def OnValidOrdonnance(self):
 		self.MyOrdonnance.Save()
 		if self.MyOrdonnance.lasterror is None:

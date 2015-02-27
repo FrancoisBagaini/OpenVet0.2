@@ -44,6 +44,19 @@ class Ordonnance(MyModel):
     def GetPoidsAnimal(self):
         if not self.Animal is None:
             return self.Animal[7].toString()
+
+    def WritePrescription(self,nline):
+        icone=config.Path_Icons+'edit1.png'
+#        anchor="<a HREF=\"#P%i\"><img title=\"Editer la préscription\" style=\"width: 32px; height: 32px;\" alt=\"Editer la préscription\" src=\"file:%s\"></a>"%(len(self.Lignes),icone)
+        nline='<b>'+nline[:nline.index('\n')]+'   </b><br>'+nline[nline.index('\n')+1:]+'<br>'
+        nline=self.parent.textEdit_Ordonnance.toHtml().replace('<meta name=\"qrichtext\" content=\"1\" />','<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />')+unicode(nline)
+        self.parent.textEdit_Ordonnance.setHtml(nline)   
+ 
+    def GetLine(self,Selection):
+        text=Selection.selectedText()
+        for j,i in enumerate(self.Lignes):
+            if str(text) in i[8]:
+                return (j,i)
     
     def Save(self):
         pathologies=''
@@ -120,7 +133,7 @@ class Medicament(MyModel):
         else:
             return self.GetMultiple(poso_qte)/self.GetMultiple(conc)
     
-    def GetLigneOrdonnance(self,poids):
+    def GetLigneOrdonnance(self,poids,values=None):
             m=self.GetEverything()
             dosemin=None
             maxadmin=None
@@ -146,17 +159,14 @@ class Medicament(MyModel):
             info=u'Composition: %s pour %s.\nPrésentation: %s.'%(m[3].toString(),m[6].toString(),m[9].toString())
             data=[dose,duree,m[10].toString(),info,m[16].toString(),m[17].toString(),m[2].toString(),m[12].toString(),poids]
             MyForm=FormPrescrire(data,self.parent)
+            if not values is None:
+                MyForm.FillValues(MyForm,values[4:])
             if MyForm.exec_()==MyForm.Accepted:
-                nline=str(MyForm.prescription)
-                #icone=config.WorkingPath+'/images/edit.png'
-                #self.textHTML="<a HREF=\"#N-1\"><img title=\"Nouvelle Consultation\" style=\"width: 32px; height: 32px;\" alt=\"Nouvelle Consultation\" src=\"file://%s\"></a>"%(icone)
-                #Put next 3 lines in Gui_ordonnance
-                nline='<b>'+nline[:nline.index('\n')]+'</b><br>'+nline[nline.index('\n')+1:]+'<br>'
-                nline=self.parent.textEdit_Ordonnance.toHtml().replace('<meta name=\"qrichtext\" content=\"1\" />','<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />')+unicode(nline)
-                self.parent.textEdit_Ordonnance.setHtml(nline)   
+                self.nline=str(MyForm.prescription) 
                 idUniteGalenique=self.MyRequest.GetInt('SELECT Unite_idUnite FROM Presentation WHERE idPresentation=%i'%self.idPresentation)
-                return (self.idMedicament,self.idPresentation,self.idMolecule,self.idPosologie,MyForm.dose,idUniteGalenique,MyForm.duree,MyForm.idtemps,str(MyForm.prescription),MyForm.delivre,MyForm.remarque)
-                
+                return (self.idMedicament,self.idPresentation,self.idMolecule,self.idPosologie,MyForm.dose,idUniteGalenique,MyForm.duree,MyForm.idtemps,str(MyForm.prescription),MyForm.delivre,MyForm.remarque)               
+
+                    
     def Download(self,cip):
         if os.system('curl \"http://base-donnees-publique.medicaments.gouv.fr/affichageDoc.php?specid=%s&typedoc=R\" -o %srcptmp.html'%(cip,config.Path_ImportMed))>0:
             return False

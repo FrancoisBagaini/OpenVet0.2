@@ -31,6 +31,7 @@ class FormPrescrire(QDialog, Ui_DialogPrescrire):
         self.pushButton_Valid.setAutoDefault(False)
         self.toolButton_detail.toggled.connect(self.ShowDetail)
         self.toolButton_prescrire.clicked.connect(self.FillPrescription)
+        self.pushButton_Erase.clicked.connect(self.OnErase)
         self.lineEdit_Posologie.textChanged.connect(self.CalculDose)
         self.lineEdit_Composition.textChanged.connect(self.CalculDose)
         self.pushButton_Valid.clicked.connect(self.OnValid)
@@ -56,6 +57,19 @@ class FormPrescrire(QDialog, Ui_DialogPrescrire):
         else:
             text=text+'.'
         self.plainTextEdit_Prescription.setPlainText(text)
+    
+    def OnErase(self):
+        self.plainTextEdit_Prescription.setPlainText('')
+
+    def FillValues(self,form,values):
+        self.plainTextEdit_Prescription.setPlainText(QString(values[4].decode('utf-8')))
+        self.lineEdit_dose.setText(str(values[0]))
+        self.spinBox_duree.setValue(values[2])
+        self.comboBox_duree.Setid(values[3])
+        self.lineEdit_Remarque.setText(values[6])
+        end=values[4].index(' pendant')
+        start=values[4][:end].rindex(', ')+2
+        form.lineEdit_frequence.setText(values[4][start:end])
 
     def CalculDose(self):
         try:

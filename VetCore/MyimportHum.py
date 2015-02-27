@@ -633,6 +633,8 @@ def SaveCompositions(filin,parent):
 #     print '%i.%s'%(i+1,j)
 
 if __name__ == '__main__':
+    if not input(u"Voulez-vous vraiment rafraichir la base médicaments (O/n)?:")=='O':
+        return
     t0=time.time()
     app = QtGui.QApplication(sys.argv)
     db = QtSql.QSqlDatabase.addDatabase("QMYSQL")
