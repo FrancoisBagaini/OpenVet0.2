@@ -24,8 +24,9 @@ class Ordonnance(MyModel):
         self.Consultation=None  #contains id,Date,4:idPrescripteur,5:Prescripteur,9:Pathologies,15:Nb Ordonnances (only one by consultation)
         self.Animal=None        #contains animal properties :idAnimal,Nom,Race,idEspeces,Sexe,Age(years),identification,Poids,idPoids
         self.Pathologies=[]     #contains Pathologies for the current consultation
-        self.Lignes=[]
+        self.Lignes=[]  #TODO; fill with existing ordonnance
         self.Html='<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" /></head><body></body></html>'
+        self.Entete=''
         
     def SetAnimal(self,idAnimal):
         self.Animal=self.MyRequest.GetLine('CALL GetAnimal(%i)'%idAnimal)
@@ -45,28 +46,67 @@ class Ordonnance(MyModel):
         if not self.Animal is None:
             return self.Animal[7].toString()
 
-    def WritePrescription(self,nline):
-        icone=config.Path_Icons+'edit1.png'
+    def WritePrescription(self):
+#        icone=config.Path_Icons+'edit1.png'
 #        anchor="<a HREF=\"#P%i\"><img title=\"Editer la préscription\" style=\"width: 32px; height: 32px;\" alt=\"Editer la préscription\" src=\"file:%s\"></a>"%(len(self.Lignes),icone)
-        nline='<b>'+nline[:nline.index('\n')]+'   </b><br>'+nline[nline.index('\n')+1:]+'<br>'
-        nline=self.parent.textEdit_Ordonnance.toHtml().replace('<meta name=\"qrichtext\" content=\"1\" />','<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />')+unicode(nline)
-        self.parent.textEdit_Ordonnance.setHtml(nline)   
+        ntext=self.Entete
+        for i in self.Lignes:
+            nline=str(i[10])        #str à enlever
+            if i[2:6]==[None,None,None,None]:  #comment
+                nline='<p>'+nline+'</p>'
+            else:
+                nline='<p><b>'+nline[:nline.index('\n')]+'   </b><br>'+nline[nline.index('\n')+1:]+'</p>'
+            ntext=ntext+nline
+        self.parent.textEdit_Ordonnance.setHtml(ntext)
+   
  
     def GetLine(self,Selection):
-        text=Selection.selectedText()
+        text=str(Selection.selectedText())
+        try:
+            text=text[:text.index(':')] 
+        except:
+            pass
         for j,i in enumerate(self.Lignes):
-            if str(text) in i[8]:
+            if text in i[10]:
                 return (j,i)
+        return (None,None)
     
     def Save(self):
         pathologies=''
+        html=self.parent.textEdit_Ordonnance.toHtml().replace('<meta name=\"qrichtext\" content=\"1\" />','<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />')
         html=self.parent.textEdit_Ordonnance.toHtml().replace('\"','\\"')
+        #valid lignes
+        doc=QTextDocument()
+        doc.setHtml(html)
+        valid=True
+        j=0
+        for i in range(4,doc.blockCount()):
+            if str(doc.findBlockByNumber(i).text())!=self.Lignes[j][10]:
+                valid=False
+            else:
+                j+=1
         new=[self.idTable,self.Consultation[0].toInt()[0],self.Consultation[4].toInt()[0],self.Animal[8].toInt()[0],pathologies,
-             html,self.parent.lineEdit_Remarque.text(),True,False,'']
+             html,self.parent.lineEdit_Remarque.text(),valid,True,False,'']
         self.SetNew(new)
         self.New()
-        self.Update()
-        #TODO valid Lignes & save Lignes
+        error=False
+        self.BeginTransaction()
+        lastid=self.Update().toInt()[0]
+        if self.lasterror.isValid():
+            error=True
+        for i in self.Lignes:
+            MyLignes=MyModel('LigneOrdonnance',i[0])
+            i[1]=lastid
+            #id,idOrdonnance,self.idMedicament,self.idPresentation,self.idMolecule,self.idPosologie,MyForm.dose,idUniteGalenique,MyForm.duree,MyForm.idtemps,str(MyForm.prescription),MyForm.delivre,MyForm.remarque,isActive,isDelete,Identifiant)
+            MyLignes.SetNew(i)
+            MyLignes.New()
+            MyLignes.Update()
+            if self.lasterror.isValid():
+                error=True
+        if error:
+            self.rollbackTransaction()
+        else:
+            self.CommitTransaction()
 
 class Molecule(MyModel):
     def __init__(self, table,idTable,parent):
@@ -160,7 +200,10 @@ class Medicament(MyModel):
             data=[dose,duree,m[10].toString(),info,m[16].toString(),m[17].toString(),m[2].toString(),m[12].toString(),poids]
             MyForm=FormPrescrire(data,self.parent)
             if not values is None:
-                MyForm.FillValues(MyForm,values[4:])
+                MyForm.FillValues(MyForm,values[6:])
+                MyForm.edit=True
+            else:
+                MyForm.edit=False
             if MyForm.exec_()==MyForm.Accepted:
                 self.nline=str(MyForm.prescription) 
                 idUniteGalenique=self.MyRequest.GetInt('SELECT Unite_idUnite FROM Presentation WHERE idPresentation=%i'%self.idPresentation)

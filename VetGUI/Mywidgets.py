@@ -79,10 +79,15 @@ class MyComboBox(QComboBox):
 				action.setData(QVariant(i[2:]))
 			action.setCheckable(True)
 			self.items.append(action)
-			self.connect(action,SIGNAL("triggered(bool)"),self.OnSelectPopupItem)
+			self.connect(action,SIGNAL("triggered(bool)"),self.OnSelectPopupItem)	
 	
 	def OnPopup(self,point):
 		self.Popup.exec_(self.mapToGlobal(QPoint(1,point.y()+8)))
+
+	def SelectPopup(self,item):
+#		self.Popup.setActiveAction(self.items[item])
+		self.items[item].setChecked(True)
+		self.SelectionContext=self.items[item].data().toPyObject()
 
 	def OnSelectPopupItem(self,action):
 		for j,i in enumerate(self.items):

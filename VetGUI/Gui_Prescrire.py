@@ -13,6 +13,7 @@ class FormPrescrire(QDialog, Ui_DialogPrescrire):
         QDialog.__init__(self, parent)
         self.setupUi(self)
         self.data=data
+        self.edit=False
         self.prescription=None
         self.label_minmax.setText(data[0])
         self.label_dureemax.setText(data[1])
@@ -31,11 +32,12 @@ class FormPrescrire(QDialog, Ui_DialogPrescrire):
         self.pushButton_Valid.setAutoDefault(False)
         self.toolButton_detail.toggled.connect(self.ShowDetail)
         self.toolButton_prescrire.clicked.connect(self.FillPrescription)
-        self.pushButton_Erase.clicked.connect(self.OnErase)
+        self.toolButton_erase.clicked.connect(self.OnErase)
         self.lineEdit_Posologie.textChanged.connect(self.CalculDose)
         self.lineEdit_Composition.textChanged.connect(self.CalculDose)
         self.pushButton_Valid.clicked.connect(self.OnValid)
         self.pushButton_Cancel.clicked.connect(self.OnCancel)
+        self.lineEdit_dose.setFocus()
         
     def ShowDetail(self):
         if self.frame_detail.isVisible():
@@ -80,7 +82,7 @@ class FormPrescrire(QDialog, Ui_DialogPrescrire):
             return
     
     def OnValid(self):
-        if self.plainTextEdit_Prescription.toPlainText().isEmpty():
+        if self.plainTextEdit_Prescription.toPlainText().isEmpty() and not self.edit:
             MyError(self,u'La préscription est vide')
         else:
             self.prescription=self.plainTextEdit_Prescription.toPlainText()
