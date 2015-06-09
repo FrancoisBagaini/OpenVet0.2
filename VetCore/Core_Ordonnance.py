@@ -29,15 +29,38 @@ class Ordonnance(MyModel):
         self.Entete=''
         
     def SetAnimal(self,idAnimal):
-        self.Animal=self.MyRequest.GetLine('CALL GetAnimal(%i)'%idAnimal)
+        self.Animal=self.MyRequest.GetLine('CALL GetAnimal_Ordonnance(%i)'%idAnimal)
     
-    def SetConsulation(self,idConsulation):   
-        self.Consultation=self.MyRequest.GetLine('CALL GetConsultation(%i)'%idConsulation)
+    def SetConsulation(self,idConsultation):   
+        self.Consultation=self.MyRequest.GetLine('CALL GetConsultation(%i)'%idConsultation)
         self.Date=self.Consultation[1].toDate().toString('dd.MM.yyyy')
         Nord=self.MyRequest.GetString('SELECT NoOrdre FROM Personne WHERE idPersonne=%i'%self.Consultation[4].toInt()[0])
-        Nord='123000'#debug only
         self.Prescripteur=self.Consultation[5].toString()+' (%s)'%Nord
         #TODO: GetPathologies
+        nline=self.Html
+        nline=nline.replace('</body></html>','')
+        nline=nline+'<div align=\"left\">Dr %s</div><br><br></p>'%self.Prescripteur
+        nline=nline+'<div align=\"right\">Le %s</div><br></p>'%self.Date
+        nline=nline+'<center><b>Pour %s </b></center><br></body></html>'%self.Animal[1].toString()
+        self.Entete=nline
+        text=None
+        #Ordonnance existante
+        Ordonnance=self.MyRequest.GetLine('CALL GetOrdonnances(%i)'%idConsultation)
+        if len(Ordonnance)>0:
+            self.idTable=Ordonnance[0].toInt()[0]
+            text=Ordonnance[5].toString()
+            self.Html=text
+            self.ligneDB0=self.MyRequest.GetInts('CALL GetLignesOrdonnance(%i)'%self.idTable,0)            
+            for idTable in self.ligneDB0:
+                MyLignes=MyModel('LigneOrdonnance',idTable)
+#                MyLignes.listdata[10]=QVariant(unicode(str(MyLignes.listdata[10].toString()).decode('utf-8')))
+                self.Lignes.append(MyLignes)
+                #id,idOrdonnance,self.idMedicament,self.idPresentation,self.idMolecule,self.idPosologie,MyForm.dose,idUniteGalenique,MyForm.duree,MyForm.idtemps,unicode(MyForm.prescription),MyForm.delivre,MyForm.remarque,isActive,isDelete,Identifiant)
+#                 values=[i[0].toInt()[0],i[1].toInt()[0],i[2].toInt(),i[3].toInt(),i[4].toInt(),i[5].toInt(),i[6].toFloat()[0],i[7].toInt(),i[8].toInt()[0],i[9].toInt(),
+#                     unicode(str(i[10].toString()).decode('utf-8')),i[11].toInt()[0],unicode(str(i[12].toString()).decode('utf-8')),i[13].toInt()[0]==1,i[14].toInt()[0]==1,str(i[15].toString())]
+        else:          
+            self.WritePrescription()
+        return text
         
     def SetPathologies(self,idConsultation):
         self.Pathologies=self.MyRequest.GetLines('CALL GetPathologiesConsult(%i)'%idConsultation)
@@ -47,29 +70,37 @@ class Ordonnance(MyModel):
             return self.Animal[7].toString()
 
     def WritePrescription(self):
-#        icone=config.Path_Icons+'edit1.png'
-#        anchor="<a HREF=\"#P%i\"><img title=\"Editer la préscription\" style=\"width: 32px; height: 32px;\" alt=\"Editer la préscription\" src=\"file:%s\"></a>"%(len(self.Lignes),icone)
         ntext=self.Entete
         for i in self.Lignes:
-            nline=str(i[10])        #str à enlever
-            if i[2:6]==[None,None,None,None]:  #comment
+            nline=unicode(i.listdata[10].toString())
+            if i.listdata[2].isNull():
+                try:
+                    nline='<p><b>'+nline[:nline.index(':\n')+1]+'   </b><br>'+nline[nline.index(':\n')+2:]+'</p>'
+                except:
+                    if nline.count('\n')>0:
+                        nline=nline.replace('\n','<br>')            
                 nline='<p>'+nline+'</p>'
             else:
                 nline='<p><b>'+nline[:nline.index('\n')]+'   </b><br>'+nline[nline.index('\n')+1:]+'</p>'
             ntext=ntext+nline
         self.parent.textEdit_Ordonnance.setHtml(ntext)
-   
  
     def GetLine(self,Selection):
-        text=str(Selection.selectedText())
-        try:
-            text=text[:text.index(':')] 
-        except:
-            pass
-        for j,i in enumerate(self.Lignes):
-            if text in i[10]:
-                return (j,i)
-        return (None,None)
+        if isinstance(Selection,int):
+            for j,i in enumerate(self.Lignes):
+                if Selection==i.listdata[0].toInt()[0]:
+                    return (j,i)
+            return (None,None)
+        else:
+            text=unicode(Selection.selectedText())
+            try:
+                text=text[:text.index(':')] 
+            except:
+                pass
+            for j,i in enumerate(self.Lignes):
+                if text in unicode(i.listdata[10].toString()):
+                    return (j,i)
+            return (None,None)
     
     def Save(self):
         pathologies=''
@@ -81,28 +112,36 @@ class Ordonnance(MyModel):
         valid=True
         j=0
         for i in range(4,doc.blockCount()):
-            if str(doc.findBlockByNumber(i).text())!=self.Lignes[j][10]:
+            text=str(doc.findBlockByNumber(i).text().toUtf8().replace(' \xe2\x80\xa8','\n')).decode('utf8')
+            if text!=str(self.Lignes[j].listdata[10].toString().toUtf8()).decode('utf8'):
                 valid=False
             else:
                 j+=1
         new=[self.idTable,self.Consultation[0].toInt()[0],self.Consultation[4].toInt()[0],self.Animal[8].toInt()[0],pathologies,
-             html,self.parent.lineEdit_Remarque.text(),valid,True,False,'']
+             html,self.parent.lineEdit_Remarque.toPlainText(),valid,True,False,'']
         self.SetNew(new)
         self.New()
         error=False
         self.BeginTransaction()
-        lastid=self.Update().toInt()[0]
-        if self.lasterror.isValid():
+        lastid=self.Update()
+        if self.MyRequest.lastError().isValid():
             error=True
         for i in self.Lignes:
-            MyLignes=MyModel('LigneOrdonnance',i[0])
-            i[1]=lastid
-            #id,idOrdonnance,self.idMedicament,self.idPresentation,self.idMolecule,self.idPosologie,MyForm.dose,idUniteGalenique,MyForm.duree,MyForm.idtemps,str(MyForm.prescription),MyForm.delivre,MyForm.remarque,isActive,isDelete,Identifiant)
-            MyLignes.SetNew(i)
-            MyLignes.New()
-            MyLignes.Update()
-            if self.lasterror.isValid():
+            #id,idOrdonnance,self.idMedicament,self.idPresentation,self.idMolecule,self.idPosologie,MyForm.dose,idUniteGalenique,MyForm.duree,MyForm.idtemps,unicode(MyForm.prescription),MyForm.delivre,MyForm.remarque,isActive,isDelete,Identifiant)
+            i.listdata[1]=lastid  
+#            MyLignes=MyModel('LigneOrdonnance',i.listdata[0])
+#            i.listdata[10]=QVariant(unicode(i.listdata[10].toString()).encode('utf-8'))
+#            MyLignes.SetNew(i)
+#            MyLignes.New()
+#            MyLignes.Update()
+            i.Update()
+            if self.MyRequest.lastError().isValid():
                 error=True
+        #TODO: delete ligne ordonnances    
+        for i in self.ligneDB0:
+            if self.GetLine(i)==(None,None):
+                MyLignes=MyModel('LigneOrdonnance',i)
+                MyLignes.Delete()
         if error:
             self.rollbackTransaction()
         else:
@@ -142,6 +181,11 @@ class Medicament(MyModel):
     def SetRCP(self,filename):
         self.listdata[8]=QVariant(filename)
         
+    def GetMolecule(self):
+        Molecule=self.MyRequest.GetLine('CALL GetCompositionMedicament(%i)'%self.idMedicament)
+        self.idMolecule=Molecule[9].toInt()[0]
+        return (self.idMolecule,Molecule[1].toString())
+
     def GetRCP(self):
             return self.listdata[8].toString()
         
@@ -173,8 +217,9 @@ class Medicament(MyModel):
         else:
             return self.GetMultiple(poso_qte)/self.GetMultiple(conc)
     
-    def GetLigneOrdonnance(self,poids,values=None):
+    def GetLigneOrdonnance(self,poids,Ligne):
             m=self.GetEverything()
+            #getVoie administration si selection médicament directe
             dosemin=None
             maxadmin=None
             duree=''
@@ -197,17 +242,34 @@ class Medicament(MyModel):
             else:
                 MyError(self.parent,u'Posologie et/ou composition inconnue')
             info=u'Composition: %s pour %s.\nPrésentation: %s.'%(m[3].toString(),m[6].toString(),m[9].toString())
+            voies=self.MyRequest.GetStrings('CALL GetVoiesAdministration(%i)'%self.idMedicament,0)
+            if len(voies)==1:
+                m[12]=QVariant(voies[0])
             data=[dose,duree,m[10].toString(),info,m[16].toString(),m[17].toString(),m[2].toString(),m[12].toString(),poids]
             MyForm=FormPrescrire(data,self.parent)
-            if not values is None:
+            if Ligne.idTable>0:
+                values=Ligne.GetValues('unicode')
                 MyForm.FillValues(MyForm,values[6:])
                 MyForm.edit=True
             else:
                 MyForm.edit=False
             if MyForm.exec_()==MyForm.Accepted:
-                self.nline=str(MyForm.prescription) 
                 idUniteGalenique=self.MyRequest.GetInt('SELECT Unite_idUnite FROM Presentation WHERE idPresentation=%i'%self.idPresentation)
-                return (self.idMedicament,self.idPresentation,self.idMolecule,self.idPosologie,MyForm.dose,idUniteGalenique,MyForm.duree,MyForm.idtemps,str(MyForm.prescription),MyForm.delivre,MyForm.remarque)               
+                Ligne.listdata[2]=QVariant(self.idMedicament)
+                Ligne.listdata[3]=QVariant(self.idPresentation)
+                Ligne.listdata[4]=QVariant(self.idMolecule)
+                Ligne.listdata[5]=QVariant(self.idPosologie)
+                Ligne.listdata[6]=QVariant(MyForm.dose)
+                Ligne.listdata[7]=QVariant(idUniteGalenique)
+                Ligne.listdata[8]=QVariant(MyForm.duree)
+                Ligne.listdata[9]=QVariant(MyForm.idtemps)
+                Ligne.listdata[10]=QVariant(MyForm.prescription)
+                Ligne.listdata[11]=QVariant(MyForm.delivre)
+                Ligne.listdata[12]=QVariant(MyForm.remarque)
+#                return Ligne
+            else:
+                Ligne=None
+#                return (self.idMedicament,self.idPresentation,self.idMolecule,self.idPosologie,MyForm.dose,idUniteGalenique,MyForm.duree,MyForm.idtemps,unicode(MyForm.prescription),MyForm.delivre,MyForm.remarque)               
 
                     
     def Download(self,cip):

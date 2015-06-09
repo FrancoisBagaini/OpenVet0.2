@@ -458,6 +458,73 @@ class MyTreeModel(QStandardItemModel):
         node=self.tree.get_node(self.refMap[currentid])
         return node
 
+class MyTextModel(QAbstractListModel):
+    def __init__(self, request,parent=None, *args):
+        QAbstractListModel.__init__(self, parent, *args)
+        self.parent=parent
+        self.MyRequest=Request()
+        self.listdata=self.MyRequest.GetLines(request)
+        self.GetFields()
+        
+    def Print(self):
+        for line in self.listdata:
+            for i in range(self.NbFields):
+                value=line[i]
+                if value.isNull():
+                    value=None
+                print '%i. %s : %s'%((i+1),self.Fields[i],str(self.Fdata(value,None,True,'QString')))
+            print
+            
+    def Write(self,filename):
+        fout=open(filename,'w')
+        for i in range(self.NbFields)[:-1]:
+            fout.write(self.Fields[i]+'\t\t')
+        fout.write(self.Fields[self.NbFields-1]+'\n')
+        for line in self.listdata:
+            for col in line[:-1]:
+                fout.write(col.toString()+'\t\t')
+            fout.write(line[-1].toString()+'\n')
+        fout.close
+        
+    def GetFields(self):
+        self.Fields=[]
+        self.NbFields=self.MyRequest.record().count()
+        for i in range(self.NbFields):
+            self.Fields.append(self.MyRequest.record().fieldName(i))
+        
+    def Fdata(self,value,vtype=None,debug=False,Format='QString'):
+        #Format : Qstring,unicode,FromUTF8,ToUTF8
+        if vtype is None:
+            vtype=value.typeName()
+        if value.isNull():
+            if debug:
+                return 'NULL'
+            else:
+                return QString('')
+        elif vtype=='QDate':
+            return value.toDate().toString('dd/MM/yyyy')
+        elif vtype=='QDateTime':
+            return value.toDateTime().toString('dd/MM/yyyy hh:mm')
+        elif vtype in ['int','qlonglong']:
+            return value.toInt()[0]
+        elif vtype=='QString':
+            if Format=='QString':
+                return value.toString()
+            elif Format=='unicode':
+                return unicode(value.toString())
+            elif Format=='FromUTF8':
+                return unicode(str(value.toString()).decode('utf-8'))
+            elif Format=='ToUTF8':
+                return str(value.toString()).encode('utf-8')
+        elif vtype=='bool':
+            return value.toBool()
+        elif vtype=='double' or vtype=='float':
+            return value.toFloat()[0]
+        else:
+#            print value.typeName()
+            return u'indeterminé'
+    
+            
         
 class MyModel(QAbstractListModel):  #TODO: rename in MyRecordModel
     def __init__(self, table,idTable,parent=None, *args):
@@ -471,7 +538,8 @@ class MyModel(QAbstractListModel):  #TODO: rename in MyRecordModel
         self.ParentWidget=parent
         self.MyRequest=Request(table,self.ParentWidget)
         self.GetFields()
-        self.listdata=self.MyRequest.GetLineTable(idTable)      
+        self.listdata=self.MyRequest.GetLineTable(idTable)
+        self.idTable=idTable      
         self.lastid=0
         self.lasterror=None
         
@@ -480,8 +548,14 @@ class MyModel(QAbstractListModel):  #TODO: rename in MyRecordModel
             value=self.listdata[i]
             if value.isNull():
                 value=None
-            print '%i. %s : %s'%((i+1),self.Fields[i].Name,str(self.Fdata(i,None,True)))
-            
+            print '%i. %s : %s'%((i+1),self.Fields[i].Name,str(self.Fdata(i,None,True,'QString')))
+
+    def GetValues(self,Format='QString'):
+        values=[]
+        for i in range(self.NbFields):
+            values.append(self.Fdata(i,None,True,Format))
+        return values
+                
     def ExtendData(self,row,extdata):
         #[id,data1,data2,...]
         if extdata[0]==self.listdata[0]:
@@ -504,7 +578,8 @@ class MyModel(QAbstractListModel):  #TODO: rename in MyRecordModel
         else: 
             return QVariant()
     
-    def Fdata(self,col,vtype=None,debug=False):
+    def Fdata(self,col,vtype=None,debug=False,Format='QString'):
+        #Format : Qstring,unicode,FromUTF8,ToUTF8
         value=self.listdata[col]
         if vtype is None:
             vtype=value.typeName()
@@ -520,7 +595,14 @@ class MyModel(QAbstractListModel):  #TODO: rename in MyRecordModel
         elif vtype in ['int','qlonglong']:
             return value.toInt()[0]
         elif vtype=='QString':
-            return value.toString()
+            if Format=='QString':
+                return value.toString()
+            elif Format=='unicode':
+                return unicode(value.toString())
+            elif Format=='FromUTF8':
+                return unicode(str(value.toString()).decode('utf-8'))
+            elif Format=='ToUTF8':
+                return str(value.toString()).encode('utf-8')
         elif vtype=='bool':
             return value.toBool()
         elif vtype=='double' or vtype=='float':
@@ -581,7 +663,10 @@ class MyModel(QAbstractListModel):  #TODO: rename in MyRecordModel
                     MyError(self.ParentWidget,u'La requête \"%s\" constitue un doublon.'%self.MyRequest.lastQuery())
                     return QVariant()
             else:
-                self.lastid=self.MyRequest.lastID
+                if values[0]=='0':
+                    self.lastid=self.MyRequest.lastID
+                else:
+                    self.lastid=QVariant(int(values[0]))        
                 return self.lastid
         else:
             MyError(self.parent,u'Les champs %s sont invalides'%','.join(err))
@@ -589,7 +674,7 @@ class MyModel(QAbstractListModel):  #TODO: rename in MyRecordModel
             return -1
  
 
-LINEEDIT,CHECKBOX,PLAINTEXTEDIT,COMBOBOX,LIST,TABLE,LABELS,SPINBOX,TREE = range(1,10)
+LINEEDIT,CHECKBOX,PLAINTEXTEDIT,COMBOBOX,LIST,TABLE,LABELS,SPINBOX,TREE,DATE,GRAPH = range(1,12)
 
 class MyForm(QDialog):
     def __init__(self,title,data,parent=None):
@@ -671,7 +756,12 @@ class MyForm(QDialog):
                 action1.setData(field)
 #                self.connect(action1,SIGNAL("triggered()"),self.OnList_edit)
                 self.popMenus.append(menuTable)  
-                   
+            if i[1]==10: #DateEdit
+                field=QDateEdit (QDate.currentDate())
+                field.setDisplayFormat('dd/MM/yy')
+                field.setCalendarPopup(True)
+            if i[1]==11: #QGraphicsView
+                field=QGraphicsView(self)           
             field.setObjectName(QString(i[0]))
             self.fields.append(field)
             if i[5]!=2:
@@ -798,7 +888,9 @@ class MyForm(QDialog):
                     elif isinstance(j,QSpinBox):
                         self.MyDelegate.insertColumnDelegate(maplist[i],IntegerColumnDelegate())
                     elif isinstance(j,MyTreeView):
-                        self.MyDelegate.insertColumnDelegate(maplist[i],TreeviewColumnDelegate())             
+                        self.MyDelegate.insertColumnDelegate(maplist[i],TreeviewColumnDelegate())
+                    elif isinstance(j,QDateEdit):
+                        self.MyDelegate.insertColumnDelegate(maplist[i],DateColumnDelegate())            
         self.mapper.setItemDelegate(self.MyDelegate)
         for i,j in enumerate(self.fields):
             if maplist.has_key(i):
@@ -945,14 +1037,18 @@ class ComboboxColumnDelegate(QItemDelegate):
 
     def setEditorData(self, editor, index):
         value = index.model().data(index, Qt.DisplayRole)
-        if not value.isNull():
-            comboindex=editor.model().GetIndex(value)
+        if value.isNull():
+            editor.setCurrentIndex(0)
+        elif value.toInt()[1]:
+            editor.setCurrentIndex(editor.model().GetIndex(value))
         else:
-            comboindex=0
-        editor.setCurrentIndex(comboindex)
-
+            editor.setEditText(value.toString())
+            
     def setModelData(self, editor, model, index):
-        model.setData(index, QVariant(editor.Getid()))
+        if editor.isEditable():
+            model.setData(index, QVariant(editor.currentText()))
+        else:
+            model.setData(index, QVariant(editor.Getid()))
         
 class TreeviewColumnDelegate(QItemDelegate):
     def __init__(self, parent=None):
@@ -1005,8 +1101,7 @@ class FloatColumnDelegate(QItemDelegate):
 
 class DateColumnDelegate(QItemDelegate):
 
-    def __init__(self, minimum=QDate(), maximum=QDate.currentDate(),
-                 format="yyyy-MM-dd", parent=None):
+    def __init__(self, minimum=QDate(), maximum=QDate.currentDate(),format="yyyy-MM-dd", parent=None):
         super(DateColumnDelegate, self).__init__(parent)
         self.minimum = minimum
         self.maximum = maximum

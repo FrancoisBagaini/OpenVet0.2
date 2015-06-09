@@ -25,7 +25,6 @@ class GuiOrdonnance():
 		self.parent.radioButton_PharmacopeVet.setChecked(True)
 		self.parent.radioButton_PharmacopeHum.setChecked(False)
 		self.parent.checkBox_Actif.setChecked(True)
-#		self.parent.dateEdit_ordonance.setDate(QDate.currentDate())
 		self.MyOrdonnance=Ordonnance(0,self.parent)
 		self.MyMedicament=None
 		self.parent.textEdit_Ordonnance.setHtml('<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />')
@@ -33,7 +32,6 @@ class GuiOrdonnance():
 		self.parent.comboBox_Molecule.setModel(MyComboModel(self.parent,'GetMolecules(0,1)'),True)
 		self.parent.connect(self.parent.comboBox_Molecule,SIGNAL("OnEnter"),self.OnSelectMolecule)
 		self.parent.connect(self.parent.comboBox_Molecule,SIGNAL("activated(int)"),self.OnSelectMolecule)
-#		self.parent.connect(self.parent.textEdit_Ordonnance, SIGNAL("anchorClicked(QUrl)"),self.OnEditPrescription)
 		self.parent.connect(self.parent.textEdit_Ordonnance, SIGNAL("OnEdit"),self.OnEditPrescription)
 		self.parent.comboBox_Molecule.clearEditText()
 		
@@ -60,6 +58,9 @@ class GuiOrdonnance():
 		self.parent.pushButton_ValidOrdonnance.clicked.connect(self.OnValidOrdonnance)
 		
 		self.parent.comboBox_Molecule.setFocus()
+		self.EditedLine=None
+		self.MyMedicament=Medicament('Medicament',0,0,self.parent)
+		self.MyMolecule=Molecule('Molecule',0,self.parent)
 		
 	def SetAnimal(self,idEspece,idAnimal):
 		self.idEspece=idEspece
@@ -67,22 +68,9 @@ class GuiOrdonnance():
 		self.parent.lineEdit_poids.setText(self.MyOrdonnance.GetPoidsAnimal())
 		
 	def SetConsultation(self,idConsultation):
-		self.MyOrdonnance.SetConsulation(idConsultation)
-		#TODO : ordonnance(s) existante(s)
-		nline=self.MyOrdonnance.Html
-		nline=nline.replace('</body></html>','')
-		if self.MyOrdonnance.Consultation is None:
-			#debug only
-			nline=nline+'<div align=\"right\">Le %s</div><br></p></body></html>'%QDate.currentDate().toString()
-		else:
-			nline=nline+'<div align=\"left\">Dr %s</div><br><br></p>'%self.MyOrdonnance.Prescripteur
-			nline=nline+'<div align=\"right\">Le %s</div><br></p>'%self.MyOrdonnance.Date
-		nline=nline+'<center><b>Pour %s </b></center><br></body></html>'%self.MyOrdonnance.Animal[1].toString()
-		self.MyOrdonnance.Entete=nline
-		self.MyOrdonnance.WritePrescription()
-#		self.parent.textEdit_Ordonnance.setHtml(nline)
-		
-
+		text=self.MyOrdonnance.SetConsulation(idConsultation)
+		if not text is None:
+			self.parent.textEdit_Ordonnance.setHtml(text)
 
 # 	def OnUpdateDate(self):
 # 		nline=self.MyOrdonnance.Html
@@ -111,11 +99,11 @@ class GuiOrdonnance():
 		self.MajCombos()
 			
 	def MajCombos(self): #TODO MajCombos(routine_mol,routine_med)
-		self.parent.comboBox_Molecule.model().Set('GetMolecules(0,0,%i)'%self.Actif)
+		self.parent.comboBox_Molecule.model().Set('GetMolecules(0,%i)'%self.Actif)
 		#need to reinitiate MycomboBox model to update the Qcompleter
 		self.parent.comboBox_Molecule.setModel(self.parent.comboBox_Molecule.model(),True)
 		self.parent.comboBox_Medicament.model().Set('GetMedicaments(\"\",\"%s\",%i)'%(self.Pharmacope,self.Actif))
-		self.parent.comboBox_Medicament.setModel(self.parent.comboBox_Medicament.model())
+		self.parent.comboBox_Medicament.setModel(self.parent.comboBox_Medicament.model(),True)
 	
 	def OnSelectMolecule(self,index=None):
 		idTable=self.parent.comboBox_Molecule.Getid()
@@ -127,19 +115,35 @@ class GuiOrdonnance():
 			self.parent.comboBox_Medicament.model().Set('GetMedicaments(\"%s\",\"%s\",%i)'%(principeActif,self.Pharmacope,self.Actif))
 			self.parent.comboBox_Medicament.setModel(self.parent.comboBox_Medicament.model(),True)
 			self.MyMolecule=Molecule('Molecule',idTable,self.parent)
-			self.parent.comboBox_Molecule.SetPopup(self.MyMolecule.GetPosologies(self.idEspece))
-			self.parent.comboBox_Molecule.SelectPopup(0)
+			posologies=self.MyMolecule.GetPosologies(self.idEspece)
+			self.parent.comboBox_Molecule.SetPopup(posologies)
+			if len(posologies)>0:
+				self.parent.comboBox_Molecule.SelectPopup(0)
 		else:
-			self.parent.comboBox_Medicament.model().Set('GetMedicaments(\"\",\"%s\",%i)'%(self.Pharmacope,self.Actif))
-			self.parent.comboBox_Medicament.setModel(self.parent.comboBox_Medicament.model())
-		self.parent.comboBox_Medicament.clearEditText()
+			self.MajCombos()
+			self.parent.comboBox_Molecule.clearEditText()
+			self.parent.comboBox_Medicament.clearEditText()
 
 	def OnSelectMedicament(self,index):
-		#TODO :get molecule if combomolecule not filled
 		idTable=self.parent.comboBox_Medicament.Getid()
 		medicament=self.parent.comboBox_Medicament.currentText()
-		self.MyMedicament=Medicament('Medicament',idTable,self.parent.comboBox_Molecule.Getid(),self.parent)
-		self.MyMedicament.idPosologie=self.parent.comboBox_Molecule.SelectionContext[0]
+		if self.MyMolecule.idMolecule==0:
+			self.MyMedicament=Medicament('Medicament',idTable,0,self.parent)
+			(idMolecule,principeActif)=self.MyMedicament.GetMolecule()
+			self.MyMolecule=Molecule('Molecule',idMolecule,self.parent)
+			posologies=self.MyMolecule.GetPosologies(self.idEspece)
+			self.parent.comboBox_Molecule.SetPopup(posologies)
+			if len(posologies)>0:
+				self.parent.comboBox_Molecule.SelectPopup(0)
+			#TODO for debugging:self.parent.comboBox_Medicament.SetProperty(2)
+			self.parent.comboBox_Medicament.model().Set('GetMedicaments(\"%s\",\"%s\",%i)'%(principeActif,self.Pharmacope,self.Actif))
+			self.parent.comboBox_Medicament.setModel(self.parent.comboBox_Medicament.model(),True)
+		else:
+			self.MyMedicament=Medicament('Medicament',idTable,self.parent.comboBox_Molecule.Getid(),self.parent)
+		try:
+			self.MyMedicament.idPosologie=self.parent.comboBox_Molecule.SelectionContext[0]
+		except:
+			self.MyMedicament.idPosologie=0
 		self.MyMedicament.idPresentation=0
 		self.parent.pushButton_toOrdonnance.setEnabled(True)
 		self.parent.comboBox_Medicament.SetPopup(self.MyMedicament.GetPresentations(medicament))
@@ -154,17 +158,17 @@ class GuiOrdonnance():
 		self.MyMedicament.idPresentation=self.parent.comboBox_Medicament.SelectionContext[1]
 		
 	def OnAdd2Ordonnance(self):
-		if self.MyMedicament.idPresentation==0:
-			MyError(self.parent,u'Vous devez renseigner la présentation avant d\'ajouter le médicament à l\'ordonnance')
-		else:
+ 		if self.MyMedicament.idPresentation==0:
+ 			MyError(self.parent,u'Vous devez renseigner la présentation avant d\'ajouter le médicament à l\'ordonnance')
+ 		else:
 			poids=self.parent.lineEdit_poids.text().toFloat()
 			if poids[1]:
-				ligne=self.MyMedicament.GetLigneOrdonnance(poids[0])
-				if not ligne is None:
-					line=[0,0]
-					line.extend(ligne)
-					line.extend([True,False,''])
-					self.MyOrdonnance.Lignes.append(line)
+				MyLignes=MyModel('LigneOrdonnance',0)
+				MyLignes.SetNew([0,self.MyOrdonnance.idTable,None,None,None,None,None,None,None,None,u'',None,None,True,False,''])
+				MyLignes.New()
+				self.MyMedicament.GetLigneOrdonnance(poids[0],MyLignes)
+				if not MyLignes is None:
+					self.MyOrdonnance.Lignes.append(MyLignes)
 					self.MyOrdonnance.WritePrescription()	
 			else:
 				MyError(self.parent,u'Poids non valide')
@@ -174,34 +178,37 @@ class GuiOrdonnance():
 		if idline is None:
 			self.parent.setStatusTip(u'Selection non trouvée')
 			return
-		if line[2:6]==[None,None,None,None]:
-			text,ok=QInputDialog.getText(self.parent, u'Modifier le commentaire' , u'Commentaire:', QLineEdit.Normal, line[10])
-			if ok:
-				if text=='':
-					del self.MyOrdonnance.Lignes[idline]
-				else:
-					line[10]=text
-					self.MyOrdonnance.Lignes[idline]=line
-					self.MyOrdonnance.WritePrescription()	
+		self.EditedLine=line
+		if line.listdata[2].isNull():
+			self.parent.lineEdit_Remarque.setPlainText(line.listdata[10].toString())
 		else:
-			(self.MyMedicament.idMedicament,self.MyMedicament.idPresentation,self.MyMedicament.idMolecule,self.MyMedicament.idPosologie)=line[2:6]
+			(self.MyMedicament.idMedicament,self.MyMedicament.idPresentation,self.MyMedicament.idMolecule,self.MyMedicament.idPosologie)=[i.toInt()[0] for i in line.listdata[2:6]]
 			poids=self.parent.lineEdit_poids.text().toFloat()
 			if poids[1]:
-				ligne=self.MyMedicament.GetLigneOrdonnance(poids[0],line)
-				if not ligne is None:
-					if ligne[8]=='':
+				self.MyMedicament.GetLigneOrdonnance(poids[0],line)
+				if not line is None:
+					if line.listdata[10].toString().isEmpty():
 						del self.MyOrdonnance.Lignes[idline]
 					else:
-						line[2:-3]=ligne
 						self.MyOrdonnance.Lignes[idline]=line
 					self.MyOrdonnance.WritePrescription()	
 				
 	def OnAddCommentLine(self):
-		ligne=self.parent.lineEdit_Remarque.text()
+		ligne=self.parent.lineEdit_Remarque.toPlainText()
 		if not ligne.isEmpty():
-			self.MyOrdonnance.Lignes.append([0,0,None,None,None,None,None,None,None,None,ligne,None,None,True,False,''])
-			self.MyOrdonnance.WritePrescription()
-			self.parent.lineEdit_Remarque.clear()
+			if not self.EditedLine is None:
+				self.EditedLine.listdata[10]=QVariant(unicode(ligne))
+			else:
+				MyLignes=MyModel('LigneOrdonnance',0)
+				MyLignes.SetNew([0,self.MyOrdonnance.idTable,None,None,None,None,None,None,None,None,unicode(ligne),None,None,True,False,''])
+				MyLignes.New()
+				self.MyOrdonnance.Lignes.append(MyLignes)
+		else:
+			if not self.EditedLine is None:
+				del self.MyOrdonnance.Lignes[self.MyOrdonnance.Lignes.index(self.EditedLine)]	
+		self.MyOrdonnance.WritePrescription()
+		self.EditedLine=None
+		self.parent.lineEdit_Remarque.clear()
 							
 	def OnDownloadRCP(self):
 		if self.MyMedicament is None:

@@ -105,6 +105,7 @@ class Request(QSqlQuery):
                     self.res.append(self.value(i))                          
         return self.res
     
+    
     def GetLineModel(self,request):
         self.res=[]
         if self.Execute(request):

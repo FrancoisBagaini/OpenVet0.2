@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1024</width>
-    <height>715</height>
+    <width>1080</width>
+    <height>722</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,7 +26,7 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1024</width>
+      <width>1071</width>
       <height>671</height>
      </rect>
     </property>
@@ -42,9 +42,12 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>1024</width>
+        <width>1071</width>
         <height>671</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>relances</string>
       </property>
       <property name="autoFillBackground">
        <bool>false</bool>
@@ -79,7 +82,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>474</width>
+          <width>521</width>
           <height>120</height>
          </rect>
         </property>
@@ -95,7 +98,7 @@
         <property name="lineWidth">
          <number>1</number>
         </property>
-        <widget class="QComboBox" name="comboBox_client">
+        <widget class="MyComboBox" name="comboBox_client">
          <property name="geometry">
           <rect>
            <x>10</x>
@@ -103,6 +106,9 @@
            <width>371</width>
            <height>27</height>
           </rect>
+         </property>
+         <property name="toolTip">
+          <string>Sélection Client</string>
          </property>
          <property name="styleSheet">
           <string notr="true">selection-background-color: rgb(255, 255, 127);</string>
@@ -116,7 +122,7 @@
           <rect>
            <x>10</x>
            <y>50</y>
-           <width>451</width>
+           <width>501</width>
            <height>61</height>
           </rect>
          </property>
@@ -142,11 +148,14 @@
         <widget class="QToolButton" name="toolButton_ClientInfo">
          <property name="geometry">
           <rect>
-           <x>430</x>
-           <y>10</y>
+           <x>480</x>
+           <y>80</y>
            <width>26</width>
            <height>25</height>
           </rect>
+         </property>
+         <property name="toolTip">
+          <string>Informations complémentaires</string>
          </property>
          <property name="text">
           <string>...</string>
@@ -162,13 +171,65 @@
           </size>
          </property>
         </widget>
+        <widget class="QToolButton" name="toolButton_editClient">
+         <property name="geometry">
+          <rect>
+           <x>390</x>
+           <y>10</y>
+           <width>26</width>
+           <height>26</height>
+          </rect>
+         </property>
+         <property name="toolTip">
+          <string>Modifie client</string>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../images/edit1.png</normaloff>../images/edit1.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+        </widget>
+        <widget class="QToolButton" name="toolButton_scan1">
+         <property name="geometry">
+          <rect>
+           <x>480</x>
+           <y>10</y>
+           <width>30</width>
+           <height>30</height>
+          </rect>
+         </property>
+         <property name="toolTip">
+          <string>Recherche client / animal</string>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../images/loupe2.png</normaloff>../images/loupe2.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+        </widget>
        </widget>
        <widget class="QFrame" name="frame_animal">
         <property name="geometry">
          <rect>
-          <x>536</x>
+          <x>540</x>
           <y>0</y>
-          <width>482</width>
+          <width>521</width>
           <height>120</height>
          </rect>
         </property>
@@ -181,14 +242,17 @@
         <property name="frameShadow">
          <enum>QFrame::Raised</enum>
         </property>
-        <widget class="QComboBox" name="comboBox_Animal">
+        <widget class="MyComboBox" name="comboBox_Animal">
          <property name="geometry">
           <rect>
            <x>10</x>
            <y>10</y>
-           <width>261</width>
+           <width>321</width>
            <height>27</height>
           </rect>
+         </property>
+         <property name="toolTip">
+          <string>Selection Animal</string>
          </property>
          <property name="styleSheet">
           <string notr="true">selection-background-color: rgb(255, 255, 127);</string>
@@ -202,12 +266,12 @@
           <rect>
            <x>10</x>
            <y>50</y>
-           <width>454</width>
+           <width>501</width>
            <height>61</height>
           </rect>
          </property>
          <property name="toolTip">
-          <string>Double click pour sélectionner l'édition</string>
+          <string/>
          </property>
          <property name="styleSheet">
           <string notr="true">background-color: rgb(231, 231, 231);</string>
@@ -219,13 +283,65 @@
           <enum>QFrame::Raised</enum>
          </property>
         </widget>
-        <widget class="QToolButton" name="toolButton_AnimalInfo">
+        <widget class="QToolButton" name="toolButton_editAnimal">
          <property name="geometry">
           <rect>
-           <x>430</x>
+           <x>340</x>
            <y>10</y>
            <width>26</width>
-           <height>25</height>
+           <height>26</height>
+          </rect>
+         </property>
+         <property name="toolTip">
+          <string>Modifie animal</string>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../images/edit1.png</normaloff>../images/edit1.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+        </widget>
+        <widget class="QToolButton" name="toolButton_scan2">
+         <property name="geometry">
+          <rect>
+           <x>480</x>
+           <y>10</y>
+           <width>30</width>
+           <height>30</height>
+          </rect>
+         </property>
+         <property name="toolTip">
+          <string>Recherche client / animal</string>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>../images/loupe2.png</normaloff>../images/loupe2.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>30</width>
+           <height>30</height>
+          </size>
+         </property>
+        </widget>
+        <widget class="QToolButton" name="toolButton_Relance">
+         <property name="geometry">
+          <rect>
+           <x>400</x>
+           <y>10</y>
+           <width>30</width>
+           <height>30</height>
           </rect>
          </property>
          <property name="text">
@@ -233,197 +349,41 @@
          </property>
          <property name="icon">
           <iconset resource="resources.qrc">
-           <normaloff>:/newPrefix/images/info.png</normaloff>:/newPrefix/images/info.png</iconset>
+           <normaloff>:/newPrefix/images/relance.png</normaloff>:/newPrefix/images/relance.png</iconset>
          </property>
          <property name="iconSize">
           <size>
-           <width>24</width>
-           <height>24</height>
+           <width>36</width>
+           <height>36</height>
           </size>
          </property>
         </widget>
-       </widget>
-       <widget class="QToolButton" name="toolButton_addAnimal">
-        <property name="geometry">
-         <rect>
-          <x>510</x>
-          <y>0</y>
-          <width>26</width>
-          <height>26</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Nouvel animal</string>
-        </property>
-        <property name="text">
-         <string>...</string>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>../images/add1.png</normaloff>../images/add1.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>30</width>
-          <height>30</height>
-         </size>
-        </property>
-       </widget>
-       <widget class="QToolButton" name="toolButton_editAnimal">
-        <property name="geometry">
-         <rect>
-          <x>510</x>
-          <y>32</y>
-          <width>26</width>
-          <height>26</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Modifie animal</string>
-        </property>
-        <property name="text">
-         <string>...</string>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>../images/edit1.png</normaloff>../images/edit1.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>30</width>
-          <height>30</height>
-         </size>
-        </property>
-       </widget>
-       <widget class="QToolButton" name="toolButton_deleteAnimal">
-        <property name="geometry">
-         <rect>
-          <x>510</x>
-          <y>64</y>
-          <width>26</width>
-          <height>26</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Efface animal</string>
-        </property>
-        <property name="text">
-         <string>...</string>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>../images/delete2.png</normaloff>../images/delete2.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>30</width>
-          <height>30</height>
-         </size>
-        </property>
-       </widget>
-       <widget class="QToolButton" name="toolButton_scan">
-        <property name="geometry">
-         <rect>
-          <x>493</x>
-          <y>95</y>
-          <width>26</width>
-          <height>26</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Recherche client / animal</string>
-        </property>
-        <property name="text">
-         <string>...</string>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>../images/loupe2.png</normaloff>../images/loupe2.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>30</width>
-          <height>30</height>
-         </size>
-        </property>
-       </widget>
-       <widget class="QToolButton" name="toolButton_addClient">
-        <property name="geometry">
-         <rect>
-          <x>474</x>
-          <y>0</y>
-          <width>26</width>
-          <height>26</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Nouveau client</string>
-        </property>
-        <property name="text">
-         <string>...</string>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>../images/add1.png</normaloff>../images/add1.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>30</width>
-          <height>30</height>
-         </size>
-        </property>
-       </widget>
-       <widget class="QToolButton" name="toolButton_deleteClient">
-        <property name="geometry">
-         <rect>
-          <x>474</x>
-          <y>64</y>
-          <width>26</width>
-          <height>26</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Efface client</string>
-        </property>
-        <property name="text">
-         <string>...</string>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>../images/delete2.png</normaloff>../images/delete2.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>30</width>
-          <height>30</height>
-         </size>
-        </property>
-       </widget>
-       <widget class="QToolButton" name="toolButton_editClient">
-        <property name="geometry">
-         <rect>
-          <x>474</x>
-          <y>32</y>
-          <width>26</width>
-          <height>26</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>Modifie client</string>
-        </property>
-        <property name="text">
-         <string>...</string>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>../images/edit1.png</normaloff>../images/edit1.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>30</width>
-          <height>30</height>
-         </size>
-        </property>
+        <widget class="QToolButton" name="toolButton_Poids">
+         <property name="geometry">
+          <rect>
+           <x>440</x>
+           <y>10</y>
+           <width>30</width>
+           <height>30</height>
+          </rect>
+         </property>
+         <property name="toolTip">
+          <string>poids et mesures</string>
+         </property>
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="icon">
+          <iconset resource="resources.qrc">
+           <normaloff>:/newPrefix/images/mesures.png</normaloff>:/newPrefix/images/mesures.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>36</width>
+           <height>36</height>
+          </size>
+         </property>
+        </widget>
        </widget>
       </widget>
       <widget class="QWidget" name="tab_fiche2">
@@ -446,7 +406,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1024</width>
+     <width>1080</width>
      <height>23</height>
     </rect>
    </property>
@@ -613,6 +573,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MyComboBox</class>
+   <extends>QComboBox</extends>
+   <header>Mywidgets</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="resources.qrc"/>
  </resources>

@@ -119,8 +119,8 @@ class Consultations:
 			MyConsult=Consultation(self.idAnimal,i,self.ParentWidget)
 			self.textHTML=self.textHTML+MyConsult.MakeHTML()+'<br>'
 			del MyConsult
-		icone=config.WorkingPath+'/images/add.png'
-		self.textHTML=self.textHTML+"<a HREF=\"#N-1\"><img title=\"Nouvelle Consultation\" style=\"width: 32px; height: 32px;\" alt=\"Nouvelle Consultation\" src=\"file://%s\"></a>"%(icone)
+		icone='../images/add.png'
+		self.textHTML=self.textHTML+"<a HREF=\"#N-1\"><img title=\"Nouvelle Consultation\" style=\"width: 32px; height: 32px;\" alt=\"Nouvelle Consultation\" src=\"file:%s\"></a>"%(icone)
 		return self.textHTML
 
 

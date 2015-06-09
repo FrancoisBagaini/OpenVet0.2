@@ -7,7 +7,6 @@ from PyQt4 import QtCore, QtGui
 from Gui_ImageBrowser import FormAnalyse
 
 import time
-import Tables
 import config
 import Core_Analyse
 from MyGenerics import *

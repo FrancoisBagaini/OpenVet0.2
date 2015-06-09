@@ -1,6 +1,8 @@
 <RCC>
   <qresource prefix="newPrefix">
     <file>../images/warning.png</file>
+    <file>../images/relance.png</file>
+    <file>../images/mesures.png</file>
     <file>../images/TransfertUp2.png</file>
     <file>../images/gelule.png</file>
     <file>../images/valid.png</file>
@@ -20,7 +22,9 @@
     <file>../images/loupe2.png</file>
     <file>../images/openvet.png</file>
     <file>../images/scalpel.png</file>
+    <file>relance.png</file>
     <file>../images/echo.png</file>
+    <file>mesures.png</file>
     <file>../images/analyse.png</file>
     <file>../images/planT.png</file>
   </qresource>

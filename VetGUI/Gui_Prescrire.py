@@ -64,11 +64,14 @@ class FormPrescrire(QDialog, Ui_DialogPrescrire):
         self.plainTextEdit_Prescription.setPlainText('')
 
     def FillValues(self,form,values):
-        self.plainTextEdit_Prescription.setPlainText(QString(values[4].decode('utf-8')))
+        self.plainTextEdit_Prescription.setPlainText(QString(values[4]))
         self.lineEdit_dose.setText(str(values[0]))
         self.spinBox_duree.setValue(values[2])
         self.comboBox_duree.Setid(values[3])
-        self.lineEdit_Remarque.setText(values[6])
+        if values[6]=='NULL':
+            self.lineEdit_Remarque.setText('')
+        else:
+            self.lineEdit_Remarque.setText(values[6])
         end=values[4].index(' pendant')
         start=values[4][:end].rindex(', ')+2
         form.lineEdit_frequence.setText(values[4][start:end])

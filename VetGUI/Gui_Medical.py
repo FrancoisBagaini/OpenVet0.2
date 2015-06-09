@@ -22,18 +22,18 @@ class TabMedical(QtGui.QTabWidget,Ui_tabWidget_medical):
         self.GuiAnalyse=GuiAnalyse(self)
         self.GuiOrdonnance=GuiOrdonnance(self)
         
-    def OnSelectAnimal(self,idEspece,idAnimal):
+    def SelectAnimal(self,idEspece,idAnimal):
         self.setVisible(True)
         self.GuiConsultation.SetAnimal(idEspece,idAnimal)
         self.GuiAnalyse.SetAnimal(idEspece,idAnimal)
         self.GuiOrdonnance.SetAnimal(idEspece,idAnimal)
-#          self.MyAnalyses=Core_Analyse.Analyses(self.idAnimal)
-#          self.listView_Analyses.setModel(self.MyAnalyses)
-#          self.HideAnalyse()               
+        self.comboBox_consultType.hidePopup()
+        self.comboBox_veterinaire.hidePopup()
+        self.comboBox_Referant.hidePopup()
+             
     
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
     window = TabMedical(None)
     window.show()
-    window.OnSelectAnimal(1,1)
     sys.exit(app.exec_())
