@@ -25,6 +25,12 @@ class Animal(MyModel):
             ret=0
         return ret
     
+    def GetLastRelance(self):
+        ret=self.MyRequest.GetInt('CALL GetLastRelance(%i)'%self.idAnimal)
+        if ret is None:
+            ret=0
+        return ret
+    
 class FormAnimal(MyForm):
     def __init__(self,idEspece,data,parent):
         MyForm.__init__(self,u'Animal',data,parent)
@@ -222,8 +228,8 @@ class FormMesures(MyForm):
         os.chdir(path)
         return values
     
-    def SetMyModel(self,model,maplist):
-        self.SetModel(model, maplist)
+#     def SetMyModel(self,model,maplist):
+#         self.SetModel(model, maplist)
 
     def OnParcourir(self):
         path=QFileDialog.getOpenFileName(self,u'OpenVet-Choisissez le fichier à importer')
@@ -235,4 +241,87 @@ class FormMesures(MyForm):
             idMesure=sel[0].data(1).toInt()[0]
             model=MyModel('PoidsMesure',idMesure,self)
             self.SetModel(model,{1:2,2:3,3:4,4:5,5:6,6:7,7:8})
+            
+class FormRelances(MyForm):   
+    def __init__(self,idAnimal,idClient,data,parent):
+        MyForm.__init__(self,u'Relances',data,parent)
+        self.parent=parent
+        self.idAnimal=idAnimal
+        self.idClient=idClient
+        self.InactivateEnter()
+        self.fields[2].setModel(MyComboModel(self.parent,'GetModelsRelance()'))
+        self.fields[0].setModel(MyComboModel(self.parent,'GetRelances(%i)'%self.idAnimal))
+        
+        menuTable=self.popMenus[0]
+        menuTable.clear()
+        action=menuTable.addAction('Editer')
+        action.setData(self.fields[0])
+        self.connect(action,SIGNAL("triggered()"),self.OnEditRelance) 
+        
+        menuTable=self.popMenus[1]
+        menuTable.clear()
+        action=menuTable.addAction('Editer')
+        action.setData(self.fields[3])
+        self.connect(action,SIGNAL("triggered()"),self.OnEditModesRelance) 
+        
+        self.EditButtons[0].clicked.connect(self.OnEditModelsRelance)
+
+
+    def SetMyModel(self,model,maplist):
+        self.SetModel(model, maplist)
+        self.fields[3].setModel(MyComboModel(self.parent,'GetModesRelance(%i)'%self.MyModel.idTable))
+
+        
+    def OnEditRelance(self):
+        idRelance=self.fields[0].model().data(self.fields[0].currentIndex(),Qt.UserRole).toInt()
+        if idRelance[1]:
+            model=MyModel('Relance',idRelance[0],self)
+            self.SetMyModel(model,{1:3,2:2,4:4,5:5})
+        
     
+    def OnEditModesRelance(self):
+        idModeRelance=self.fields[3].model().data(self.fields[0].currentIndex(),Qt.UserRole).toInt()
+        if not idModeRelance[1]:
+            return
+        new=[0,self.MyModel.idTable,idModeRelance[0],True,True,'']
+        model=MyModel('RelanceModeRef',idModeRelance[0],self)
+        if not model.SetNew(new):
+            return
+        data=[[u'Mode de Relance',4],[u'Automatique',2],[u'Mode de Relance actif',2]]
+        form=FormModesRelance(self.idClient,data,self)
+        form.SetModel(model,{0:2,1:3,2:4})
+        if form.exec_():
+            self.fields[3].setModel(MyComboModel(self.parent,'GetModesRelance(%i)'%self.MyModel.idTable))
+            #Cf OnEditModelsRelance pour mettre a jour current index
+    #Attention les modes de relances sont conservées si annuler edition relance
+    
+    def OnEditModelsRelance(self):
+        idModel=self.MyModel.listdata[2].toInt()
+        if not idModel[1]:
+            return  #id Invalide
+        new=[0,'','',None,True,'']
+        model=MyModel('ModelRelance',idModel[0],self)
+        if not model.SetNew(new):
+            return
+        data=[[u'Type de Relance',1,45],[u'texte',3,65535,140],[u'Remarque',3,200,80]]
+        form=MyForm('Model de relance',data,self)
+        form.SetModel(model,{0:1,1:2,2:3})
+        if form.exec_():
+            idModel=form.MyModel.lastid
+            self.fields[2].setModel(MyComboModel(self.parent,'GetModelsRelance()'))
+            self.fields[2].Setid(idModel)
+            self.fields[2].hidePopup()
+       
+    
+class FormModesRelance(MyForm):   
+    def __init__(self,idClient,data,parent):
+        MyForm.__init__(self,u'Modes de Relance',data,parent)
+        self.parent=parent
+        self.idClient=idClient
+        self.InactivateEnter()
+        self.fields[0].setModel(MyComboModel(self.parent,'GetAllModesRelance()'))
+        #suppresion impossible juste isactif. le delete est effectué au save relance
+        #TODO: surcharger Onselection verifie si N°,email, adresse renseignés
+        #Pas d'édition des modes de relance car doivent être liés à une action: envoyer courrier, sms, email, message vocal, Relance téléphonique manuelle 
+
+        

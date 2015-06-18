@@ -16,7 +16,11 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.db=db
         self.editConsultation = TabMedical(db,self)
-        self.editConsultation.setGeometry(QtCore.QRect(0, 180, 1024, 521))
+        Fiches_Layout=QVBoxLayout()
+        Fiches_Layout.addWidget(self.tabWidget_fiches)
+        Fiches_Layout.addWidget(self.editConsultation)
+        self.centralwidget.setLayout(Fiches_Layout)
+        
         #En attendant la connection avec la gestion client
         self.editConsultation.setVisible(False)
         self.idClient=None
@@ -29,6 +33,7 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         self.comboBox_Animal.currentIndexChanged.connect(self.OnSelectAnimal)
         self.toolButton_editAnimal.clicked.connect(self.OnEditAnimal)
         self.toolButton_Poids.clicked.connect(self.OnMesuresAnimal)
+        self.toolButton_Relance.clicked.connect(self.OnRelancesAnimal)
         self.actionQuitter.triggered.connect(self.Mycloseapp)
     
     def OnSelectClient(self):
@@ -62,12 +67,27 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         model=MyModel('PoidsMesure',idMesure,self)
         if not model.SetNew(new):
             return
-        data=[['',11,None,None,None,2],[u'Date',10],[u'Poids',1,6],[u'Taille au garrot',1,6],[u'Tour de Thorax',1,6],[u'Photo',1,80,None,u'Parcourir'],[u'Remarque',3,200,80]]
+        data=[['',11,None,None,None,2],[u'Date',10],[u'Poids',1,6],[u'Taille au garrot',1,6],[u'Tour de Thorax',1,6],[u'Photo',1,80,None,u'Parcourir'],
+              [u'Remarque',3,200,80]]
         form=FormMesures(self.MyAnimal.idAnimal,data,self)
-        form.SetMyModel(model,{1:2,2:3,3:4,4:5,5:6,6:7,7:8})
+#        form.SetMyModel(model,{1:2,2:3,3:4,4:5,5:6,6:7,7:8})
+        form.SetModel(model,{1:2,2:3,3:4,4:5,5:6,6:7,7:8})
         if form.exec_():
             self.OnSelectAnimal()
-            
+    
+    def OnRelancesAnimal(self):
+        new=[0,self.idAnimal,1,QDate.currentDate(),None,True,'']
+        idRelance=self.MyAnimal.GetLastRelance()
+        model=MyModel('Relance',idRelance,self)
+        if not model.SetNew(new):
+            return
+        data=[['',5,None,60,None,2],[u'Date',10],[u'Type de Relance',4,None,None,u'Editer les types de relance'],[u'Mode de Relance',5,None,60],[u'Remarque',3,200,80],
+              [u'Relance active',2]]
+        form=FormRelances(self.MyAnimal.idAnimal,self.idClient,data,self)
+        form.SetMyModel(model,{1:3,2:2,4:4,5:5})
+        if form.exec_():
+            self.OnSelectAnimal()
+         
     def Mycloseapp(self):
         self.close()
 

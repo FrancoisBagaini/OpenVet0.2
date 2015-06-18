@@ -104,7 +104,7 @@ class GuiConsultation():
         self.parent.pushButton_valider.setEnabled(True)
         self.mapper.toFirst()
         self.parent.toolButton_comment.setToolTip(self.MyConsultation.Fdata(COMMENTAIRE))
-        self.parent.label_Pathologies.setText("<font color=\"blue\">* %s *</font>"%self.MyConsultation.Pathologies.LinePathologies)
+        self.parent.label_Pathologie.setText("<font color=\"blue\">* %s *</font>"%self.MyConsultation.Pathologies.LinePathologies)
 #         if self.MyConsultation.Pathologies.Count()<=1:
 #             self.parent.label_Pathologie.setMaximumWidth(81)
 #             self.parent.label_Pathologie.setText(QtCore.QString(u'Pathologie'))
@@ -162,7 +162,7 @@ class GuiConsultation():
         self.parent.comboBox_Pathologie.setModel(MyComboModel(self.parent,'SelectPathologies(%i,%i)'%(self.idEspece, self.parent.comboBox_PathologieDomaine.Getid())))
         
     def OnPathologieEnter(self):
-        self.parent.label_Pathologies.setText("<font color=\"blue\">%s</font>"%self.MyConsultation.Pathologies.Add(self.parent.comboBox_Pathologie.Getid()))
+        self.parent.label_Pathologie.setText("<font color=\"blue\">%s</font>"%self.MyConsultation.Pathologies.Add(self.parent.comboBox_Pathologie.Getid()))
 
     def EditDomaine(self):
         idDomaine=self.parent.comboBox_PathologieDomaine.Getid()
