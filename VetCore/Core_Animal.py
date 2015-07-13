@@ -17,7 +17,14 @@ class Animal(MyModel):
         
     def GetAbstract(self):
         self.Abstract=self.MyRequest.GetLineModel('CALL GetAnimal_short(%i)'%self.idAnimal)
-        return self.Abstract[0].toString()
+        text=self.Abstract[0].toString()
+        vaccins=self.MyRequest.GetLines('CALL GetLastVaccins(%i)'%self.idAnimal)
+        for i in vaccins:
+            if i[1].toInt()[0]:
+                text="""%s<br><font color=\"red\">%s</font>"""%(text,i[0].toString())
+            else:
+                text="%s<br>%s"%(text,i[0].toString())
+        return text
     
     def GetLastMesure(self):
         ret=self.MyRequest.GetInt('CALL GetLastMesure(%i)'%self.idAnimal)

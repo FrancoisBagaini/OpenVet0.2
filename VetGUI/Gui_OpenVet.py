@@ -3,6 +3,7 @@
 import sys
 from PyQt4 import QtCore, QtGui,QtSql
 #from PySide import QtCore, QtGui
+sys.path.append('../VetCore')
 import config
 import math
 from ui_Form_openvet import Ui_MainWindow
@@ -83,14 +84,14 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         #splitter.setStretchFactor to 1:3
     
     def OnEditAnimal(self):
-        new=[0,'',0,0,False,'','',None,0,None,'',True,False,False,True,'']#date par défaut
+        new=[0,'',0,0,False,0,'',None,0,None,QDate.currentDate(),None,None,True,False,False,True,'']#date par défaut
         model=MyModel('Animal',self.idAnimal,self)
         if not model.SetNew(new):
             return
-        data=[[u'Nom',1,60],[u'Espèce',4,None,None,u'Editer les unités espèces'],[u'Race',4,None,None,u'Editer les races'],[u'Croisement',2],[u'robe',4],[u'Sexe',4],
-              [u'Date de naissance',10],[u'Stérilisation',2],[u'Identification',1,14],[u'Remarque',3,200,80],[u'Relances',2],[u'Perdu',2],[u'Décès',2]]
+        data=[[u'Nom',1,60],[u'Espèce',4,None,None,u'Editer les espèces'],[u'Race',4,None,None,u'Editer les races'],[u'Croisement',2],[u'robe',4],[u'Sexe',4],
+              [u'Date de naissance',10],[u'Stérilisation',2],[u'Identification',1,14],[u'Date d\'identification',10],[u'No de Passeport',1,20],[u'Remarque',3,200,80],[u'Relances',2],[u'Perdu',2],[u'Décès',2]]
         form=FormAnimal(self.idEspece,data,self)
-        form.SetMyModel(model,{0:1,1:2,2:3,3:4,4:5,5:6,6:7,7:8,8:9,9:10,10:11,11:12,12:13})
+        form.SetMyModel(model,{0:1,1:2,2:3,3:4,4:5,5:6,6:7,7:8,8:9,9:10,10:11,11:12,12:13,13:14,14:15})
         if form.exec_():
             self.OnSelectAnimal()
 

@@ -1,5 +1,4 @@
 # -*- coding: utf8 -*-
-#import Tables
 import time
 from PyQt4 import QtCore
 from PyQt4.QtGui import *

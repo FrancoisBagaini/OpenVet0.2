@@ -60,10 +60,10 @@ class MyComboBox(QComboBox):
 	# on model change, update the models of the filter and completer as well 
 	def setModel(self, model,isCompleter=False):
 		super(MyComboBox,self).setModel(model)
-		if self.count()<10:
-			self.showPopup ()
-		else:
-			self.hidePopup ()
+# 		if self.count()<10:
+# 			self.showPopup ()
+# 		else:
+# 			self.hidePopup ()
 		if isCompleter:
 			self.pFilterModel.setSourceModel(model)
 			self.completer.setModel(self.pFilterModel)
@@ -103,6 +103,14 @@ class MyComboBox(QComboBox):
 		else:
 			self.setCurrentIndex(index[0])
 	
+	def SetValue(self,value):
+		#value is QString(u'mystring') format
+		index=[i for i,j in enumerate(self.model().listdata) if value==j[1]]
+		if len(index)==0:
+			self.setCurrentIndex(0)
+		else:
+			self.setCurrentIndex(index[0])
+			
 	def Getid(self):
 		return self.itemData(self.currentIndex(),Qt.UserRole).toInt()[0]
 	
@@ -178,6 +186,8 @@ class MyTableView(QTableView):
 		return QSize(self.size().width(),5*self.rowHeight(0)+self.horizontalHeader().height()+self.horizontalScrollBar().height())
 	
 	def sizeHint(self):
+		if self.model() is None:
+			return QSize(self.size().width(),self.size().height())
 		height=(self.model().rowCount()+1)*self.rowHeight(0)+self.horizontalHeader().height()
 		if not self.horizontalScrollBar().isHidden():
 			height+=self.horizontalScrollBar().height()

@@ -3,7 +3,7 @@
 import sys
 from PyQt4 import QtCore, QtGui
 #from PySide import QtCore, QtGui
-sys.path.append('../VetCore')
+#sys.path.append('../VetCore')
 
 import time
 #import config

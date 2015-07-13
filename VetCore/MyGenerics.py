@@ -21,12 +21,13 @@ class MyComboModel(QAbstractListModel):     #Convient aussi pour QListView
         self.error=None
         self.isEditable=False
         self.dirty=False
+        self.listdata = []
         if routine is None:
             self.Routine=QString('')
         else:
             if isinstance(routine,str):
                 self.Routine=routine
-                self.listdata = self.MyRequest.GetComboList('CALL %s'%self.Routine,firstField )
+                self.listdata = self.MyRequest.GetComboList('CALL %s'%self.Routine,firstField ) 
                 if self.MyRequest.lastError().isValid():
                     self.error=self.MyRequest.lastError().text()
                     MyError(parentwidget,self.error)
@@ -36,12 +37,16 @@ class MyComboModel(QAbstractListModel):     #Convient aussi pour QListView
     def Set(self,routine=None,firstField=None):
         if not routine is None:
             self.Routine=routine
+            self.beginResetModel ()
             self.listdata = self.MyRequest.GetComboList('CALL %s'%self.Routine,firstField )
+            self.endResetModel ()
             if self.MyRequest.lastError().isValid():
                 self.error=self.MyRequest.lastError().text()
+                MyError(self.ParentWidget,self.error)
         else:
-            self.listdata = []
-        
+            self.beginResetModel ()
+            self.listdata = []   
+            self.endResetModel ()  
                 
     def rowCount(self,parent=QModelIndex()): 
         return len(self.listdata)
@@ -129,7 +134,10 @@ class MyComboModel(QAbstractListModel):     #Convient aussi pour QListView
     def DeleteLine(self,index):
         self.dirty = True
         self.setData(index, 1, 33)
-           
+    
+    def DeleteLine_hard(self,index):   
+        self.listdata.pop(index)
+        
     def GetIndex(self,currentid):
         res=[i for i in self.listdata if i[0]==currentid]
         if len(res)==0:
@@ -938,7 +946,7 @@ class GenericDelegate(QItemDelegate):
             self.insertColumnDelegate(column, ComboboxColumnDelegate())
         elif field.Type=='text' or 'varchar' in field.Type:
             self.insertColumnDelegate(column, PlainTextColumnDelegate())
-        elif field.Type=='datetime':
+        elif field.Type=='datetime' or 'date':
             self.insertColumnDelegate(column, DateColumnDelegate())
         elif 'decimal' in field.Type:
             self.insertColumnDelegate(column, FloatColumnDelegate(field.NbDecimals))

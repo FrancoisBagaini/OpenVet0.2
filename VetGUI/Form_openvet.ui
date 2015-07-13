@@ -27,7 +27,7 @@
       <x>2</x>
       <y>2</y>
       <width>1076</width>
-      <height>181</height>
+      <height>171</height>
      </rect>
     </property>
     <property name="toolTip">
@@ -71,6 +71,12 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>120</height>
+           </size>
           </property>
           <property name="baseSize">
            <size>
@@ -251,6 +257,12 @@
         </item>
         <item>
          <widget class="QFrame" name="frame_animal">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>120</height>
+           </size>
+          </property>
           <property name="baseSize">
            <size>
             <width>520</width>
@@ -336,35 +348,6 @@
                 </spacer>
                </item>
                <item>
-                <widget class="QToolButton" name="toolButton_Relance">
-                 <property name="minimumSize">
-                  <size>
-                   <width>30</width>
-                   <height>30</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>30</width>
-                   <height>30</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>...</string>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="resources.qrc">
-                   <normaloff>:/newPrefix/images/relance.png</normaloff>:/newPrefix/images/relance.png</iconset>
-                 </property>
-                 <property name="iconSize">
-                  <size>
-                   <width>36</width>
-                   <height>36</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-               <item>
                 <widget class="QToolButton" name="toolButton_Poids">
                  <property name="minimumSize">
                   <size>
@@ -387,6 +370,35 @@
                  <property name="icon">
                   <iconset resource="resources.qrc">
                    <normaloff>:/newPrefix/images/mesures.png</normaloff>:/newPrefix/images/mesures.png</iconset>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>36</width>
+                   <height>36</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="toolButton_Relance">
+                 <property name="minimumSize">
+                  <size>
+                   <width>30</width>
+                   <height>30</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>30</width>
+                   <height>30</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>...</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="resources.qrc">
+                   <normaloff>:/newPrefix/images/relance.png</normaloff>:/newPrefix/images/relance.png</iconset>
                  </property>
                  <property name="iconSize">
                   <size>
