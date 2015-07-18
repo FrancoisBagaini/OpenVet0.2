@@ -30,6 +30,7 @@ class Vaccination(MyModel):
 #        self.listdata=self.MyRequest.GetLineTable(self.idVaccination)
 
     def SetVaccin(self,idTable):
+        self.idTable=idTable
         if idTable==0:
             self.New()
         else:
@@ -42,6 +43,50 @@ class Vaccination(MyModel):
 
     def GetLot(self,idValence):
         return self.MyRequest.GetInt("CALL GetLots(%i)"%idValence)
+    
+    def Save(self):
+        id=self.idTable
+        #self.BeginTransaction()
+        nid=self.Update()
+        if id==0 or (id>0 and self.MyLots.dirty):
+            if self.MyLots.dirty:
+                self.MyRequest.Execute('CALL CleanLotsVaccination(%i)'%id)
+        #TODO: updaterelational from ComboModel?
+            Lots=Request('LotsVaccination',self.parent)
+            for i in self.MyLots.listdata:
+                data=[QVariant(0),nid,i[0],QVariant(True),QVariant()]
+                self.MyUpdate(Lots,data)
+        #TODO save rappels
+        
+        #if self.lasterror is None: self.CommitTransaction
+        return self.lasterror
+
+    def MyUpdate(self,request,data):
+        values=[]
+        for i in range(request.NbFields):
+            value=data[i]
+            if value.isNull():
+                value=None
+            values.append(value)
+        (err, values) =request.ValidData(values, request.Fields)
+#         print values
+        if len(err) == 0:
+            error = request.Save(values)
+            if error.isValid():
+                self.lasterror=error
+                if self.lasterror.type()==2:
+                    MyError(self.ParentWidget,u'La requête \"%s\" constitue un doublon.'%request.lastQuery())
+                    return QVariant()
+            else:
+                if values[0]=='0':
+                    self.lastid=request.lastID
+                else:
+                    self.lastid=QVariant(int(values[0]))        
+                return self.lastid
+        else:
+            MyError(self.parent,u'Les champs %s sont invalides'%','.join(err))
+            self.lasterror=u'Les champs %s sont invalides'%','.join(err)
+            return -1
 
 class Lot():
     def __init__(self,idLot,parent):

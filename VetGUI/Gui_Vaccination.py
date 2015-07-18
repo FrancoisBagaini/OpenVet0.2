@@ -58,7 +58,8 @@ class GuiVaccination():
     def SetAnimal(self,idEspece,idAnimal):
         self.idEspece=idEspece
         self.idAnimal=idAnimal
-        self.parent.tableView_Vaccins.setModel(MyTableModel(self.parent,3,'GetVaccins(%i)'%self.idAnimal))
+        self.TableVacccinModel=MyTableModel(self.parent,3,'GetVaccins(%i)'%self.idAnimal)
+        self.parent.tableView_Vaccins.setModel(self.TableVacccinModel)
 #        self.parent.tableView_Vaccins.resizeColumnsToContents()
         self.parent.tableView_Vaccins.horizontalHeader().setStretchLastSection(True)
         self.parent.comboBox_valenceRappel.setModel(MyComboModel(self.parent,'GetValences(%i)'%self.idEspece))
@@ -194,4 +195,8 @@ class GuiVaccination():
         self.parent.listView_Rappels.model().DeleteLine_hard(index.row())
         
     def OnSaveVaccin(self):
-        pass
+        self.mapper.submit()
+        if self.MyVaccination.Save() is None:
+            QToolTip.showText(QCursor.pos(),u'Sauvegarde réussie.')
+            self.TableVacccinModel.Set('GetVaccins(%i)'%self.idAnimal)
+        

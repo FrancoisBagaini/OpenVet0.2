@@ -30,9 +30,11 @@ class Request(QSqlQuery):
         self.Fields=None
         self.lastID=None
         self.ParentWidget=parentwidget
+        self.FieldsName=[]
         if not table is None:
             self.GetFields()
             self.FieldsName=[i.Name for i in self.Fields]
+        self.NbFields=len(self.FieldsName)
         
     def SetTable(self,table):
         self.Table=table

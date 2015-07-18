@@ -374,6 +374,20 @@ class MyTableModel(QAbstractTableModel):
         self.dirty = True
         return valid
 
+    def Set(self,routine=None):
+        if not routine is None:
+            self.Routine=routine
+            self.beginResetModel ()
+            self.listdata = self.Myrequest.GetTableList(self.NbCols,'CALL %s' %routine)
+            self.endResetModel ()
+            if self.Myrequest.lastError().isValid():
+                self.error=self.Myrequest.lastError().text()
+                MyError(self.ParentWidget,self.error)
+        else:
+            self.beginResetModel ()
+            self.listdata = []   
+            self.endResetModel ()
+
     def EditItem(self,values,table,maplist,idindex,delindex,parent):
         values[idindex]=QVariant(abs(values[idindex].toInt()[0]))
         model=MyModel(table,0,parent)
